@@ -87,16 +87,25 @@ function HomeContent() {
 
       const res = await api.get('/land', { params });
       
+      // 🛡️ DEFENSIVE CHECK: Handle transition between Old Array API and New Object API
+      // This prevents "This page couldn't load" crashes if Vercel deploys faster than Render
+      const rawData = res.data;
+      const serverData = rawData?.data || (Array.isArray(rawData) ? rawData : []);
+      const serverPages = rawData?.pages || 1;
+      const serverPage = rawData?.page || 1;
+
       if (append) {
-        setProperties(prev => [...prev, ...res.data.data]);
+        setProperties(prev => [...(Array.isArray(prev) ? prev : []), ...serverData]);
       } else {
-        setProperties(res.data.data);
+        setProperties(serverData);
       }
       
-      setTotalPages(res.data.pages);
-      setPage(res.data.page);
-    } catch (error) {
+      setTotalPages(serverPages);
+      setPage(serverPage);
+    } catch (error: any) {
       console.error("Failed to fetch lands:", error);
+      // Fallback to avoid undefined state
+      if (!append) setProperties([]);
     } finally {
       setIsLoading(false);
       setIsFetchingMore(false);

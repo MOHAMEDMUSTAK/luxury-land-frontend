@@ -26,7 +26,8 @@ export default function RecentlyViewed({ activeCategory }: RecentlyViewedProps) 
         ? `/land/recently-viewed?category=${activeCategory}`
         : "/land/recently-viewed";
       const res = await api.get(url);
-      setItems(res.data);
+      const serverData = res.data?.data || (Array.isArray(res.data) ? res.data : []);
+      setItems(serverData);
     } catch (err) {
       console.error("Failed to fetch history:", err);
     } finally {
