@@ -53,10 +53,10 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
   const { addProperty, removeProperty, isInCompare } = useCompareStore();
   const { user } = useAuthStore();
   
-  const propertyId = property._id || property.id;
-  const isWishlisted = hasItem(propertyId as string);
-  const isCompared = isInCompare(propertyId as string);
-
+  const propertyId = String(property._id || property.id);
+  const isWishlisted = hasItem(propertyId);
+  const isCompared = isInCompare(propertyId);
+  
   const handleToggleCompare = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();

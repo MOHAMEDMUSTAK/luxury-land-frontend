@@ -38,17 +38,17 @@ export default function LoginPage() {
         const res = await api.post("/auth/login", { email, password });
         login(
           { 
-            id: res.data.id || res.data._id, 
+            id: String(res.data.id || res.data._id), 
             name: res.data.name, 
             email: res.data.email, 
             profileImage: res.data.profileImage,
             phone: res.data.phone,
             location: res.data.location,
-            role: res.data.role || "user" 
+            role: res.data.role || "user",
+            wishlist: res.data.wishlist || []
           },
           res.data.token
         );
-        useWishlistStore.getState().setItems(res.data.wishlist || []);
         toast.success("Welcome back!", { id: toastId });
         router.replace("/");
       } catch (err: any) {

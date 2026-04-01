@@ -67,7 +67,7 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
 
   if (!property) return notFound();
 
-  const propertyId = property._id || property.id;
+  const propertyId = String(property._id || property.id);
   const isWishlisted = hasItem(propertyId);
 
   // Use ONLY real uploaded images

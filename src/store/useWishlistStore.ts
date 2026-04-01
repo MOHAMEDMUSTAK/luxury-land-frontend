@@ -13,21 +13,26 @@ export const useWishlistStore = create<WishlistStore>()(
   persist(
     (set, get) => ({
       items: [],
-      setItems: (items) => set({ items }),
+      setItems: (items) => set({ items: items.map(id => String(id)) }),
       toggleItem: async (id, userId) => {
         const currentItems = get().items;
+        const stringId = String(id);
         
         // Optimistic UI update
-        if (currentItems.includes(id)) {
-          set({ items: currentItems.filter((i) => i !== id) });
+        if (currentItems.includes(stringId)) {
+          set({ items: currentItems.filter((i) => i !== stringId) });
         } else {
-          set({ items: [...currentItems, id] });
+          set({ items: [...currentItems, stringId] });
         }
 
         // Sync with backend if logged in
         if (userId) {
           try {
-            await api.post(`/auth/wishlist/${id}`);
+            const response = await api.post(`/auth/wishlist/${stringId}`);
+            if (response.data && response.data.wishlist) {
+              // Ensure we use the server's source of truth, and strictly stringify
+              set({ items: response.data.wishlist.map((i: any) => String(i)) });
+            }
           } catch (error) {
             console.error("Failed to sync wishlist with server:", error);
             // Revert changes on failure
