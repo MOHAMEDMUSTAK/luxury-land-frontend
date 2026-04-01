@@ -116,88 +116,91 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] bg-white/95 backdrop-blur-xl flex items-center justify-center p-0 md:p-10"
+            className="fixed inset-0 z-[100] bg-white/95 backdrop-blur-xl flex flex-col items-center justify-center p-0"
           >
+            {/* Dark Mode Toggle if needed or just keep white for clarity */}
+            
             {/* Toolbar */}
-            <div className="absolute top-6 right-6 flex items-center gap-3 z-[101]">
-              <button 
-                onClick={() => setIsZoomed(!isZoomed)}
-                className="text-text-secondary hover:text-brand-primary bg-white/80 p-3 rounded-xl transition-all border border-ui-border shadow-sm"
-              >
-                {isZoomed ? <ZoomOut className="w-6 h-6" /> : <ZoomIn className="w-6 h-6" />}
-              </button>
-              <button 
-                onClick={() => {
-                  setIsFullscreen(false);
-                  setIsZoomed(false);
-                }}
-                className="text-text-secondary hover:text-red-500 bg-white/80 p-3 rounded-xl transition-all border border-ui-border shadow-sm"
-              >
-                <X className="w-6 h-6" />
-              </button>
+            <div className="absolute top-6 left-6 right-6 flex items-center justify-between z-[101]">
+               <div className="px-5 py-2.5 bg-white border border-ui-border rounded-full text-text-main font-bold text-sm shadow-sm flex items-center gap-2">
+                <span className="text-brand-primary">{currentIndex + 1}</span>
+                <span className="opacity-20">/</span>
+                <span>{images.length}</span>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <button 
+                  onClick={() => setIsZoomed(!isZoomed)}
+                  className={`p-3 rounded-xl transition-all border shadow-sm ${isZoomed ? "bg-brand-primary text-white border-brand-primary" : "bg-white text-text-secondary border-ui-border"}`}
+                  title="Toggle Zoom"
+                >
+                  {isZoomed ? <ZoomOut className="w-6 h-6" /> : <ZoomIn className="w-6 h-6" />}
+                </button>
+                <button 
+                  onClick={() => {
+                    setIsFullscreen(false);
+                    setIsZoomed(false);
+                  }}
+                  className="bg-white text-text-secondary hover:text-red-500 p-3 rounded-xl transition-all border border-ui-border shadow-sm"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
             </div>
             
+            {/* Navigation Arrows (Desktop) */}
             <button 
               onClick={(e) => { e.stopPropagation(); handlePrev(); }}
-              className="absolute left-6 top-1/2 -translate-y-1/2 text-text-secondary hover:text-brand-primary transition-all z-[101] p-4 hidden md:block"
+              className="absolute left-6 top-1/2 -translate-y-1/2 text-text-secondary hover:text-brand-primary transition-all z-[101] p-4 hidden md:block bg-white/50 backdrop-blur-md rounded-2xl border border-white/20"
             >
-              <ChevronLeft className="w-12 h-12" />
+              <ChevronLeft className="w-10 h-10" />
             </button>
 
-            <motion.div 
-              className="relative w-full h-full flex items-center justify-center overflow-hidden touch-none"
-              drag="x"
-              dragConstraints={{ left: 0, right: 0 }}
-              dragElastic={0.2}
-              onDragEnd={(e, { offset, velocity }) => {
-                const swipe = swipePower(offset.x, velocity.x);
-                if (swipe < -swipeConfidenceThreshold) {
-                  handleNext();
-                } else if (swipe > swipeConfidenceThreshold) {
-                  handlePrev();
-                }
-              }}
-            >
+            <div className="relative w-full h-[80vh] flex items-center justify-center overflow-hidden">
               <motion.div
                 key={currentIndex}
-                initial={{ opacity: 0, scale: 0.95 }}
+                initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ 
                   opacity: 1, 
-                  scale: isZoomed ? 1.5 : 1,
-                  cursor: isZoomed ? "zoom-out" : "zoom-in"
+                  scale: isZoomed ? 2 : 1,
                 }}
-                transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                className="relative w-full h-full"
-                onClick={() => setIsZoomed(!isZoomed)}
+                drag={isZoomed}
+                dragConstraints={{ left: -1000, right: 1000, top: -1000, bottom: 1000 }}
+                dragElastic={0.1}
+                className={`relative w-full h-full flex items-center justify-center ${isZoomed ? "cursor-grab active:cursor-grabbing" : "cursor-zoom-in"}`}
+                onClick={() => !isZoomed && setIsZoomed(true)}
               >
                 <Image
                   src={images[currentIndex]}
                   alt="Fullscreen main"
                   fill
-                  className={`transition-all duration-300 ${isZoomed ? "object-contain" : "object-contain"}`}
+                  className="object-contain"
                   sizes="100vw"
                   priority
                 />
               </motion.div>
-            </motion.div>
+            </div>
 
             <button 
               onClick={(e) => { e.stopPropagation(); handleNext(); }}
-              className="absolute right-6 top-1/2 -translate-y-1/2 text-text-secondary hover:text-brand-primary transition-all z-[101] p-4 hidden md:block"
+              className="absolute right-6 top-1/2 -translate-y-1/2 text-text-secondary hover:text-brand-primary transition-all z-[101] p-4 hidden md:block bg-white/50 backdrop-blur-md rounded-2xl border border-white/20"
             >
-              <ChevronRight className="w-12 h-12" />
+              <ChevronRight className="w-10 h-10" />
             </button>
             
-            {/* Overlay Counter */}
-            <div className="absolute bottom-10 left-1/2 -translate-x-1/2 px-6 py-2.5 bg-white border border-ui-border rounded-full text-text-main font-bold text-sm shadow-md flex items-center gap-2">
-              <span className="text-brand-primary">{currentIndex + 1}</span>
-              <span className="opacity-20">/</span>
-              <span>{images.length}</span>
-            </div>
-            
-            {/* Mobile Swipe Indicator */}
-            <div className="absolute bottom-24 left-1/2 -translate-x-1/2 text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em] md:hidden opacity-40">
-              Swipe to navigate
+            {/* Mobile Instructions Overlay */}
+            <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4 w-full px-6">
+              <div className="flex gap-2">
+                {images.map((_, i) => (
+                  <div 
+                    key={i} 
+                    className={`h-1.5 rounded-full transition-all duration-300 ${i === currentIndex ? "w-8 bg-brand-primary" : "w-1.5 bg-gray-200"}`} 
+                  />
+                ))}
+              </div>
+              <p className="text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em] opacity-60">
+                {isZoomed ? "Drag to pan your view" : "Pinch or tap to zoom"}
+              </p>
             </div>
           </motion.div>
         )}

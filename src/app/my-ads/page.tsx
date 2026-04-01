@@ -163,12 +163,12 @@ export default function MyAdsPage() {
                             <p className="text-[9px] font-bold text-text-secondary uppercase tracking-widest">Views</p>
                           </div>
                        </div>
-                       <div className="flex items-center gap-2.5">
+                        <div className="flex items-center gap-2.5">
                           <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center border border-gray-100">
                              <Heart className="w-4 h-4 text-red-400" />
                           </div>
                           <div>
-                            <p className="text-text-main font-bold text-xs">24</p>
+                            <p className="text-text-main font-bold text-xs">{ad.wishlistCount || 0}</p>
                             <p className="text-[9px] font-bold text-text-secondary uppercase tracking-widest">Saves</p>
                           </div>
                        </div>
