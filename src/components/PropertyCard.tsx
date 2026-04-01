@@ -67,11 +67,24 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
 
   const handleToggleWishlist = async (e: React.MouseEvent) => {
     e.preventDefault();
-    await toggleItem(propertyId as string, user?.id);
-    if (!isWishlisted) {
-      toast.success("Added to Wishlist");
-    } else {
-      toast("Removed from Wishlist", { icon: "ℹ️" });
+    e.stopPropagation(); // 🚀 FIX: Prevent bubbling to the parent Link (avoids login redirection)
+    
+    if (!user) {
+      return toast.error("Please login to save property", {
+        icon: "🔐",
+        duration: 3000
+      });
+    }
+
+    try {
+      await toggleItem(propertyId as string, user?.id);
+      if (!isWishlisted) {
+        toast.success("Added to Wishlist");
+      } else {
+        toast("Removed from Wishlist", { icon: "ℹ️" });
+      }
+    } catch (err) {
+      toast.error("Failed to update wishlist");
     }
   };
 
