@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ChevronLeft, ChevronRight, Maximize2, ZoomIn, ZoomOut } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, Maximize2, ZoomIn, ZoomOut, RotateCcw } from "lucide-react";
+import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
 interface ImageGalleryProps {
   images: string[];
@@ -12,21 +13,25 @@ interface ImageGalleryProps {
 export default function ImageGallery({ images }: ImageGalleryProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [isZoomed, setIsZoomed] = useState(false);
+
+  // Disable background scroll when fullscreen is active
+  useEffect(() => {
+    if (isFullscreen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isFullscreen]);
 
   const handleNext = () => {
-    setIsZoomed(false);
     setCurrentIndex((prev) => (prev + 1) % images.length);
   };
 
   const handlePrev = () => {
-    setIsZoomed(false);
     setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
-  };
-
-  const swipeConfidenceThreshold = 10000;
-  const swipePower = (offset: number, velocity: number) => {
-    return Math.abs(offset) * velocity;
   };
 
   return (
@@ -97,7 +102,6 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
           <button
             key={idx}
             onClick={() => {
-              setIsZoomed(false);
               setCurrentIndex(idx);
             }}
             className={`relative flex-shrink-0 w-24 h-16 rounded-xl overflow-hidden border-2 transition-all duration-300 ${
@@ -116,89 +120,98 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] bg-white/95 backdrop-blur-xl flex items-center justify-center p-0 md:p-10"
+            className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-sm flex items-center justify-center p-0"
           >
-            {/* Toolbar */}
-            <div className="absolute top-6 right-6 flex items-center gap-3 z-[101]">
-              <button 
-                onClick={() => setIsZoomed(!isZoomed)}
-                className="text-text-secondary hover:text-brand-primary bg-white/80 p-3 rounded-xl transition-all border border-ui-border shadow-sm"
-              >
-                {isZoomed ? <ZoomOut className="w-6 h-6" /> : <ZoomIn className="w-6 h-6" />}
-              </button>
-              <button 
-                onClick={() => {
-                  setIsFullscreen(false);
-                  setIsZoomed(false);
-                }}
-                className="text-text-secondary hover:text-red-500 bg-white/80 p-3 rounded-xl transition-all border border-ui-border shadow-sm"
-              >
-                <X className="w-6 h-6" />
-              </button>
-            </div>
-            
-            <button 
-              onClick={(e) => { e.stopPropagation(); handlePrev(); }}
-              className="absolute left-6 top-1/2 -translate-y-1/2 text-text-secondary hover:text-brand-primary transition-all z-[101] p-4 hidden md:block"
+            <TransformWrapper
+              initialScale={1}
+              minScale={1}
+              maxScale={8}
+              centerOnInit={true}
+              wheel={{ step: 0.1 }}
+              doubleClick={{ disabled: false }}
+              pinch={{ disabled: false }}
             >
-              <ChevronLeft className="w-12 h-12" />
-            </button>
+              {({ zoomIn, zoomOut, resetTransform }) => (
+                <>
+                  {/* Toolbar */}
+                  <div className="absolute top-6 right-6 flex items-center gap-3 z-[101]">
+                    <button 
+                      onClick={() => zoomIn()}
+                      className="text-white hover:bg-white/20 bg-white/10 p-3 rounded-xl transition-all border border-white/10 shadow-lg backdrop-blur-md"
+                      title="Zoom In"
+                    >
+                      <ZoomIn className="w-5 h-5" />
+                    </button>
+                    <button 
+                      onClick={() => zoomOut()}
+                      className="text-white hover:bg-white/20 bg-white/10 p-3 rounded-xl transition-all border border-white/10 shadow-lg backdrop-blur-md"
+                      title="Zoom Out"
+                    >
+                      <ZoomOut className="w-5 h-5" />
+                    </button>
+                    <button 
+                      onClick={() => resetTransform()}
+                      className="text-white hover:bg-white/20 bg-white/10 p-3 rounded-xl transition-all border border-white/10 shadow-lg backdrop-blur-md"
+                      title="Reset"
+                    >
+                      <RotateCcw className="w-5 h-5" />
+                    </button>
+                    <div className="w-px h-6 bg-white/20 mx-1" />
+                    <button 
+                      onClick={() => setIsFullscreen(false)}
+                      className="text-white hover:bg-red-500 bg-white/10 p-3 rounded-xl transition-all border border-white/10 shadow-lg backdrop-blur-md"
+                      title="Close"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+                  
+                  {/* Navigation Arrows (Absolute to screen, not transform) */}
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); handlePrev(); resetTransform(); }}
+                    className="absolute left-6 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-all z-[101] p-4 hidden md:block"
+                  >
+                    <ChevronLeft className="w-12 h-12" />
+                  </button>
 
-            <motion.div 
-              className="relative w-full h-full flex items-center justify-center overflow-hidden touch-none"
-              drag="x"
-              dragConstraints={{ left: 0, right: 0 }}
-              dragElastic={0.2}
-              onDragEnd={(e, { offset, velocity }) => {
-                const swipe = swipePower(offset.x, velocity.x);
-                if (swipe < -swipeConfidenceThreshold) {
-                  handleNext();
-                } else if (swipe > swipeConfidenceThreshold) {
-                  handlePrev();
-                }
-              }}
-            >
-              <motion.div
-                key={currentIndex}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ 
-                  opacity: 1, 
-                  scale: isZoomed ? 1.5 : 1,
-                  cursor: isZoomed ? "zoom-out" : "zoom-in"
-                }}
-                transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                className="relative w-full h-full"
-                onClick={() => setIsZoomed(!isZoomed)}
-              >
-                <Image
-                  src={images[currentIndex]}
-                  alt="Fullscreen main"
-                  fill
-                  className={`transition-all duration-300 ${isZoomed ? "object-contain" : "object-contain"}`}
-                  sizes="100vw"
-                  priority
-                />
-              </motion.div>
-            </motion.div>
+                  <TransformComponent
+                    wrapperClass="!w-screen !h-screen"
+                    contentClass="!w-screen !h-screen flex items-center justify-center"
+                  >
+                    <div className="relative w-full h-full flex items-center justify-center p-4">
+                      <Image
+                        src={images[currentIndex]}
+                        alt="Fullscreen main"
+                        fill
+                        className="object-contain select-none"
+                        sizes="100vw"
+                        priority
+                        draggable={false}
+                      />
+                    </div>
+                  </TransformComponent>
 
-            <button 
-              onClick={(e) => { e.stopPropagation(); handleNext(); }}
-              className="absolute right-6 top-1/2 -translate-y-1/2 text-text-secondary hover:text-brand-primary transition-all z-[101] p-4 hidden md:block"
-            >
-              <ChevronRight className="w-12 h-12" />
-            </button>
-            
-            {/* Overlay Counter */}
-            <div className="absolute bottom-10 left-1/2 -translate-x-1/2 px-6 py-2.5 bg-white border border-ui-border rounded-full text-text-main font-bold text-sm shadow-md flex items-center gap-2">
-              <span className="text-brand-primary">{currentIndex + 1}</span>
-              <span className="opacity-20">/</span>
-              <span>{images.length}</span>
-            </div>
-            
-            {/* Mobile Swipe Indicator */}
-            <div className="absolute bottom-24 left-1/2 -translate-x-1/2 text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em] md:hidden opacity-40">
-              Swipe to navigate
-            </div>
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); handleNext(); resetTransform(); }}
+                    className="absolute right-6 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-all z-[101] p-4 hidden md:block"
+                  >
+                    <ChevronRight className="w-12 h-12" />
+                  </button>
+                  
+                  {/* Overlay Counter */}
+                  <div className="absolute bottom-10 left-1/2 -translate-x-1/2 px-6 py-2.5 bg-white/10 backdrop-blur-md border border-white/10 rounded-full text-white font-bold text-sm shadow-xl flex items-center gap-2">
+                    <span className="text-brand-primary">{currentIndex + 1}</span>
+                    <span className="opacity-20">/</span>
+                    <span>{images.length}</span>
+                  </div>
+                  
+                  {/* Mobile Hints */}
+                  <div className="absolute bottom-24 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 md:hidden pointer-events-none opacity-40">
+                    <p className="text-[10px] font-bold text-white uppercase tracking-[0.2em]">Pinch to zoom</p>
+                  </div>
+                </>
+              )}
+            </TransformWrapper>
           </motion.div>
         )}
       </AnimatePresence>
