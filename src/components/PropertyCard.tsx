@@ -57,7 +57,6 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
 
   const handleToggleCompare = (e: React.MouseEvent) => {
     e.preventDefault();
-    e.stopPropagation(); // 🚀 FIX: Prevent bubbling to parent Link
     if (isCompared) {
       removeProperty(propertyId as string);
       toast("Removed from Compare", { icon: "ℹ️" });
@@ -68,24 +67,11 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
 
   const handleToggleWishlist = async (e: React.MouseEvent) => {
     e.preventDefault();
-    e.stopPropagation(); // 🚀 FIX: Prevent bubbling to the parent Link (avoids login redirection)
-    
-    if (!user) {
-      return toast.error("Please login to save property", {
-        icon: "🔐",
-        duration: 3000
-      });
-    }
-
-    try {
-      await toggleItem(propertyId as string, user?.id);
-      if (!isWishlisted) {
-        toast.success("Added to Wishlist");
-      } else {
-        toast("Removed from Wishlist", { icon: "ℹ️" });
-      }
-    } catch (err) {
-      toast.error("Failed to update wishlist");
+    await toggleItem(propertyId as string, user?.id);
+    if (!isWishlisted) {
+      toast.success("Added to Wishlist");
+    } else {
+      toast("Removed from Wishlist", { icon: "ℹ️" });
     }
   };
 
@@ -101,7 +87,6 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
 
   const handleOpenMap = (e: React.MouseEvent) => {
     e.preventDefault();
-    e.stopPropagation(); // 🚀 FIX: Prevent bubbling to parent Link
     setIsMapOpen(true);
   };
 
