@@ -9,6 +9,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { useNotificationStore } from "@/store/useNotificationStore";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { formatDistanceToNow } from "date-fns";
 
 export default function Navbar() {
@@ -217,9 +218,11 @@ export default function Navbar() {
               >
                 {user?.profileImage ? (
                   <div className="relative w-8.5 h-8.5 rounded-xl overflow-hidden shadow-sm border border-brand-primary/10 group-hover/profile:border-brand-primary/30 transition-colors">
-                    <img 
+                    <Image 
                       src={user.profileImage} 
-                      alt={user.name} 
+                      alt={user.name!} 
+                      width={34}
+                      height={34}
                       className="w-full h-full object-cover"
                     />
                   </div>
@@ -407,7 +410,7 @@ export default function Navbar() {
                 <div className="flex items-center gap-3 pb-4 border-b border-ui-border">
                   {user?.profileImage ? (
                     <div className="w-10 h-10 rounded-xl overflow-hidden border border-brand-primary/10">
-                      <img src={user.profileImage} alt={user.name} className="w-full h-full object-cover" />
+                      <Image src={user.profileImage} alt={user.name!} width={40} height={40} className="w-full h-full object-cover" />
                     </div>
                   ) : (
                     <div className="w-10 h-10 rounded-xl bg-brand-primary flex items-center justify-center text-white font-bold">

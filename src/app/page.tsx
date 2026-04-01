@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useState, useEffect, useCallback, Suspense } from "react";
 import { Filter, ChevronDown, Search, X, SlidersHorizontal, Store, Home as HomeIcon, Landmark, Check as CheckIcon } from "lucide-react";
 import PropertyCard from "@/components/PropertyCard";
@@ -9,7 +10,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import PropertySkeleton from "@/components/PropertySkeleton";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import RecentlyViewed from "@/components/RecentlyViewed";
+
+const RecentlyViewed = dynamic(() => import("@/components/RecentlyViewed"), { 
+  ssr: false,
+  loading: () => <div className="h-40 animate-pulse bg-gray-50 rounded-3xl mt-12" />
+});
 
 function HomeContent() {
   const { t } = useTranslation();
@@ -34,13 +39,21 @@ function HomeContent() {
   const [listingCategory, setListingCategory] = useState("Buy"); // "Buy" | "Rent"
   const [activeChip, setActiveChip] = useState<string | null>(null);
 
+  // Pagination State
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
+
   // Build params and fetch (MODIFIED: Removed auto-collapse from here)
   const fetchProperties = useCallback(async (
-    query: string, sort: string, filters: { minPrice: string; maxPrice: string; type: string; minSize: string; maxSize: string; sizeUnitFilter: string; landType: string; listingCategory: string }
+    query: string, sort: string, filters: { minPrice: string; maxPrice: string; type: string; minSize: string; maxSize: string; sizeUnitFilter: string; landType: string; listingCategory: string },
+    pageNumber: number = 1, append: boolean = false
   ) => {
     try {
-      setIsLoading(true);
-      const params: any = {};
+      if (append) setIsFetchingMore(true);
+      else setIsLoading(true);
+
+      const params: any = { page: pageNumber, limit: 12 };
       
       if (query.trim()) {
         params.search = query.trim();
@@ -63,7 +76,7 @@ function HomeContent() {
       // Map listingCategory to DB schema
       params.listingType = filters.listingCategory === "Rent" ? "rent" : "sale";
 
-      // Map legacy Type dropdown to the new propertyCategory structure
+      // Map legacy Type dropdown
       if (filters.type === "Land" || filters.type === "Plot") {
         params.propertyCategory = "land";
       } else if (filters.type === "House") {
@@ -71,12 +84,22 @@ function HomeContent() {
       } else if (filters.type === "Shop") {
         params.propertyCategory = "shop";
       }
+
       const res = await api.get('/land', { params });
-      setProperties(res.data);
+      
+      if (append) {
+        setProperties(prev => [...prev, ...res.data.data]);
+      } else {
+        setProperties(res.data.data);
+      }
+      
+      setTotalPages(res.data.pages);
+      setPage(res.data.page);
     } catch (error) {
       console.error("Failed to fetch lands:", error);
     } finally {
       setIsLoading(false);
+      setIsFetchingMore(false);
     }
   }, []);
 
@@ -104,10 +127,17 @@ function HomeContent() {
   // This keeps the data fresh while typing without closing the bar
   useEffect(() => {
     const debounce = setTimeout(() => {
-      fetchProperties(searchQuery, activeSort, currentFilters());
+      setPage(1); // Reset page on filter change
+      fetchProperties(searchQuery, activeSort, currentFilters(), 1, false);
     }, 500);
     return () => clearTimeout(debounce);
   }, [searchQuery, activeSort, minPrice, maxPrice, propertyType, minSize, maxSize, sizeUnitFilter, landTypeFilter, listingCategory, fetchProperties, currentFilters]);
+
+  const handleLoadMore = () => {
+    if (page < totalPages) {
+      fetchProperties(searchQuery, activeSort, currentFilters(), page + 1, true);
+    }
+  };
 
   const clearSearch = () => {
     setSearchQuery("");
@@ -427,12 +457,33 @@ function HomeContent() {
                   <button onClick={clearAllFilters} className="mt-4 text-brand-primary font-bold text-sm hover:underline">{t("home.showAll")}</button>
                 </div>
               ) : (
-                <motion.div variants={containerVariants} initial="hidden" animate="visible" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {properties.map((property, i) => (
-                    <motion.div key={property._id || property.id} variants={itemVariants}>
-                      <PropertyCard property={{...property, id: property._id || property.id}} priority={i < 4} />
-                    </motion.div>
-                  ))}
+                <motion.div variants={containerVariants} initial="hidden" animate="visible" className="flex flex-col gap-8">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {properties.map((property, i) => (
+                      <motion.div key={property._id || property.id || i} variants={itemVariants}>
+                        <PropertyCard property={{...property, id: property._id || property.id}} priority={i < 4} />
+                      </motion.div>
+                    ))}
+                  </div>
+
+                  {page < totalPages && (
+                    <div className="flex justify-center pt-8">
+                      <button
+                        onClick={handleLoadMore}
+                        disabled={isFetchingMore}
+                        className="px-12 py-4 bg-white border-2 border-brand-primary text-brand-primary rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-brand-primary hover:text-white transition-all shadow-lg active:scale-95 disabled:opacity-50 disabled:pointer-events-none group"
+                      >
+                        {isFetchingMore ? (
+                          <div className="flex items-center gap-2">
+                            <div className="w-4 h-4 border-2 border-brand-primary border-t-white rounded-full animate-spin" />
+                            Loading...
+                          </div>
+                        ) : (
+                          "Load More Landscapes"
+                        )}
+                      </button>
+                    </div>
+                  )}
                 </motion.div>
               )}
 

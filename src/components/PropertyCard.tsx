@@ -9,9 +9,11 @@ import { useWishlistStore } from "@/store/useWishlistStore";
 import { useCompareStore } from "@/store/useCompareStore";
 import toast from "react-hot-toast";
 import { useAuthStore } from "@/store/useAuthStore";
-import MapModal from "./MapModal";
+import dynamic from "next/dynamic";
 import { motion, useMotionTemplate, useMotionValue } from "framer-motion";
 import { useTranslation } from "react-i18next";
+
+const MapModal = dynamic(() => import("./MapModal"), { ssr: false });
 
 interface PropertyCardProps {
   property: {
@@ -157,7 +159,7 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
               fill
               priority={priority}
               className="object-cover group-hover/card:scale-110 transition-transform duration-[1200ms] ease-out will-change-transform"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             />
           ) : (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-gray-50">

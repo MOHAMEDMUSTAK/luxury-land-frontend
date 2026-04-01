@@ -47,7 +47,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} min-h-full antialiased`}>
+    <html lang="en" className={`${inter.variable} min-h-full antialiased`} data-scroll-behavior="smooth">
       <head>
         <link rel="apple-touch-icon" href="/icon-512.png" />
       </head>
