@@ -48,6 +48,7 @@ interface PropertyCardProps {
 const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) => {
   const { t } = useTranslation();
   const [isMapOpen, setIsMapOpen] = useState(false);
+  const [isWishlisting, setIsWishlisting] = useState(false);
   const { hasItem, toggleItem } = useWishlistStore();
   const { addProperty, removeProperty, isInCompare } = useCompareStore();
   const { user } = useAuthStore();
@@ -68,14 +69,23 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
   const handleToggleWishlist = async (e: React.MouseEvent) => {
     e.preventDefault();
     if (!user) {
-      toast.error("Please login to save properties");
+      toast.error("Please login to save properties", { id: "wishlist-login-prompt" });
       return;
     }
-    await toggleItem(propertyId as string, user?.id);
-    if (!isWishlisted) {
-      toast.success("Added to Wishlist");
-    } else {
-      toast("Removed from Wishlist", { icon: "ℹ️" });
+    if (isWishlisting) return;
+
+    setIsWishlisting(true);
+    try {
+      await toggleItem(propertyId as string, user?.id);
+      if (!isWishlisted) {
+        toast.success("Added to Wishlist");
+      } else {
+        toast("Removed from Wishlist", { icon: "ℹ️" });
+      }
+    } catch (err) {
+      toast.error("Failed to update wishlist");
+    } finally {
+      setIsWishlisting(false);
     }
   };
 
@@ -131,8 +141,9 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
         <div className="absolute -inset-px rounded-2xl opacity-0 transition-opacity duration-500 group-hover/card:opacity-100 z-0 bg-gradient-to-br from-white/20 to-transparent pointer-events-none" />
         
         <button
+          disabled={isWishlisting}
           onClick={handleToggleWishlist}
-          className="absolute top-4 right-4 z-10 w-11 h-11 rounded-2xl bg-white/80 backdrop-blur-xl flex items-center justify-center hover:bg-white transition-all shadow-xl border border-white/40 group/heart active:scale-95"
+          className={`absolute top-4 right-4 z-10 w-11 h-11 rounded-2xl bg-white/80 backdrop-blur-xl flex items-center justify-center hover:bg-white transition-all shadow-xl border border-white/40 group/heart active:scale-95 ${isWishlisting ? "opacity-50 cursor-not-allowed" : ""}`}
           aria-label="Add to Wishlist"
         >
           <Heart

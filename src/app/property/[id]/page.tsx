@@ -182,7 +182,7 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
                     disabled={isWishlisting}
                     onClick={async () => {
                       if (!user) {
-                        toast.error("Please login to save properties");
+                        toast.error("Please login to save properties", { id: "wishlist-login-prompt" });
                         return;
                       }
                       setIsWishlisting(true);
