@@ -48,15 +48,18 @@ interface PropertyCardProps {
 const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) => {
   const { t } = useTranslation();
   const [isMapOpen, setIsMapOpen] = useState(false);
+  const [isWishlisting, setIsWishlisting] = useState(false);
   const { hasItem, toggleItem } = useWishlistStore();
   const { addProperty, removeProperty, isInCompare } = useCompareStore();
   const { user } = useAuthStore();
+  
   const propertyId = property._id || property.id;
   const isWishlisted = hasItem(propertyId as string);
   const isCompared = isInCompare(propertyId as string);
 
   const handleToggleCompare = (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     if (isCompared) {
       removeProperty(propertyId as string);
       toast("Removed from Compare", { icon: "ℹ️" });
@@ -67,11 +70,25 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
 
   const handleToggleWishlist = async (e: React.MouseEvent) => {
     e.preventDefault();
-    await toggleItem(propertyId as string, user?.id);
-    if (!isWishlisted) {
-      toast.success("Added to Wishlist");
-    } else {
-      toast("Removed from Wishlist", { icon: "ℹ️" });
+    e.stopPropagation();
+    
+    if (!user) {
+      toast.error("Please login to save properties", { id: "wishlist-login-prompt" });
+      return;
+    }
+
+    if (isWishlisting) return;
+    
+    setIsWishlisting(true);
+    try {
+      await toggleItem(propertyId as string, user?.id);
+      if (!isWishlisted) {
+        toast.success("Added to Wishlist");
+      } else {
+        toast("Removed from Wishlist", { icon: "ℹ️" });
+      }
+    } finally {
+      setIsWishlisting(false);
     }
   };
 
@@ -138,7 +155,8 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
         
         <button
           onClick={handleToggleWishlist}
-          className="absolute top-4 right-4 z-10 w-11 h-11 rounded-2xl bg-white/80 backdrop-blur-xl flex items-center justify-center hover:bg-white transition-all shadow-xl border border-white/40 group/heart active:scale-95"
+          disabled={isWishlisting}
+          className={`absolute top-4 right-4 z-10 w-11 h-11 rounded-2xl bg-white/80 backdrop-blur-xl flex items-center justify-center hover:bg-white transition-all shadow-xl border border-white/40 group/heart active:scale-95 ${isWishlisting ? 'opacity-50 cursor-not-allowed' : ''}`}
           aria-label="Add to Wishlist"
         >
           <Heart

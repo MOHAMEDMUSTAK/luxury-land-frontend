@@ -5,7 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@/store/useAuthStore";
 import { motion } from "framer-motion";
 
-const PUBLIC_ROUTES = ["/login", "/signup"];
+const PROTECTED_ROUTES = ["/profile", "/dashboard", "/my-ads", "/wishlist"];
 
 export default function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isCheckingAuth } = useAuthStore();
@@ -23,26 +23,26 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
     return () => clearTimeout(timer);
   }, []);
 
-  const isPublic = PUBLIC_ROUTES.some(route => pathname?.startsWith(route));
+  const isProtected = PROTECTED_ROUTES.some(route => pathname?.startsWith(route));
 
   useEffect(() => {
     if (!mounted || isCheckingAuth) return;
 
-    // Decision logic
-    if (!isPublic && !isAuthenticated) {
-      // Trying to access private route while logged out
+    // Decision logic: Only redirect to login if accessing a protected route while NOT authenticated
+    if (isProtected && !isAuthenticated) {
       router.replace("/login");
-    } else if (isPublic && isAuthenticated) {
-      // Trying to access login/signup while logged in
+    } 
+    // Redirect to home if accessing login/signup while already authenticated
+    else if ((pathname === "/login" || pathname === "/signup") && isAuthenticated) {
       router.replace("/");
     }
-  }, [mounted, isCheckingAuth, isAuthenticated, isPublic, router, pathname]);
+  }, [mounted, isCheckingAuth, isAuthenticated, isProtected, router, pathname]);
 
   // Prevent hydration mismatch
   if (!mounted) return null;
 
   // Show loading screen ONLY if we are truly checking auth and it's a private route
-  if (isCheckingAuth && !isPublic) {
+  if (isCheckingAuth && isProtected) {
     return (
       <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-white p-6 text-center">
         <div className="w-16 h-16 relative mb-8">

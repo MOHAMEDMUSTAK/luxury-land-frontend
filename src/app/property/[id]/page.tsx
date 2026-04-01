@@ -74,7 +74,6 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
   const hasImages = property.images && property.images.length > 0;
 
   return (
-    <ProtectedRoute>
     <div className="container mx-auto px-4 py-10 max-w-6xl page-fade-in scroll-smooth">
       <div className="flex flex-col lg:flex-row gap-8">
         
@@ -181,7 +180,12 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
                   <button 
                     disabled={isWishlisting}
                     onClick={async () => {
-                      if (!user) return toast.error("Please login to save");
+                      if (!user) {
+                        toast.error("Please login to save properties", { id: "wishlist-login-prompt" });
+                        return;
+                      }
+
+                      if (isWishlisting) return;
                       setIsWishlisting(true);
                       try {
                         const propertyId = property._id || property.id;
@@ -189,7 +193,7 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
                         
                         await toggleItem(propertyId, user?.id);
                         
-                        // Optimistically update the local view count
+                        // Optimistically update the local view count/state
                         setProperty((prev: any) => ({
                           ...prev,
                           wishlistCount: previouslyWishlisted 
@@ -706,6 +710,5 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
       {/* --- RECENTLY VIEWED (NEW) --- */}
       <RecentlyViewed activeCategory={property?.propertyCategory} />
     </div>
-    </ProtectedRoute>
   );
 }
