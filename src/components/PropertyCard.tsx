@@ -57,6 +57,7 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
 
   const handleToggleCompare = (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation(); // 🚀 FIX: Prevent bubbling to parent Link
     if (isCompared) {
       removeProperty(propertyId as string);
       toast("Removed from Compare", { icon: "ℹ️" });
@@ -100,6 +101,7 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
 
   const handleOpenMap = (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation(); // 🚀 FIX: Prevent bubbling to parent Link
     setIsMapOpen(true);
   };
 
