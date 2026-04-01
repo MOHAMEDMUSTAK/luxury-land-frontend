@@ -5,7 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@/store/useAuthStore";
 import { motion } from "framer-motion";
 
-const PUBLIC_ROUTES = ["/login", "/signup"];
+const PUBLIC_ROUTES = ["/login", "/signup", "/property", "/compare", "/forgot-password", "/reset-password", "/privacy-policy", "/terms-of-service"];
 
 export default function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isCheckingAuth } = useAuthStore();
@@ -23,7 +23,8 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
     return () => clearTimeout(timer);
   }, []);
 
-  const isPublic = PUBLIC_ROUTES.some(route => pathname?.startsWith(route));
+  // Root path ("/") is ALWAYS public. Other routes check the whitelist.
+  const isPublic = pathname === "/" || PUBLIC_ROUTES.some(route => pathname?.startsWith(route));
 
   useEffect(() => {
     if (!mounted || isCheckingAuth) return;
