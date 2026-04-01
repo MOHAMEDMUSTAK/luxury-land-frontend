@@ -29,7 +29,7 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
   const [showPhone, setShowPhone] = useState(false);
   const { hasItem, toggleItem } = useWishlistStore();
   const { properties, addProperty, removeProperty, isInCompare } = useCompareStore();
-  const { user } = useAuthStore();
+  const { user, isAuthenticated, isCheckingAuth } = useAuthStore();
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isMapOpen, setIsMapOpen] = useState(false);
   const [similarProperties, setSimilarProperties] = useState<any[]>([]);
@@ -180,8 +180,10 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
                   <button 
                     disabled={isWishlisting}
                     onClick={async () => {
-                      if (!user) {
-                        toast.error("Please login to save properties", { id: "wishlist-login-prompt" });
+                      if (isCheckingAuth) return;
+                      
+                      if (!isAuthenticated) {
+                        toast.error(t("auth.loginRequired"), { id: "wishlist-login-prompt" });
                         return;
                       }
 

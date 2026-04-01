@@ -4,6 +4,7 @@ import { useState, useRef, memo } from "react";
 import { Heart, MapPin, Maximize2, ImageOff, BarChart2, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { formatCurrency, getTimeOnMarket } from "@/lib/utils";
 import { useWishlistStore } from "@/store/useWishlistStore";
 import { useCompareStore } from "@/store/useCompareStore";
@@ -46,12 +47,13 @@ interface PropertyCardProps {
 }
 
 const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) => {
+  const router = useRouter();
   const { t } = useTranslation();
   const [isMapOpen, setIsMapOpen] = useState(false);
   const [isWishlisting, setIsWishlisting] = useState(false);
   const { hasItem, toggleItem } = useWishlistStore();
   const { addProperty, removeProperty, isInCompare } = useCompareStore();
-  const { user } = useAuthStore();
+  const { user, isAuthenticated, isCheckingAuth } = useAuthStore();
   
   const propertyId = String(property._id || property.id);
   const isWishlisted = hasItem(propertyId);
@@ -72,8 +74,10 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
     e.preventDefault();
     e.stopPropagation();
     
-    if (!user) {
-      toast.error("Please login to save properties", { id: "wishlist-login-prompt" });
+    if (isCheckingAuth) return;
+
+    if (!isAuthenticated) {
+      toast.error(t("auth.loginRequired"), { id: "wishlist-login-prompt" });
       return;
     }
 
@@ -130,7 +134,10 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
 
   return (
     <>
-      <Link href={`/property/${propertyId}`} className="group block h-full">
+      <div 
+        onClick={() => router.push(`/property/${propertyId}`)}
+        className="group block h-full cursor-pointer"
+      >
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -305,7 +312,7 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
           </div>
         </div>
       </motion.div>
-    </Link>
+      </div>
 
     <MapModal
       isOpen={isMapOpen}
