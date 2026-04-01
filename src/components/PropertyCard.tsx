@@ -67,6 +67,10 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
 
   const handleToggleWishlist = async (e: React.MouseEvent) => {
     e.preventDefault();
+    if (!user) {
+      toast.error("Please login to save properties");
+      return;
+    }
     await toggleItem(propertyId as string, user?.id);
     if (!isWishlisted) {
       toast.success("Added to Wishlist");
