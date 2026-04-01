@@ -185,19 +185,19 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
                       setIsWishlisting(true);
                       try {
                         const propertyId = property._id || property.id;
-                        const previouslyWishlisted = isWishlisted;
+                        const wasWishlisted = isWishlisted;
                         
-                        await toggleItem(propertyId, user?.id);
+                        // STRICT SYNC: Update based on real backend response
+                        const newCount = await toggleItem(propertyId, user?.id);
                         
-                        // Optimistically update the local view count
-                        setProperty((prev: any) => ({
-                          ...prev,
-                          wishlistCount: previouslyWishlisted 
-                            ? Math.max(0, (prev.wishlistCount || 1) - 1) 
-                            : (prev.wishlistCount || 0) + 1
-                        }));
+                        if (typeof newCount === 'number') {
+                          setProperty((prev: any) => ({
+                            ...prev,
+                            wishlistCount: newCount
+                          }));
+                        }
 
-                        if (!previouslyWishlisted) {
+                        if (!wasWishlisted) {
                           toast.success("Added to Wishlist");
                         } else {
                           toast("Removed from Wishlist", { icon: "ℹ️" });

@@ -123,18 +123,8 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
         className="premium-card h-full flex flex-col group/card relative"
         onMouseMove={handleMouseMove}
       >
-        <motion.div
-          className="pointer-events-none absolute -inset-px rounded-2xl opacity-0 transition duration-300 group-hover/card:opacity-100 z-0 hidden md:block"
-          style={{
-            background: useMotionTemplate`
-              radial-gradient(
-                450px circle at ${mouseX}px ${mouseY}px,
-                rgba(255, 255, 255, 0.4),
-                transparent 80%
-              )
-            `,
-          }}
-        />
+        {/* Optimized Hover Effect: Use CSS instead of heavy JS-driven gradients if possible, or keep it refined */}
+        <div className="absolute -inset-px rounded-2xl opacity-0 transition-opacity duration-500 group-hover/card:opacity-100 z-0 bg-gradient-to-br from-white/20 to-transparent pointer-events-none" />
         
         <button
           onClick={handleToggleWishlist}
@@ -158,6 +148,7 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
               alt={property.title}
               fill
               priority={priority}
+              loading={priority ? undefined : "lazy"}
               className="object-cover group-hover/card:scale-110 transition-transform duration-[1200ms] ease-out will-change-transform"
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             />
@@ -304,5 +295,13 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
 export default memo(PropertyCard, (prevProps, nextProps) => {
   const prevId = (prevProps.property._id || prevProps.property.id) as string;
   const nextId = (nextProps.property._id || nextProps.property.id) as string;
-  return prevId === nextId && prevProps.priority === nextProps.priority;
+  
+  // Only re-render if core data changes
+  return (
+    prevId === nextId && 
+    prevProps.priority === nextProps.priority &&
+    prevProps.property.status === nextProps.property.status &&
+    prevProps.property.price === nextProps.property.price &&
+    prevProps.property.title === nextProps.property.title
+  );
 });

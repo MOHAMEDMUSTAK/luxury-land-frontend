@@ -145,19 +145,22 @@ function HomeContent() {
 
   // React to URL search param changes
   useEffect(() => {
-    setSearchQuery(urlSearch);
-    fetchProperties(urlSearch, activeSort, currentFilters());
-    if (urlSearch.trim()) setIsSearchActive(true);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [urlSearch]);
+    if (urlSearch) {
+      setSearchQuery(urlSearch);
+      fetchProperties(urlSearch, activeSort, currentFilters());
+      setIsSearchActive(true);
+    }
+  }, [urlSearch, activeSort, currentFilters, fetchProperties]);
 
   // 🚀 UNIFIED DEBOUNCED FETCH (Search, Sort, Filters)
-  // This keeps the data fresh while typing without closing the bar
   useEffect(() => {
+    const filters = currentFilters();
     const debounce = setTimeout(() => {
-      setPage(1); // Reset page on filter change
-      fetchProperties(searchQuery, activeSort, currentFilters(), 1, false);
-    }, 500);
+      // Only fetch if not already fetching from URL or initial load if needed
+      // But standard debounced fetch is the primary source of truth
+      setPage(1); 
+      fetchProperties(searchQuery, activeSort, filters, 1, false);
+    }, 400); 
     return () => clearTimeout(debounce);
   }, [searchQuery, activeSort, minPrice, maxPrice, propertyType, minSize, maxSize, sizeUnitFilter, landTypeFilter, listingCategory, fetchProperties, currentFilters]);
 
