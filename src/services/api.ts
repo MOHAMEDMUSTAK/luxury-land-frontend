@@ -9,9 +9,14 @@ if (typeof window !== "undefined") {
 // Environment variable takes precedence if set
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || defaultAPI;
 
+if (process.env.NODE_ENV === 'production' && !process.env.NEXT_PUBLIC_API_URL) {
+  console.warn("WARNING: NEXT_PUBLIC_API_URL is not set in production. Using fallback.");
+}
+
 export const api = axios.create({
   baseURL: API_BASE_URL,
   timeout: 60000, // Increased to 60 seconds for heavy image uploads
+  withCredentials: true,
 });
 
 // Request Interceptor to add JWT Auth Token and handle Content-Type
