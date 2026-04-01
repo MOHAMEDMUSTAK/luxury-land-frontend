@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ChevronLeft, ChevronRight, Maximize2, ZoomIn, ZoomOut, RotateCcw } from "lucide-react";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+import { useEffect } from "react";
 
 interface ImageGalleryProps {
   images: string[];
@@ -13,8 +14,17 @@ interface ImageGalleryProps {
 export default function ImageGallery({ images }: ImageGalleryProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isZoomed, setIsZoomed] = useState(false);
 
-  // Disable background scroll when fullscreen is active
+  const handleNext = () => {
+    setCurrentIndex((prev) => (prev + 1) % images.length);
+  };
+
+  const handlePrev = () => {
+    setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
+  };
+
+  // Lock body scroll when fullscreen
   useEffect(() => {
     if (isFullscreen) {
       document.body.style.overflow = "hidden";
@@ -26,12 +36,9 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
     };
   }, [isFullscreen]);
 
-  const handleNext = () => {
-    setCurrentIndex((prev) => (prev + 1) % images.length);
-  };
-
-  const handlePrev = () => {
-    setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
+  const swipeConfidenceThreshold = 10000;
+  const swipePower = (offset: number, velocity: number) => {
+    return Math.abs(offset) * velocity;
   };
 
   return (
@@ -97,7 +104,7 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
       </div>
 
       {/* Thumbnails */}
-      <div className="flex gap-3 overflow-x-auto p-1 scrollbar-hide">
+      <div className="flex gap-3 overflow-x-auto p-1 scrollbar-hide no-scrollbar">
         {images.map((img, idx) => (
           <button
             key={idx}
@@ -120,94 +127,113 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-sm flex items-center justify-center p-0"
+            className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-2xl flex items-center justify-center"
           >
             <TransformWrapper
               initialScale={1}
               minScale={1}
-              maxScale={8}
-              centerOnInit={true}
+              maxScale={5}
+              centerOnInit
               wheel={{ step: 0.1 }}
-              doubleClick={{ disabled: false }}
-              pinch={{ disabled: false }}
+              doubleClick={{ mode: "reset" }}
             >
-              {({ zoomIn, zoomOut, resetTransform }) => (
+              {({ zoomIn, zoomOut, resetTransform, ...rest }) => (
                 <>
-                  {/* Toolbar */}
-                  <div className="absolute top-6 right-6 flex items-center gap-3 z-[101]">
-                    <button 
-                      onClick={() => zoomIn()}
-                      className="text-white hover:bg-white/20 bg-white/10 p-3 rounded-xl transition-all border border-white/10 shadow-lg backdrop-blur-md"
-                      title="Zoom In"
-                    >
-                      <ZoomIn className="w-5 h-5" />
-                    </button>
-                    <button 
-                      onClick={() => zoomOut()}
-                      className="text-white hover:bg-white/20 bg-white/10 p-3 rounded-xl transition-all border border-white/10 shadow-lg backdrop-blur-md"
-                      title="Zoom Out"
-                    >
-                      <ZoomOut className="w-5 h-5" />
-                    </button>
-                    <button 
-                      onClick={() => resetTransform()}
-                      className="text-white hover:bg-white/20 bg-white/10 p-3 rounded-xl transition-all border border-white/10 shadow-lg backdrop-blur-md"
-                      title="Reset"
-                    >
-                      <RotateCcw className="w-5 h-5" />
-                    </button>
-                    <div className="w-px h-6 bg-white/20 mx-1" />
-                    <button 
-                      onClick={() => setIsFullscreen(false)}
-                      className="text-white hover:bg-red-500 bg-white/10 p-3 rounded-xl transition-all border border-white/10 shadow-lg backdrop-blur-md"
-                      title="Close"
-                    >
-                      <X className="w-5 h-5" />
-                    </button>
+                  {/* Premium Toolbar */}
+                  <div className="absolute top-0 left-0 right-0 p-6 flex items-center justify-between z-[102] bg-gradient-to-b from-black/50 to-transparent">
+                    <div className="flex items-center gap-4">
+                      <div className="px-4 py-2 bg-white/10 backdrop-blur-md rounded-xl border border-white/10 text-white font-bold text-sm tracking-widest uppercase">
+                        {currentIndex + 1} / {images.length}
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-2">
+                      <button 
+                        onClick={() => zoomIn()}
+                        className="p-3 bg-white/10 hover:bg-white/20 text-white rounded-xl backdrop-blur-md border border-white/10 transition-all active:scale-95"
+                        title="Zoom In"
+                      >
+                        <ZoomIn className="w-5 h-5" />
+                      </button>
+                      <button 
+                        onClick={() => zoomOut()}
+                        className="p-3 bg-white/10 hover:bg-white/20 text-white rounded-xl backdrop-blur-md border border-white/10 transition-all active:scale-95"
+                        title="Zoom Out"
+                      >
+                        <ZoomOut className="w-5 h-5" />
+                      </button>
+                      <button 
+                        onClick={() => resetTransform()}
+                        className="p-3 bg-white/10 hover:bg-white/20 text-white rounded-xl backdrop-blur-md border border-white/10 transition-all active:scale-95"
+                        title="Reset"
+                      >
+                        <RotateCcw className="w-5 h-5" />
+                      </button>
+                      <div className="w-px h-8 bg-white/10 mx-2" />
+                      <button 
+                        onClick={() => setIsFullscreen(false)}
+                        className="p-3 bg-red-500/80 hover:bg-red-500 text-white rounded-xl backdrop-blur-md border border-white/10 transition-all active:scale-95 flex items-center gap-2 shadow-lg"
+                      >
+                        <X className="w-5 h-5" />
+                        <span className="text-xs font-bold uppercase tracking-wider hidden sm:block">Close</span>
+                      </button>
+                    </div>
                   </div>
-                  
-                  {/* Navigation Arrows (Absolute to screen, not transform) */}
+
+                  {/* Desktop Navigation */}
                   <button 
-                    onClick={(e) => { e.stopPropagation(); handlePrev(); resetTransform(); }}
-                    className="absolute left-6 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-all z-[101] p-4 hidden md:block"
+                    onClick={(e) => { e.stopPropagation(); resetTransform(); handlePrev(); }}
+                    className="absolute left-6 top-1/2 -translate-y-1/2 text-white/50 hover:text-white bg-white/5 hover:bg-white/10 p-4 rounded-2xl border border-white/5 backdrop-blur-sm transition-all z-[101] hidden md:block group"
                   >
-                    <ChevronLeft className="w-12 h-12" />
+                    <ChevronLeft className="w-8 h-8 group-hover:-translate-x-1 transition-transform" />
                   </button>
 
-                  <TransformComponent
-                    wrapperClass="!w-screen !h-screen"
-                    contentClass="!w-screen !h-screen flex items-center justify-center"
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); resetTransform(); handleNext(); }}
+                    className="absolute right-6 top-1/2 -translate-y-1/2 text-white/50 hover:text-white bg-white/5 hover:bg-white/10 p-4 rounded-2xl border border-white/5 backdrop-blur-sm transition-all z-[101] hidden md:block group"
                   >
-                    <div className="relative w-full h-full flex items-center justify-center p-4">
-                      <Image
-                        src={images[currentIndex]}
-                        alt="Fullscreen main"
-                        fill
-                        className="object-contain select-none"
-                        sizes="100vw"
-                        priority
-                        draggable={false}
-                      />
+                    <ChevronRight className="w-8 h-8 group-hover:translate-x-1 transition-transform" />
+                  </button>
+
+                  {/* Main Transformable Area */}
+                  <TransformComponent
+                    wrapperClass="!w-screen !h-screen flex items-center justify-center overflow-hidden"
+                    contentClass="!w-fit !h-fit"
+                  >
+                    <div className="relative w-screen h-screen flex items-center justify-center p-4 md:p-20">
+                      <motion.div
+                        key={currentIndex}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 1.1 }}
+                        transition={{ duration: 0.4, ease: "easeOut" }}
+                        className="relative w-full h-full"
+                      >
+                        <Image
+                          src={images[currentIndex]}
+                          alt={`View Image ${currentIndex + 1}`}
+                          fill
+                          className="object-contain pointer-events-none select-none"
+                          sizes="100vw"
+                          priority
+                        />
+                      </motion.div>
                     </div>
                   </TransformComponent>
 
-                  <button 
-                    onClick={(e) => { e.stopPropagation(); handleNext(); resetTransform(); }}
-                    className="absolute right-6 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-all z-[101] p-4 hidden md:block"
-                  >
-                    <ChevronRight className="w-12 h-12" />
-                  </button>
-                  
-                  {/* Overlay Counter */}
-                  <div className="absolute bottom-10 left-1/2 -translate-x-1/2 px-6 py-2.5 bg-white/10 backdrop-blur-md border border-white/10 rounded-full text-white font-bold text-sm shadow-xl flex items-center gap-2">
-                    <span className="text-brand-primary">{currentIndex + 1}</span>
-                    <span className="opacity-20">/</span>
-                    <span>{images.length}</span>
-                  </div>
-                  
-                  {/* Mobile Hints */}
-                  <div className="absolute bottom-24 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 md:hidden pointer-events-none opacity-40">
-                    <p className="text-[10px] font-bold text-white uppercase tracking-[0.2em]">Pinch to zoom</p>
+                  {/* Mobile Instructions / Quick View */}
+                  <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-[102] flex flex-col items-center gap-4 w-full px-6">
+                    <div className="flex items-center gap-3 overflow-x-auto no-scrollbar max-w-full pb-2">
+                       {images.map((_, i) => (
+                         <div 
+                           key={i} 
+                           className={`h-1 rounded-full transition-all duration-300 ${i === currentIndex ? 'w-8 bg-brand-primary' : 'w-2 bg-white/20'}`}
+                         />
+                       ))}
+                    </div>
+                    <p className="text-[10px] font-bold text-white/40 uppercase tracking-[0.3em] md:hidden">
+                      Pinch to zoom • Swipe to navigate
+                    </p>
                   </div>
                 </>
               )}
