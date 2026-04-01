@@ -1,9 +1,11 @@
 "use client";
 
-import { use, useState, useEffect } from "react";
+import dynamic from "next/dynamic";
+import { use, useState, useEffect, useMemo } from "react";
 import { formatCurrency, getTimeOnMarket } from "@/lib/utils";
 import ImageGallery from "@/components/ImageGallery";
-import ChatBox from "@/components/ChatBox";
+const ChatBox = dynamic(() => import("@/components/ChatBox"), { ssr: false });
+const MapModal = dynamic(() => import("@/components/MapModal"), { ssr: false });
 import { MapPin, CheckCircle2, Phone, MessageCircle, Heart, Share2, Ruler, Loader2, Tag, ShieldCheck, ImageOff, Calendar, User, Sparkles, TrendingUp, Navigation, Landmark, Eye, Clock, Edit2, Trash2, BarChart2, Star } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -14,7 +16,6 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { api } from "@/services/api";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
-import MapModal from "@/components/MapModal";
 import { useTranslation } from "react-i18next";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import RecentlyViewed from "@/components/RecentlyViewed";
@@ -42,7 +43,7 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
     window.scrollTo(0, 0);
 
     api.get(`/land/${id}`).then(res => {
-      setProperty(res.data);
+      setProperty(res.data?.data || res.data); // Support both paginated and flat response
       setLoading(false);
     }).catch(err => {
       console.error(err);

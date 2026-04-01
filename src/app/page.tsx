@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useState, useEffect, useCallback, Suspense } from "react";
+import { useState, useEffect, useCallback, Suspense, useMemo } from "react";
 import { Filter, ChevronDown, Search, X, SlidersHorizontal, Store, Home as HomeIcon, Landmark, Check as CheckIcon } from "lucide-react";
 import PropertyCard from "@/components/PropertyCard";
 import { api } from "@/services/api";
@@ -15,6 +15,25 @@ const RecentlyViewed = dynamic(() => import("@/components/RecentlyViewed"), {
   ssr: false,
   loading: () => <div className="h-40 animate-pulse bg-gray-50 rounded-3xl mt-12" />
 });
+
+const containerVariants: any = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+};
+
+const itemVariants: any = {
+  hidden: { opacity: 0, y: 15 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] }
+  }
+};
 
 function HomeContent() {
   const { t } = useTranslation();
@@ -112,17 +131,17 @@ function HomeContent() {
     }
   }, []);
 
-  const executeSearch = () => {
-    if (searchQuery.trim()) {
-      setIsSearchActive(true);
-      fetchProperties(searchQuery, activeSort, currentFilters());
-    }
-  };
-
   // Helper to get current filters
   const currentFilters = useCallback(() => ({
     minPrice, maxPrice, type: propertyType, minSize, maxSize, sizeUnitFilter, landType: landTypeFilter, listingCategory
   }), [minPrice, maxPrice, propertyType, minSize, maxSize, sizeUnitFilter, landTypeFilter, listingCategory]);
+
+  const executeSearch = useCallback(() => {
+    if (searchQuery.trim()) {
+      setIsSearchActive(true);
+      fetchProperties(searchQuery, activeSort, currentFilters());
+    }
+  }, [searchQuery, activeSort, currentFilters, fetchProperties]);
 
   // React to URL search param changes
   useEffect(() => {
@@ -142,19 +161,19 @@ function HomeContent() {
     return () => clearTimeout(debounce);
   }, [searchQuery, activeSort, minPrice, maxPrice, propertyType, minSize, maxSize, sizeUnitFilter, landTypeFilter, listingCategory, fetchProperties, currentFilters]);
 
-  const handleLoadMore = () => {
+  const handleLoadMore = useCallback(() => {
     if (page < totalPages) {
       fetchProperties(searchQuery, activeSort, currentFilters(), page + 1, true);
     }
-  };
+  }, [page, totalPages, searchQuery, activeSort, currentFilters, fetchProperties]);
 
-  const clearSearch = () => {
+  const clearSearch = useCallback(() => {
     setSearchQuery("");
     setIsSearchActive(false);
     fetchProperties("", activeSort, currentFilters());
-  };
+  }, [activeSort, currentFilters, fetchProperties]);
 
-  const clearAllFilters = () => {
+  const clearAllFilters = useCallback(() => {
     setSearchQuery("");
     setIsSearchActive(false);
     setActiveSort("latest");
@@ -168,32 +187,16 @@ function HomeContent() {
     setListingCategory("Buy");
     setActiveChip(null);
     fetchProperties("", "latest", { minPrice: "", maxPrice: "", type: "", minSize: "", maxSize: "", sizeUnitFilter: "sq ft", landType: "", listingCategory: "Buy" });
-  };
+  }, [fetchProperties]);
 
-  const hasActiveFilters = minPrice || maxPrice || propertyType || minSize || maxSize || searchQuery;
+  const hasActiveFilters = !!(minPrice || maxPrice || propertyType || minSize || maxSize || searchQuery);
 
-  const sortLabel = activeSort === "price-low-high" ? t("home.sortBy") + ": Low → High" 
+  const sortLabel = useMemo(() => {
+    return activeSort === "price-low-high" ? t("home.sortBy") + ": Low → High" 
     : activeSort === "price-high-low" ? t("home.sortBy") + ": High → Low" 
     : t("home.sortBy") + ": Latest";
+  }, [activeSort, t]);
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      transition: { duration: 0.5 }
-    }
-  };
 
   return (
     <>
