@@ -44,6 +44,12 @@ export const useWishlistStore = create<WishlistStore>()(
     }),
     {
       name: 'luxuryland-wishlist',
+      onRehydrateStorage: () => (state) => {
+        if (state && state.items) {
+          // Normalize items into strict strings upon rehydration
+          state.setItems(state.items.map(id => String(id)));
+        }
+      }
     }
   )
 );

@@ -59,13 +59,25 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Handle unauthorized explicitly
       if (typeof window !== 'undefined') {
-        const token = localStorage.getItem('luxuryland-auth-token');
-        if (token) {
-          // Only trigger if a token actually existed (avoids looping on initial check)
+        const tokenInLocal = localStorage.getItem('luxuryland-auth-token');
+        const zustandData = localStorage.getItem('luxuryland-auth');
+        let hasAuth = !!tokenInLocal;
+        
+        if (!hasAuth && zustandData) {
+          try {
+            const parsed = JSON.parse(zustandData);
+            hasAuth = !!parsed?.state?.token;
+          } catch(e) {}
+        }
+        
+        // ONLY logout if we actually HAD an authentication session
+        if (hasAuth) {
           import("@/store/useAuthStore").then((mod) => {
-            mod.useAuthStore.getState().logout();
+            const store = mod.useAuthStore.getState();
+            if (store.isAuthenticated) {
+              store.logout();
+            }
           });
         }
       }
