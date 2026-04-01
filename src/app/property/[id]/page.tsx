@@ -181,26 +181,23 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
                   <button 
                     disabled={isWishlisting}
                     onClick={async () => {
-                      if (!user) {
-                        toast.error("Please login to save properties", { id: "wishlist-login-prompt" });
-                        return;
-                      }
+                      if (!user) return toast.error("Please login to save");
                       setIsWishlisting(true);
                       try {
                         const propertyId = property._id || property.id;
-                        const wasWishlisted = isWishlisted;
+                        const previouslyWishlisted = isWishlisted;
                         
-                        // STRICT SYNC: Update based on real backend response
-                        const newCount = await toggleItem(propertyId, user?.id);
+                        await toggleItem(propertyId, user?.id);
                         
-                        if (typeof newCount === 'number') {
-                          setProperty((prev: any) => ({
-                            ...prev,
-                            wishlistCount: newCount
-                          }));
-                        }
+                        // Optimistically update the local view count
+                        setProperty((prev: any) => ({
+                          ...prev,
+                          wishlistCount: previouslyWishlisted 
+                            ? Math.max(0, (prev.wishlistCount || 1) - 1) 
+                            : (prev.wishlistCount || 0) + 1
+                        }));
 
-                        if (!wasWishlisted) {
+                        if (!previouslyWishlisted) {
                           toast.success("Added to Wishlist");
                         } else {
                           toast("Removed from Wishlist", { icon: "ℹ️" });

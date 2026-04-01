@@ -48,7 +48,6 @@ interface PropertyCardProps {
 const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) => {
   const { t } = useTranslation();
   const [isMapOpen, setIsMapOpen] = useState(false);
-  const [isWishlisting, setIsWishlisting] = useState(false);
   const { hasItem, toggleItem } = useWishlistStore();
   const { addProperty, removeProperty, isInCompare } = useCompareStore();
   const { user } = useAuthStore();
@@ -68,24 +67,11 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
 
   const handleToggleWishlist = async (e: React.MouseEvent) => {
     e.preventDefault();
-    if (!user) {
-      toast.error("Please login to save properties", { id: "wishlist-login-prompt" });
-      return;
-    }
-    if (isWishlisting) return;
-
-    setIsWishlisting(true);
-    try {
-      await toggleItem(propertyId as string, user?.id);
-      if (!isWishlisted) {
-        toast.success("Added to Wishlist");
-      } else {
-        toast("Removed from Wishlist", { icon: "ℹ️" });
-      }
-    } catch (err) {
-      toast.error("Failed to update wishlist");
-    } finally {
-      setIsWishlisting(false);
+    await toggleItem(propertyId as string, user?.id);
+    if (!isWishlisted) {
+      toast.success("Added to Wishlist");
+    } else {
+      toast("Removed from Wishlist", { icon: "ℹ️" });
     }
   };
 
@@ -137,13 +123,22 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
         className="premium-card h-full flex flex-col group/card relative"
         onMouseMove={handleMouseMove}
       >
-        {/* Optimized Hover Effect: Use CSS instead of heavy JS-driven gradients if possible, or keep it refined */}
-        <div className="absolute -inset-px rounded-2xl opacity-0 transition-opacity duration-500 group-hover/card:opacity-100 z-0 bg-gradient-to-br from-white/20 to-transparent pointer-events-none" />
+        <motion.div
+          className="pointer-events-none absolute -inset-px rounded-2xl opacity-0 transition duration-300 group-hover/card:opacity-100 z-0 hidden md:block"
+          style={{
+            background: useMotionTemplate`
+              radial-gradient(
+                450px circle at ${mouseX}px ${mouseY}px,
+                rgba(255, 255, 255, 0.4),
+                transparent 80%
+              )
+            `,
+          }}
+        />
         
         <button
-          disabled={isWishlisting}
           onClick={handleToggleWishlist}
-          className={`absolute top-4 right-4 z-10 w-11 h-11 rounded-2xl bg-white/80 backdrop-blur-xl flex items-center justify-center hover:bg-white transition-all shadow-xl border border-white/40 group/heart active:scale-95 ${isWishlisting ? "opacity-50 cursor-not-allowed" : ""}`}
+          className="absolute top-4 right-4 z-10 w-11 h-11 rounded-2xl bg-white/80 backdrop-blur-xl flex items-center justify-center hover:bg-white transition-all shadow-xl border border-white/40 group/heart active:scale-95"
           aria-label="Add to Wishlist"
         >
           <Heart
@@ -163,7 +158,6 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
               alt={property.title}
               fill
               priority={priority}
-              loading={priority ? undefined : "lazy"}
               className="object-cover group-hover/card:scale-110 transition-transform duration-[1200ms] ease-out will-change-transform"
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             />
@@ -310,13 +304,5 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
 export default memo(PropertyCard, (prevProps, nextProps) => {
   const prevId = (prevProps.property._id || prevProps.property.id) as string;
   const nextId = (nextProps.property._id || nextProps.property.id) as string;
-  
-  // Only re-render if core data changes
-  return (
-    prevId === nextId && 
-    prevProps.priority === nextProps.priority &&
-    prevProps.property.status === nextProps.property.status &&
-    prevProps.property.price === nextProps.property.price &&
-    prevProps.property.title === nextProps.property.title
-  );
+  return prevId === nextId && prevProps.priority === nextProps.priority;
 });
