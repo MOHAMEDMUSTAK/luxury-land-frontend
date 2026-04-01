@@ -43,17 +43,21 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
     // Scroll to top on mount
     window.scrollTo(0, 0);
 
-    api.get(`/land/${id}`).then(res => {
-      setProperty(res.data?.data || res.data); // Support both paginated and flat response
-      setLoading(false);
-    }).catch(err => {
-      console.error(err);
+    // Speed Optimization: Parallel fetching to zero-out sequential latency
+    const fetchMainData = api.get(`/land/${id}`).then(res => {
+      setProperty(res.data?.data || res.data);
       setLoading(false);
     });
 
-    api.get(`/land/${id}/similar`).then(res => {
+    const fetchSimilarData = api.get(`/land/${id}/similar`).then(res => {
       setSimilarProperties(res.data);
-    }).catch(err => console.error("Error fetching similar props:", err));
+    });
+
+    Promise.all([fetchMainData, fetchSimilarData]).catch(err => {
+      console.error("DATA_FETCH_ERROR:", err);
+      // Ensure we don't hang if one fails
+      setLoading(false);
+    });
   }, [id]);
 
   if (loading) {

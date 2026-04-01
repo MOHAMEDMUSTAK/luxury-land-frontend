@@ -99,6 +99,15 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
     mouseY.set(clientY - top);
   }
 
+  const prefetchProperty = () => {
+    if (propertyId) {
+      // Background pre-fetch to warm up backend cache and browser cache
+      import("@/services/api").then(({ api }) => {
+        api.get(`/land/${propertyId}`).catch(() => {});
+      });
+    }
+  };
+
   const getLandTypeIcon = (type: string) => {
     switch (type) {
       case "Nanjai": return "🌾";
@@ -122,6 +131,7 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
         transition={{ duration: 0.5, ease: "easeOut" }}
         className="premium-card h-full flex flex-col group/card relative"
         onMouseMove={handleMouseMove}
+        onMouseEnter={prefetchProperty}
       >
         {/* Optimized Hover Effect: Use CSS instead of heavy JS-driven gradients if possible, or keep it refined */}
         <div className="absolute -inset-px rounded-2xl opacity-0 transition-opacity duration-500 group-hover/card:opacity-100 z-0 bg-gradient-to-br from-white/20 to-transparent pointer-events-none" />
