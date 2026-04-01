@@ -27,7 +27,7 @@ export const useWishlistStore = create<WishlistStore>()(
         // Sync with backend if logged in
         if (userId) {
           try {
-            await api.post(`/auth/wishlist/${id}`, { userId });
+            await api.post(`/auth/wishlist/${id}`);
           } catch (error) {
             console.error("Failed to sync wishlist with server:", error);
             // Revert changes on failure

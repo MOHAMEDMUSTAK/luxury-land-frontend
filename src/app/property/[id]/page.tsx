@@ -37,6 +37,7 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
   const [hoverRating, setHoverRating] = useState(0);
   const [comment, setComment] = useState("");
   const [submittingReview, setSubmittingReview] = useState(false);
+  const [isWishlisting, setIsWishlisting] = useState(false);
 
   useEffect(() => {
     // Scroll to top on mount
@@ -178,8 +179,36 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
                     <BarChart2 className={`w-5 h-5 transition-all duration-300 ${isInCompare(propertyId) ? "text-brand-primary scale-110" : "text-text-secondary group-hover/compare:text-brand-primary"}`} />
                   </button>
                   <button 
-                    onClick={() => toggleItem(propertyId, user?.id)}
-                    className="w-12 h-12 flex items-center justify-center border-2 border-red-500/20 bg-white rounded-2xl shadow-sm hover:shadow-lg hover:border-red-500 hover:scale-110 active:scale-95 transition-all duration-300 group/heart"
+                    disabled={isWishlisting}
+                    onClick={async () => {
+                      if (!user) return toast.error("Please login to save");
+                      setIsWishlisting(true);
+                      try {
+                        const propertyId = property._id || property.id;
+                        const previouslyWishlisted = isWishlisted;
+                        
+                        await toggleItem(propertyId, user?.id);
+                        
+                        // Optimistically update the local view count
+                        setProperty((prev: any) => ({
+                          ...prev,
+                          wishlistCount: previouslyWishlisted 
+                            ? Math.max(0, (prev.wishlistCount || 1) - 1) 
+                            : (prev.wishlistCount || 0) + 1
+                        }));
+
+                        if (!previouslyWishlisted) {
+                          toast.success("Added to Wishlist");
+                        } else {
+                          toast("Removed from Wishlist", { icon: "ℹ️" });
+                        }
+                      } catch (err) {
+                        toast.error("Failed to update wishlist");
+                      } finally {
+                        setIsWishlisting(false);
+                      }
+                    }}
+                    className={`w-12 h-12 flex items-center justify-center border-2 border-red-500/20 bg-white rounded-2xl shadow-sm hover:shadow-lg hover:border-red-500 hover:scale-110 active:scale-95 transition-all duration-300 group/heart ${isWishlisting ? 'opacity-50 cursor-not-allowed' : ''}`}
                   >
                     <Heart className={`w-5 h-5 transition-all duration-300 ${isWishlisted ? "fill-red-500 text-red-500 scale-110" : "text-text-secondary group-hover/heart:text-red-500"}`} />
                   </button>
