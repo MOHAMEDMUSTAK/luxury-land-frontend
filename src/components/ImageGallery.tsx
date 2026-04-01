@@ -116,22 +116,20 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] bg-white/95 backdrop-blur-xl flex flex-col items-center justify-center p-0"
+            className="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center p-0"
           >
-            {/* Dark Mode Toggle if needed or just keep white for clarity */}
-            
             {/* Toolbar */}
-            <div className="absolute top-6 left-6 right-6 flex items-center justify-between z-[101]">
-               <div className="px-5 py-2.5 bg-white border border-ui-border rounded-full text-text-main font-bold text-sm shadow-sm flex items-center gap-2">
-                <span className="text-brand-primary">{currentIndex + 1}</span>
-                <span className="opacity-20">/</span>
-                <span>{images.length}</span>
+            <div className="absolute top-0 left-0 right-0 p-6 flex items-center justify-between z-[101] bg-gradient-to-b from-black/60 to-transparent">
+               <div className="px-5 py-2 bg-white/10 backdrop-blur-md border border-white/10 rounded-full text-white font-bold text-sm flex items-center gap-2">
+                <span className="text-white">{currentIndex + 1}</span>
+                <span className="opacity-40">/</span>
+                <span className="opacity-60">{images.length}</span>
               </div>
 
               <div className="flex items-center gap-3">
                 <button 
                   onClick={() => setIsZoomed(!isZoomed)}
-                  className={`p-3 rounded-xl transition-all border shadow-sm ${isZoomed ? "bg-brand-primary text-white border-brand-primary" : "bg-white text-text-secondary border-ui-border"}`}
+                  className={`p-3 rounded-xl transition-all border shadow-sm ${isZoomed ? "bg-white text-black border-white" : "bg-white/10 text-white border-white/10"}`}
                   title="Toggle Zoom"
                 >
                   {isZoomed ? <ZoomOut className="w-6 h-6" /> : <ZoomIn className="w-6 h-6" />}
@@ -141,7 +139,7 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
                     setIsFullscreen(false);
                     setIsZoomed(false);
                   }}
-                  className="bg-white text-text-secondary hover:text-red-500 p-3 rounded-xl transition-all border border-ui-border shadow-sm"
+                  className="bg-white/10 text-white hover:text-red-500 p-3 rounded-xl transition-all border border-white/10 backdrop-blur-md"
                 >
                   <X className="w-6 h-6" />
                 </button>
@@ -151,21 +149,23 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
             {/* Navigation Arrows (Desktop) */}
             <button 
               onClick={(e) => { e.stopPropagation(); handlePrev(); }}
-              className="absolute left-6 top-1/2 -translate-y-1/2 text-text-secondary hover:text-brand-primary transition-all z-[101] p-4 hidden md:block bg-white/50 backdrop-blur-md rounded-2xl border border-white/20"
+              className="absolute left-6 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-all z-[101] p-4 hidden md:block bg-white/5 flex items-center justify-center rounded-2xl border border-white/5 backdrop-blur-sm"
             >
               <ChevronLeft className="w-10 h-10" />
             </button>
 
-            <div className="relative w-full h-[80vh] flex items-center justify-center overflow-hidden">
+            <div className="relative w-full h-[100dvh] flex items-center justify-center overflow-hidden touch-none">
               <motion.div
                 key={currentIndex}
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ 
                   opacity: 1, 
-                  scale: isZoomed ? 2 : 1,
+                  scale: isZoomed ? 2.5 : 1,
+                  x: 0,
+                  y: 0
                 }}
                 drag={isZoomed}
-                dragConstraints={{ left: -1000, right: 1000, top: -1000, bottom: 1000 }}
+                dragConstraints={{ left: -1500, right: 1500, top: -1500, bottom: 1500 }}
                 dragElastic={0.1}
                 className={`relative w-full h-full flex items-center justify-center ${isZoomed ? "cursor-grab active:cursor-grabbing" : "cursor-zoom-in"}`}
                 onClick={() => !isZoomed && setIsZoomed(true)}
@@ -183,23 +183,24 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
 
             <button 
               onClick={(e) => { e.stopPropagation(); handleNext(); }}
-              className="absolute right-6 top-1/2 -translate-y-1/2 text-text-secondary hover:text-brand-primary transition-all z-[101] p-4 hidden md:block bg-white/50 backdrop-blur-md rounded-2xl border border-white/20"
+              className="absolute right-6 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-all z-[101] p-4 hidden md:block bg-white/5 flex items-center justify-center rounded-2xl border border-white/5 backdrop-blur-sm"
             >
               <ChevronRight className="w-10 h-10" />
             </button>
             
-            {/* Mobile Instructions Overlay */}
+            {/* Mobile Navigation Dots */}
             <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4 w-full px-6">
-              <div className="flex gap-2">
+              <div className="flex gap-2.5">
                 {images.map((_, i) => (
-                  <div 
+                  <button 
                     key={i} 
-                    className={`h-1.5 rounded-full transition-all duration-300 ${i === currentIndex ? "w-8 bg-brand-primary" : "w-1.5 bg-gray-200"}`} 
+                    onClick={() => setCurrentIndex(i)}
+                    className={`h-1.5 rounded-full transition-all duration-300 ${i === currentIndex ? "w-8 bg-white" : "w-1.5 bg-white/20"}`} 
                   />
                 ))}
               </div>
-              <p className="text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em] opacity-60">
-                {isZoomed ? "Drag to pan your view" : "Pinch or tap to zoom"}
+              <p className="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em]">
+                {isZoomed ? "Drag to explore details" : "Tap to zoom • Swipe to navigate"}
               </p>
             </div>
           </motion.div>
