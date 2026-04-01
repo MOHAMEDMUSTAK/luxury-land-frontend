@@ -1,0 +1,88 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Home, Search, Heart, PlusCircle, User } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useUIStore } from "@/store/useUIStore";
+
+export default function MobileBottomNav() {
+  const pathname = usePathname();
+  const { isChatActive } = useUIStore();
+  const [isVisible, setIsVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
+  // Auto-hide logic on scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      // Only hide after 10 pixels of scroll to prevent sensitivity
+      if (Math.abs(currentScrollY - lastScrollY) < 10) return;
+
+      if (currentScrollY > lastScrollY && currentScrollY > 60) {
+        setIsVisible(false); // Scrolling Down
+      } else {
+        setIsVisible(true); // Scrolling Up
+      }
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [lastScrollY]);
+
+  // Hide on chat pages or if a chat modal is active - Moved here to follow hooks rule
+  if (pathname.startsWith('/chat/') || isChatActive) {
+    return null;
+  }
+
+  const navItems = [
+    { label: "Home", icon: Home, path: "/" },
+    { label: "Search", icon: Search, path: "/?focus=true" },
+    { label: "Post", icon: PlusCircle, path: "/my-ads/create" },
+    { label: "Wishlist", icon: Heart, path: "/wishlist" },
+    { label: "My Ads", icon: User, path: "/my-ads" },
+  ];
+
+  return (
+    <AnimatePresence>
+      <motion.div 
+        initial={{ y: 0, x: "-50%", opacity: 1 }}
+        animate={{ 
+          y: isVisible ? 0 : 100, 
+          x: "-50%", 
+          opacity: 1 
+        }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}
+        className="md:hidden fixed left-1/2 z-[40] w-[92%] max-w-[420px] flex items-center justify-between bg-white/70 backdrop-blur-xl border border-white/40 h-16 rounded-full shadow-[0_20px_50px_rgba(0,0,0,0.2)] px-4 overflow-hidden pointer-events-auto"
+        style={{ 
+          bottom: `calc(16px + env(safe-area-inset-bottom))`,
+          transform: `translateX(-50%) translateY(${isVisible ? '0' : '100px'})`
+        }}
+      >
+        {/* Subtle accent line on top */}
+        <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-brand-primary/20 to-transparent" />
+        
+        {navItems.map((item) => {
+          const isActive = pathname === item.path;
+          return (
+            <Link key={item.path} href={item.path} className="relative flex-1 flex flex-col items-center justify-center h-14 rounded-2xl group active:scale-90 transition-all">
+              <item.icon className={`h-5 w-5 transition-all duration-300 ${isActive ? "text-brand-primary scale-110 drop-shadow-[0_0_8px_rgba(37,99,235,0.4)]" : "text-gray-400 group-hover:text-text-main"}`} />
+              
+              {isActive && (
+                <motion.div 
+                  layoutId="activeTab"
+                  className="absolute bottom-2 w-1.5 h-1.5 bg-brand-primary rounded-full shadow-[0_0_10px_rgba(37,99,235,1)]"
+                />
+              )}
+              <span className="sr-only">{item.label}</span>
+            </Link>
+          );
+        })}
+      </motion.div>
+    </AnimatePresence>
+  );
+}
+

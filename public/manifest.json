@@ -1,0 +1,38 @@
+{
+  "name": "LandMarket | Luxury Real Estate",
+  "short_name": "LandApp",
+  "description": "The premier marketplace for luxury real estate and premium land acquisitions.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": ["business", "lifestyle", "shopping"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "My Ads",
+      "url": "/my-ads",
+      "icons": [{ "src": "/icon-512.png", "sizes": "512x512" }]
+    },
+    {
+      "name": "Wishlist",
+      "url": "/wishlist",
+      "icons": [{ "src": "/icon-512.png", "sizes": "512x512" }]
+    }
+  ]
+}
