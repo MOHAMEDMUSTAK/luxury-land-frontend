@@ -20,20 +20,38 @@ import { useTranslation } from "react-i18next";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import RecentlyViewed from "@/components/RecentlyViewed";
 import { requireStrictAuth } from "@/lib/authUtils";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 
 export default function PropertyDetails({ params }: { params: Promise<{ id: string }> }) {
   const { t } = useTranslation();
   const { id } = use(params);
-  const [property, setProperty] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
+  
+  const { data: property, isLoading: loading } = useQuery({
+    queryKey: ['land', id],
+    queryFn: async () => {
+      const res = await api.get(`/land/${id}`);
+      return res.data?.data || res.data;
+    },
+    staleTime: 60 * 1000
+  });
+
+  const { data: similarProperties = [] } = useQuery({
+    queryKey: ['land', id, 'similar'],
+    queryFn: async () => {
+      const res = await api.get(`/land/${id}/similar`);
+      return res.data;
+    },
+    staleTime: 60 * 1000
+  });
+
   const [showPhone, setShowPhone] = useState(false);
   const { hasItem, toggleItem } = useWishlistStore();
-  const { properties, addProperty, removeProperty, isInCompare } = useCompareStore();
+  const { addProperty, removeProperty, isInCompare } = useCompareStore();
   const { user, isAuthenticated, isCheckingAuth } = useAuthStore();
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isMapOpen, setIsMapOpen] = useState(false);
-  const [similarProperties, setSimilarProperties] = useState<any[]>([]);
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [comment, setComment] = useState("");
@@ -43,18 +61,6 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
   useEffect(() => {
     // Scroll to top on mount
     window.scrollTo(0, 0);
-
-    api.get(`/land/${id}`).then(res => {
-      setProperty(res.data?.data || res.data); // Support both paginated and flat response
-      setLoading(false);
-    }).catch(err => {
-      console.error(err);
-      setLoading(false);
-    });
-
-    api.get(`/land/${id}/similar`).then(res => {
-      setSimilarProperties(res.data);
-    }).catch(err => console.error("Error fetching similar props:", err));
   }, [id]);
 
   if (loading) {
@@ -194,19 +200,11 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
                         const previouslyWishlisted = isWishlisted;
                         
                         await toggleItem(propertyId, user?.id);
-                        
-                        // Optimistically update the local view count/state
-                        setProperty((prev: any) => ({
-                          ...prev,
-                          wishlistCount: previouslyWishlisted 
-                            ? Math.max(0, (prev.wishlistCount || 1) - 1) 
-                            : (prev.wishlistCount || 0) + 1
-                        }));
 
                         if (!previouslyWishlisted) {
-                          toast.success("Added to Wishlist");
+                           toast.success("Added to Wishlist");
                         } else {
-                          toast("Removed from Wishlist", { icon: "ℹ️" });
+                           toast("Removed from Wishlist", { icon: "ℹ️" });
                         }
                       } catch (err) {
                         toast.error("Failed to update wishlist");
@@ -613,8 +611,7 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
                     setRating(0);
                     setComment("");
                     // Refresh data
-                    const res = await api.get(`/land/${id}`);
-                    setProperty(res.data);
+                    queryClient.invalidateQueries({ queryKey: ['land', id] });
                   } catch (err: any) {
                     toast.error(err.response?.data?.message || "Failed to submit review");
                   } finally {
@@ -682,7 +679,7 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
           </div>
           
           <div className="flex overflow-x-auto pb-8 gap-6 no-scrollbar -mx-4 px-4 scroll-smooth">
-            {similarProperties.map((sim, i) => (
+            {similarProperties.map((sim: any, i: number) => (
               <div key={i} className="min-w-[300px] md:min-w-[350px]">
                 <Link href={`/property/${sim._id}`} className="block group/sim">
                   <div className="bg-white rounded-3xl border border-ui-border overflow-hidden hover:shadow-xl transition-all duration-500 hover:-translate-y-2">

@@ -84,7 +84,7 @@ export default function Navbar() {
               </div>
               <input
                 autoComplete="off"
-                className="peer block w-full pl-12 pr-4 py-3 bg-white/40 border-2 border-white/60 rounded-2xl leading-5 text-text-main placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-brand-primary/10 focus:border-white focus:bg-white/70 transition-all duration-300 sm:text-sm font-bold shadow-inner"
+                className="navbar-search-input peer block w-full pl-12 pr-4 py-3 bg-white/40 border-2 border-white/60 rounded-2xl leading-5 text-text-main placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-brand-primary/10 focus:border-white focus:bg-white/70 transition-all duration-300 sm:text-sm font-bold shadow-inner"
                 placeholder={mounted ? t("navbar.searchPlaceholder") : "Search..."}
               />
             </form>

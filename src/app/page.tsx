@@ -11,6 +11,7 @@ import { useTranslation } from "react-i18next";
 import PropertySkeleton from "@/components/PropertySkeleton";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { useIntersectionObserver } from "@/lib/useIntersectionObserver";
+import { useQueryClient } from "@tanstack/react-query";
 
 const RecentlyViewed = dynamic(() => import("@/components/RecentlyViewed"), { 
   ssr: false,
@@ -46,6 +47,7 @@ function HomeContent() {
   const [properties, setProperties] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState(urlSearch);
+  const queryClient = useQueryClient();
 
   // Filter/Sort State
   const [activeSort, setActiveSort] = useState("latest");
@@ -105,9 +107,17 @@ function HomeContent() {
         params.propertyCategory = "shop";
       }
 
-      const res = await api.get('/land', { params });
+      const queryKey = ['lands', params];
       
-      const rawData = res.data;
+      const rawData = await queryClient.fetchQuery({
+        queryKey,
+        queryFn: async () => {
+          const res = await api.get('/land', { params });
+          return res.data;
+        },
+        staleTime: 60 * 1000 // Cache for 60 seconds
+      });
+
       const serverData = rawData?.data || (Array.isArray(rawData) ? rawData : []);
       const serverPages = rawData?.pages || 1;
       const serverPage = rawData?.page || 1;
@@ -271,7 +281,7 @@ function HomeContent() {
                           onChange={(e) => setSearchQuery(e.target.value)}
                           onKeyDown={(e) => e.key === 'Enter' && executeSearch()}
                           placeholder="Search lands..."
-                          className="flex-1 min-w-0 bg-transparent border-none text-sm sm:text-base font-bold text-white placeholder-white/25 focus:ring-0 outline-none px-3 sm:px-4 h-12 sm:h-14"
+                          className="hero-search-input flex-1 min-w-0 bg-transparent border-none text-sm sm:text-base font-bold text-white placeholder-white/25 focus:ring-0 outline-none px-3 sm:px-4 h-12 sm:h-14"
                         />
                         {searchQuery && (
                           <button onClick={clearSearch} className="flex-shrink-0 px-2 text-white/30 hover:text-red-400 transition-colors">

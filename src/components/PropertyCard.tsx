@@ -12,6 +12,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 import dynamic from "next/dynamic";
 import { useTranslation } from "react-i18next";
 import { requireStrictAuth } from "@/lib/authUtils";
+import { useQueryClient } from "@tanstack/react-query";
 
 const MapModal = dynamic(() => import("./MapModal"), { ssr: false });
 
@@ -53,6 +54,7 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
   const { hasItem, toggleItem } = useWishlistStore();
   const { addProperty, removeProperty, isInCompare } = useCompareStore();
   const { user, isAuthenticated, isCheckingAuth } = useAuthStore();
+  const queryClient = useQueryClient();
   
   const propertyId = String(property._id || property.id);
   const isWishlisted = hasItem(propertyId);
@@ -118,6 +120,18 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
     router.push(`/property/${propertyId}`);
   }, [router, propertyId, isAuthenticated]);
 
+  const handlePrefetch = useCallback(() => {
+    queryClient.prefetchQuery({
+      queryKey: ['land', propertyId],
+      queryFn: async () => {
+        const { api } = await import("@/services/api");
+        const res = await api.get(`/land/${propertyId}`);
+        return res.data;
+      },
+      staleTime: 60 * 1000
+    });
+  }, [queryClient, propertyId]);
+
   const getLandTypeIcon = (type: string) => {
     switch (type) {
       case "Nanjai": return "🌾";
@@ -134,10 +148,11 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
     <>
       <div 
         onClick={handleNavigate}
+        onMouseEnter={handlePrefetch}
         className="group block h-full cursor-pointer"
       >
       <div 
-        className="premium-card h-full flex flex-col group/card relative"
+        className="premium-card glass-card h-full flex flex-col group/card relative transition-transform duration-300 hover:scale-[1.02]"
       >
         {/* CSS-only spotlight effect — replaces per-card JS mouse tracking */}
         <div className="pointer-events-none absolute -inset-px rounded-3xl opacity-0 transition duration-300 group-hover/card:opacity-100 z-0 hidden md:block bg-[radial-gradient(400px_circle_at_50%_50%,rgba(99,102,241,0.06),transparent_60%)]" />
