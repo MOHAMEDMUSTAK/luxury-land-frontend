@@ -50,7 +50,14 @@ export default function LoginPage() {
           res.data.token
         );
         toast.success("Welcome back!", { id: toastId });
-        router.replace("/");
+        
+        const redirect = localStorage.getItem("redirectAfterLogin");
+        if (redirect) {
+          localStorage.removeItem("redirectAfterLogin");
+          router.replace(redirect);
+        } else {
+          router.replace("/");
+        }
       } catch (err: any) {
         toast.error(err.response?.data?.message || "Invalid credentials.", { id: toastId });
       }

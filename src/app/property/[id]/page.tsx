@@ -19,6 +19,7 @@ import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import RecentlyViewed from "@/components/RecentlyViewed";
+import { requireStrictAuth } from "@/lib/authUtils";
 
 
 export default function PropertyDetails({ params }: { params: Promise<{ id: string }> }) {
@@ -182,8 +183,7 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
                     onClick={async () => {
                       if (isCheckingAuth) return;
                       
-                      if (!isAuthenticated) {
-                        toast.error(t("auth.loginRequired"), { id: "wishlist-login-prompt" });
+                      if (!requireStrictAuth(isAuthenticated, window.location.pathname)) {
                         return;
                       }
 
@@ -465,7 +465,10 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
               ) : (
                 <div className="space-y-3">
                   <button 
-                    onClick={() => setIsChatOpen(true)}
+                    onClick={() => {
+                      if (!requireStrictAuth(isAuthenticated, window.location.pathname)) return;
+                      setIsChatOpen(true);
+                    }}
                     className="w-full flex items-center justify-center gap-2 bg-brand-primary text-white font-bold py-4 rounded-xl hover:bg-brand-primary/90 transition-all shadow-md active:scale-95"
                   >
                     <MessageCircle className="w-5 h-5" />
@@ -550,7 +553,7 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
           <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
             <button 
               onClick={() => {
-                if (!user) return toast.error("Please login to review");
+                if (!requireStrictAuth(isAuthenticated, window.location.pathname)) return;
                 document.getElementById('review-form')?.scrollIntoView({ behavior: 'smooth' });
               }}
               className="px-6 py-3 bg-white border border-brand-primary text-brand-primary font-bold rounded-xl hover:bg-brand-primary/[0.02] transition-all text-sm"

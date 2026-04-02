@@ -11,6 +11,7 @@ import toast from "react-hot-toast";
 import { useAuthStore } from "@/store/useAuthStore";
 import dynamic from "next/dynamic";
 import { useTranslation } from "react-i18next";
+import { requireStrictAuth } from "@/lib/authUtils";
 
 const MapModal = dynamic(() => import("./MapModal"), { ssr: false });
 
@@ -74,8 +75,7 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
     
     if (isCheckingAuth) return;
 
-    if (!isAuthenticated) {
-      toast.error(t("auth.loginRequired"), { id: "wishlist-login-prompt" });
+    if (!requireStrictAuth(isAuthenticated, window.location.pathname)) {
       return;
     }
 
@@ -109,9 +109,14 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
     setIsMapOpen(true);
   }, []);
 
-  const handleNavigate = useCallback(() => {
+  const handleNavigate = useCallback((e: React.MouseEvent) => {
+    // Intercept property views for guests
+    if (!requireStrictAuth(isAuthenticated, `/property/${propertyId}`)) {
+       e.preventDefault();
+       return;
+    }
     router.push(`/property/${propertyId}`);
-  }, [router, propertyId]);
+  }, [router, propertyId, isAuthenticated]);
 
   const getLandTypeIcon = (type: string) => {
     switch (type) {

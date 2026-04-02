@@ -6,10 +6,13 @@ import { usePathname } from "next/navigation";
 import { Home, Search, Heart, PlusCircle, User } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useUIStore } from "@/store/useUIStore";
+import { useAuthStore } from "@/store/useAuthStore";
+import { requireStrictAuth } from "@/lib/authUtils";
 
 export default function MobileBottomNav() {
   const pathname = usePathname();
   const { isChatActive } = useUIStore();
+  const { isAuthenticated } = useAuthStore();
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
 
@@ -41,9 +44,9 @@ export default function MobileBottomNav() {
   const navItems = [
     { label: "Home", icon: Home, path: "/" },
     { label: "Search", icon: Search, path: "/?focus=true" },
-    { label: "Post", icon: PlusCircle, path: "/my-ads/create" },
-    { label: "Wishlist", icon: Heart, path: "/wishlist" },
-    { label: "My Ads", icon: User, path: "/my-ads" },
+    { label: "Post", icon: PlusCircle, path: "/my-ads/create", protected: true },
+    { label: "Wishlist", icon: Heart, path: "/wishlist", protected: true },
+    { label: "My Ads", icon: User, path: "/my-ads", protected: true },
   ];
 
   return (
@@ -68,7 +71,16 @@ export default function MobileBottomNav() {
         {navItems.map((item) => {
           const isActive = pathname === item.path;
           return (
-            <Link key={item.path} href={item.path} className="relative flex-1 flex flex-col items-center justify-center h-14 rounded-2xl group active:scale-90 transition-all">
+            <Link 
+              onClick={(e) => {
+                if (item.protected && !requireStrictAuth(isAuthenticated, item.path)) {
+                  e.preventDefault();
+                }
+              }}
+              key={item.path} 
+              href={item.path} 
+              className="relative flex-1 flex flex-col items-center justify-center h-14 rounded-2xl group active:scale-90 transition-all"
+            >
               <item.icon className={`h-5 w-5 transition-all duration-300 ${isActive ? "text-brand-primary scale-110 drop-shadow-[0_0_8px_rgba(99,102,241,0.5)]" : "text-gray-400 group-hover:text-text-main"}`} />
               
               {isActive && (

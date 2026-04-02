@@ -5,7 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@/store/useAuthStore";
 import { motion } from "framer-motion";
 
-const PROTECTED_ROUTES = ["/profile", "/dashboard", "/my-ads", "/wishlist"];
+const PROTECTED_ROUTES = ["/profile", "/dashboard", "/my-ads", "/property", "/wishlist", "/chat", "/post"];
 
 export default function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isCheckingAuth } = useAuthStore();
