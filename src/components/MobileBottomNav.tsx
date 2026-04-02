@@ -69,12 +69,12 @@ export default function MobileBottomNav() {
           const isActive = pathname === item.path;
           return (
             <Link key={item.path} href={item.path} className="relative flex-1 flex flex-col items-center justify-center h-14 rounded-2xl group active:scale-90 transition-all">
-              <item.icon className={`h-5 w-5 transition-all duration-300 ${isActive ? "text-brand-primary scale-110 drop-shadow-[0_0_8px_rgba(37,99,235,0.4)]" : "text-gray-400 group-hover:text-text-main"}`} />
+              <item.icon className={`h-5 w-5 transition-all duration-300 ${isActive ? "text-brand-primary scale-110 drop-shadow-[0_0_8px_rgba(99,102,241,0.5)]" : "text-gray-400 group-hover:text-text-main"}`} />
               
               {isActive && (
                 <motion.div 
                   layoutId="activeTab"
-                  className="absolute bottom-2 w-1.5 h-1.5 bg-brand-primary rounded-full shadow-[0_0_10px_rgba(37,99,235,1)]"
+                  className="absolute bottom-2 w-1.5 h-1.5 bg-brand-primary rounded-full shadow-[0_0_10px_rgba(99,102,241,1)]"
                 />
               )}
               <span className="sr-only">{item.label}</span>

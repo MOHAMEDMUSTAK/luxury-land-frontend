@@ -50,19 +50,27 @@ export default function RootLayout({
     <html lang="en" className={`${inter.variable} min-h-full antialiased`} data-scroll-behavior="smooth">
       <head>
         <link rel="apple-touch-icon" href="/icon-512.png" />
+        <link rel="dns-prefetch" href="https://res.cloudinary.com" />
+        <link rel="preconnect" href="https://res.cloudinary.com" crossOrigin="anonymous" />
       </head>
       <body className="min-h-full flex flex-col bg-[var(--background)] text-[var(--foreground)] selection:bg-brand-primary/10">
         <Providers>
-          <Toaster position="top-right" />
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              style: {
+                borderRadius: '16px',
+                background: '#fff',
+                color: '#1C1C1E',
+                fontSize: '14px',
+                fontWeight: '600',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.08)',
+                border: '1px solid rgba(0,0,0,0.04)',
+              },
+            }}
+          />
           <PWARegistration />
           <Navbar />
-          
-          {/* Ultra-Luxurious Decorative Orbs */}
-          <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-            <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-brand-primary/10 rounded-full blur-[100px]" />
-            <div className="absolute top-[20%] right-[-10%] w-[40%] h-[60%] bg-brand-secondary/10 rounded-full blur-[120px]" />
-            <div className="absolute bottom-[-20%] left-[10%] w-[60%] h-[50%] bg-brand-gold/10 rounded-full blur-[140px]" />
-          </div>
 
           <main className="flex-1 flex flex-col relative z-10 pb-[160px] md:pb-0">
             <AuthInit>

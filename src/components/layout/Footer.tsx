@@ -8,8 +8,8 @@ export default function Footer() {
   const { t } = useTranslation();
   return (
     <footer className="bg-white border-t border-ui-border pt-20 pb-12 mt-auto relative overflow-hidden">
-      {/* Subtle Background Element */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-px bg-gradient-to-r from-transparent via-ui-border to-transparent" />
+      {/* Premium Accent Line */}
+      <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-brand-primary/40 to-transparent" />
       
       <div className="container mx-auto px-4 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8 items-start">
@@ -17,11 +17,11 @@ export default function Footer() {
           {/* Column 1: Brand (4 cols) */}
           <div className="lg:col-span-4 space-y-6">
             <Link href="/" className="flex items-center gap-3 group">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-primary to-brand-secondary flex items-center justify-center text-white font-black text-xl shadow-lg shadow-brand-primary/20 group-hover:scale-105 transition-transform duration-500">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-primary to-brand-secondary flex items-center justify-center text-white font-black text-xl shadow-lg shadow-brand-primary/25 group-hover:scale-105 transition-transform duration-500">
                 L
               </div>
               <span className="text-2xl font-bold tracking-tight text-text-main">
-                Land<span className="text-brand-secondary">Market</span>
+                <span className="gradient-accent">Land</span><span className="text-brand-secondary">Market</span>
               </span>
             </Link>
             <p className="text-text-secondary text-base leading-relaxed max-w-xs font-medium opacity-80">
@@ -97,7 +97,7 @@ export default function Footer() {
         <div className="mt-20 pt-8 border-t border-ui-border/40 flex flex-col md:flex-row justify-between items-center gap-6 text-[11px] font-bold text-text-secondary uppercase tracking-[0.1em] opacity-60">
           <p>© {new Date().getFullYear()} LuxuryLand. All rights reserved.</p>
           <p className="flex items-center gap-2">
-            Designed for <span className="text-text-main">Excellence</span>
+            Designed for <span className="gradient-accent">Excellence</span>
           </p>
         </div>
       </div>

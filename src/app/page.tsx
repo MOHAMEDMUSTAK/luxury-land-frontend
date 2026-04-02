@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useState, useEffect, useCallback, Suspense, useMemo } from "react";
+import { useState, useEffect, useCallback, Suspense, useMemo, useRef } from "react";
 import { Filter, ChevronDown, Search, X, SlidersHorizontal, Store, Home as HomeIcon, Landmark, Check as CheckIcon } from "lucide-react";
 import PropertyCard from "@/components/PropertyCard";
 import { api } from "@/services/api";
@@ -10,6 +10,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import PropertySkeleton from "@/components/PropertySkeleton";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import { useIntersectionObserver } from "@/lib/useIntersectionObserver";
 
 const RecentlyViewed = dynamic(() => import("@/components/RecentlyViewed"), { 
   ssr: false,
@@ -21,17 +22,17 @@ const containerVariants: any = {
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.1
+      staggerChildren: 0.04
     }
   }
 };
 
 const itemVariants: any = {
-  hidden: { opacity: 0, y: 15 },
+  hidden: { opacity: 0, y: 10 },
   visible: { 
     opacity: 1, 
     y: 0,
-    transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] }
+    transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] }
   }
 };
 
@@ -50,12 +51,12 @@ function HomeContent() {
   const [activeSort, setActiveSort] = useState("latest");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
-  const [propertyType, setPropertyType] = useState(""); // "" = All
+  const [propertyType, setPropertyType] = useState("");
   const [minSize, setMinSize] = useState("");
   const [maxSize, setMaxSize] = useState("");
   const [sizeUnitFilter, setSizeUnitFilter] = useState("sq ft");
-  const [landTypeFilter, setLandTypeFilter] = useState(""); // "" = All
-  const [listingCategory, setListingCategory] = useState("Buy"); // "Buy" | "Rent"
+  const [landTypeFilter, setLandTypeFilter] = useState("");
+  const [listingCategory, setListingCategory] = useState("Buy");
   const [activeChip, setActiveChip] = useState<string | null>(null);
 
   // Pagination State
@@ -63,7 +64,11 @@ function HomeContent() {
   const [totalPages, setTotalPages] = useState(1);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
 
-  // Build params and fetch (MODIFIED: Removed auto-collapse from here)
+  // IntersectionObserver for infinite scroll
+  const [loadMoreRef, isLoadMoreVisible] = useIntersectionObserver({
+    rootMargin: '400px',
+  });
+
   const fetchProperties = useCallback(async (
     query: string, sort: string, filters: { minPrice: string; maxPrice: string; type: string; minSize: string; maxSize: string; sizeUnitFilter: string; landType: string; listingCategory: string },
     pageNumber: number = 1, append: boolean = false
@@ -78,12 +83,10 @@ function HomeContent() {
         params.search = query.trim();
       }
 
-      // Sort mapping
       if (sort === "price-low-high") params.sortBy = "price_asc";
       else if (sort === "price-high-low") params.sortBy = "price_desc";
       else params.sortBy = "latest";
 
-      // Filters
       if (filters.minPrice) params.minPrice = filters.minPrice;
       if (filters.maxPrice) params.maxPrice = filters.maxPrice;
       if (filters.type) params.type = filters.type;
@@ -92,10 +95,8 @@ function HomeContent() {
       params.sizeUnitFilter = filters.sizeUnitFilter;
       if (filters.landType) params.landType = filters.landType;
       
-      // Map listingCategory to DB schema
       params.listingType = filters.listingCategory === "Rent" ? "rent" : "sale";
 
-      // Map legacy Type dropdown
       if (filters.type === "Land" || filters.type === "Plot") {
         params.propertyCategory = "land";
       } else if (filters.type === "House") {
@@ -106,8 +107,6 @@ function HomeContent() {
 
       const res = await api.get('/land', { params });
       
-      // 🛡️ DEFENSIVE CHECK: Handle transition between Old Array API and New Object API
-      // This prevents "This page couldn't load" crashes if Vercel deploys faster than Render
       const rawData = res.data;
       const serverData = rawData?.data || (Array.isArray(rawData) ? rawData : []);
       const serverPages = rawData?.pages || 1;
@@ -123,7 +122,6 @@ function HomeContent() {
       setPage(serverPage);
     } catch (error: any) {
       console.error("Failed to fetch lands:", error);
-      // Fallback to avoid undefined state
       if (!append) setProperties([]);
     } finally {
       setIsLoading(false);
@@ -131,7 +129,6 @@ function HomeContent() {
     }
   }, []);
 
-  // Helper to get current filters
   const currentFilters = useCallback(() => ({
     minPrice, maxPrice, type: propertyType, minSize, maxSize, sizeUnitFilter, landType: landTypeFilter, listingCategory
   }), [minPrice, maxPrice, propertyType, minSize, maxSize, sizeUnitFilter, landTypeFilter, listingCategory]);
@@ -143,7 +140,6 @@ function HomeContent() {
     }
   }, [searchQuery, activeSort, currentFilters, fetchProperties]);
 
-  // React to URL search param changes
   useEffect(() => {
     setSearchQuery(urlSearch);
     fetchProperties(urlSearch, activeSort, currentFilters());
@@ -151,21 +147,26 @@ function HomeContent() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [urlSearch]);
 
-  // 🚀 UNIFIED DEBOUNCED FETCH (Search, Sort, Filters)
-  // This keeps the data fresh while typing without closing the bar
   useEffect(() => {
     const debounce = setTimeout(() => {
-      setPage(1); // Reset page on filter change
+      setPage(1);
       fetchProperties(searchQuery, activeSort, currentFilters(), 1, false);
     }, 500);
     return () => clearTimeout(debounce);
   }, [searchQuery, activeSort, minPrice, maxPrice, propertyType, minSize, maxSize, sizeUnitFilter, landTypeFilter, listingCategory, fetchProperties, currentFilters]);
 
+  // Auto-load more with IntersectionObserver
   const handleLoadMore = useCallback(() => {
-    if (page < totalPages) {
+    if (page < totalPages && !isFetchingMore) {
       fetchProperties(searchQuery, activeSort, currentFilters(), page + 1, true);
     }
-  }, [page, totalPages, searchQuery, activeSort, currentFilters, fetchProperties]);
+  }, [page, totalPages, isFetchingMore, searchQuery, activeSort, currentFilters, fetchProperties]);
+
+  useEffect(() => {
+    if (isLoadMoreVisible && page < totalPages && !isFetchingMore && !isLoading) {
+      handleLoadMore();
+    }
+  }, [isLoadMoreVisible, page, totalPages, isFetchingMore, isLoading, handleLoadMore]);
 
   const clearSearch = useCallback(() => {
     setSearchQuery("");
@@ -197,68 +198,72 @@ function HomeContent() {
     : t("home.sortBy") + ": Latest";
   }, [activeSort, t]);
 
+  const chipOptions = useMemo(() => [
+    { id: 'budget', label: 'Budget Friendly 💰', logic: () => { setMaxPrice("5000000"); setMinPrice(""); } },
+    { id: 'farming', label: 'Best for Farming 🌾', logic: () => { setPropertyType("Land"); setLandTypeFilter("Agricultural"); setMinSize("1"); setSizeUnitFilter("acres"); } },
+    { id: 'investment', label: 'High Investment 📈', logic: () => { setSearchQuery("City"); setPropertyType("Land"); } },
+    { id: 'residential', label: 'Residential Plots 🏡', logic: () => { setPropertyType("Land"); setLandTypeFilter("Residential"); } },
+  ], []);
+
 
   return (
     <>
       <div className="min-h-screen mb-20 page-fade-in relative">
-        {/* 🚀 EPIC CINEMATIC HERO SECTION (FIXED: Added pt-32 to clear Navbar and pt-8 for mobile) */}
-        <section className="relative w-full h-auto min-h-[600px] flex items-center justify-center overflow-hidden mb-16 rounded-b-[3rem] border-b-2 border-white/60 shadow-2xl bg-white/20 backdrop-blur-3xl pt-32 pb-20">
-          {/* Deep mesh backgrounds inside Hero */}
-          <div className="absolute inset-0 pointer-events-none z-0">
-            <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-brand-primary/30 rounded-full blur-[150px]" />
-            <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-brand-gold/20 rounded-full blur-[150px]" />
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white/40" />
-          </div>
-
+        {/* 🌑 DARK CINEMATIC HERO SECTION */}
+        <section className="hero-dark relative w-full min-h-[620px] flex items-center justify-center mb-16 pt-32 pb-24">
+          {/* Grid pattern overlay */}
+          <div className="hero-grid" />
+          {/* Floating particles */}
+          <div className="hero-particles" />
+          
           <div className="relative z-10 w-full max-w-5xl mx-auto px-4 flex flex-col items-center text-center">
-            <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.2, ease: "easeOut" }}>
-              <span className="inline-block py-1.5 px-5 rounded-full bg-white/40 border border-white/80 text-[10px] sm:text-xs font-black tracking-[0.3em] text-brand-primary uppercase mb-8 shadow-sm backdrop-blur-md">
+            <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease: "easeOut" }}>
+              <span className="inline-block py-1.5 px-5 rounded-full bg-white/[0.06] border border-white/10 text-[10px] sm:text-xs font-black tracking-[0.3em] text-indigo-300 uppercase mb-8 backdrop-blur-md">
                 The Pinnacle of Real Estate
               </span>
-              <h1 className="text-4xl sm:text-6xl md:text-8xl font-black text-text-main tracking-tighter leading-[0.9] mb-6 drop-shadow-sm">
+              <h1 className="text-4xl sm:text-6xl md:text-8xl font-black text-white tracking-tighter leading-[0.9] mb-6">
                 Exclusive <br/>
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-primary via-brand-secondary to-brand-gold shimmer-effect inline-block">Landscapes</span>.
+                <span className="gradient-hero-text shimmer-effect inline-block">Landscapes</span>.
               </h1>
-              <p className="text-text-secondary text-sm sm:text-lg md:text-xl font-medium max-w-2xl mx-auto mb-10 leading-relaxed px-2">
+              <p className="text-white/50 text-sm sm:text-lg md:text-xl font-medium max-w-2xl mx-auto mb-10 leading-relaxed px-2">
                 Discover the world's most innovative high-end real estate platform. Find untouched lands and premium properties with an unparalleled user experience.
               </p>
             </motion.div>
 
-            {/* Majestic Floating Search Pill with UI Collapse logic */}
-            <motion.div initial={{ opacity: 0, y: 50, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ duration: 1, delay: 0.3, ease: "easeOut" }} className="w-full max-w-3xl flex flex-col items-center px-0">
+            {/* Search Section */}
+            <motion.div initial={{ opacity: 0, y: 30, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ duration: 0.7, delay: 0.2, ease: "easeOut" }} className="w-full max-w-3xl flex flex-col items-center px-0">
               
               <AnimatePresence mode="wait">
                 {!isSearchActive ? (
-                  /* --- FULL SEARCH BAR (Expanded State) --- */
                   <motion.div 
                     key="full-search"
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20, scale: 0.95 }}
-                    transition={{ duration: 0.4, ease: "circOut" }}
+                    exit={{ opacity: 0, y: -15, scale: 0.95 }}
+                    transition={{ duration: 0.3, ease: "circOut" }}
                     className="w-full flex flex-col items-center"
                   >
-                    {/* Elegant Buy / Rent Toggle */}
-                    <div className="relative flex bg-white/30 backdrop-blur-md p-1.5 rounded-full mb-8 shadow-inner border border-white/40 scale-90 sm:scale-100">
+                    {/* Buy / Rent Toggle */}
+                    <div className="relative flex bg-white/[0.06] backdrop-blur-md p-1.5 rounded-full mb-8 border border-white/10 scale-90 sm:scale-100">
                       <button 
                         onClick={() => setListingCategory("Buy")}
-                        className={`relative z-10 px-8 py-2 rounded-full text-[10px] sm:text-sm font-black tracking-widest uppercase transition-all duration-300 ${listingCategory === "Buy" ? "text-brand-primary" : "text-text-main/70 hover:text-text-main"}`}
+                        className={`relative z-10 px-8 py-2 rounded-full text-[10px] sm:text-sm font-black tracking-widest uppercase transition-all duration-300 ${listingCategory === "Buy" ? "text-white" : "text-white/40 hover:text-white/60"}`}
                       >
                         Buy
                       </button>
                       <button 
                         onClick={() => setListingCategory("Rent")}
-                        className={`relative z-10 px-8 py-2 rounded-full text-[10px] sm:text-sm font-black tracking-widest uppercase transition-all duration-300 ${listingCategory === "Rent" ? "text-brand-primary" : "text-text-main/70 hover:text-text-main"}`}
+                        className={`relative z-10 px-8 py-2 rounded-full text-[10px] sm:text-sm font-black tracking-widest uppercase transition-all duration-300 ${listingCategory === "Rent" ? "text-white" : "text-white/40 hover:text-white/60"}`}
                       >
                         Rent
                       </button>
-                      <div className={`absolute top-1.5 bottom-1.5 w-[calc(50%-6px)] bg-white rounded-full shadow-md transition-all duration-500 ease-in-out ${listingCategory === 'Buy' ? 'left-1.5' : 'left-[calc(50%+4.5px)]'}`}/>
+                      <div className={`absolute top-1.5 bottom-1.5 w-[calc(50%-6px)] bg-gradient-to-r from-brand-primary to-brand-secondary rounded-full shadow-lg shadow-brand-primary/30 transition-all duration-500 ease-in-out ${listingCategory === 'Buy' ? 'left-1.5' : 'left-[calc(50%+4.5px)]'}`}/>
                     </div>
 
                     <div className="w-full max-w-[500px] mx-auto px-4 sm:px-0">
-                      <div className="w-full flex items-center bg-white/80 backdrop-blur-3xl border border-white/80 rounded-full p-1.5 sm:p-2 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.15)] transition-all duration-500 hover:bg-white hover:shadow-[0_40px_80px_-20px_rgba(37,99,235,0.2)] group/hero-search overflow-hidden">
+                      <div className="w-full flex items-center bg-white/[0.08] backdrop-blur-xl border border-white/10 rounded-full p-1.5 sm:p-2 shadow-[0_20px_60px_rgba(0,0,0,0.3)] transition-all duration-500 hover:bg-white/[0.12] hover:border-white/15 group/hero-search overflow-hidden">
                         <div className="pl-4 sm:pl-5 flex-shrink-0">
-                          <Search className="h-5 w-5 text-brand-primary/60 group-focus-within/hero-search:text-brand-primary transition-colors" />
+                          <Search className="h-5 w-5 text-indigo-400/60 group-focus-within/hero-search:text-indigo-300 transition-colors" />
                         </div>
                         <input
                           type="text"
@@ -266,16 +271,16 @@ function HomeContent() {
                           onChange={(e) => setSearchQuery(e.target.value)}
                           onKeyDown={(e) => e.key === 'Enter' && executeSearch()}
                           placeholder="Search lands..."
-                          className="flex-1 min-w-0 bg-transparent border-none text-sm sm:text-base font-bold text-text-main placeholder-text-secondary/40 focus:ring-0 outline-none px-3 sm:px-4 h-12 sm:h-14"
+                          className="flex-1 min-w-0 bg-transparent border-none text-sm sm:text-base font-bold text-white placeholder-white/25 focus:ring-0 outline-none px-3 sm:px-4 h-12 sm:h-14"
                         />
                         {searchQuery && (
-                          <button onClick={clearSearch} className="flex-shrink-0 px-2 text-text-secondary hover:text-red-500 transition-colors">
+                          <button onClick={clearSearch} className="flex-shrink-0 px-2 text-white/30 hover:text-red-400 transition-colors">
                             <X className="w-4 h-4" />
                           </button>
                         )}
                         <button 
                           onClick={executeSearch} 
-                          className="flex-shrink-0 bg-gradient-to-r from-brand-primary to-brand-secondary text-white font-black uppercase tracking-widest text-[10px] sm:text-xs px-5 sm:px-10 py-3.5 sm:py-5 rounded-full shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-300 ml-1 sm:ml-2"
+                          className="flex-shrink-0 btn-hero text-[10px] sm:text-xs px-5 sm:px-10 py-3.5 sm:py-5 rounded-full uppercase tracking-widest font-black ml-1 sm:ml-2"
                         >
                           Explore
                         </button>
@@ -283,14 +288,13 @@ function HomeContent() {
                     </div>
                   </motion.div>
                 ) : (
-                  /* --- SEARCH RESULT SUMMARY (Collapsed State) --- */
                   <motion.div 
                     key="summary-pill"
-                    initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                    initial={{ opacity: 0, y: 15, scale: 0.9 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 20, scale: 0.9 }}
+                    exit={{ opacity: 0, y: 15, scale: 0.9 }}
                     transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                    className="w-fit flex items-center justify-center p-1.5 bg-brand-primary text-white rounded-full shadow-[0_20px_50px_rgba(37,99,235,0.3)] border border-brand-primary/20 backdrop-blur-xl group/summary"
+                    className="w-fit flex items-center justify-center p-1.5 bg-gradient-to-r from-brand-primary to-brand-secondary text-white rounded-full shadow-[0_20px_50px_rgba(99,102,241,0.35)] border border-white/10 backdrop-blur-xl group/summary"
                   >
                     <div className="flex items-center gap-4 pl-6 pr-1.5 py-1.5">
                       <div className="flex flex-col items-start gap-0.5">
@@ -317,14 +321,14 @@ function HomeContent() {
           </div>
         </section>
 
-        {/* Main Content Area */}
+        {/* Main Content Area — LIGHT THEME */}
         <div className="container mx-auto px-4 relative z-20">
           {/* Mobile Filter Toggle */}
           <div className="lg:hidden flex items-center justify-between mb-6">
             <h1 className="text-2xl font-bold text-text-main">{t("home.title")}</h1>
             <button
               onClick={() => setIsMobileFilterOpen(true)}
-              className="flex items-center gap-2 px-4 py-2.5 bg-white/40 backdrop-blur-2xl border-2 border-white/60 rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.06)] text-sm font-bold text-brand-primary active:scale-95 transition-all shadow-inner"
+              className="flex items-center gap-2 px-4 py-2.5 bg-white/80 backdrop-blur-xl border border-ui-border rounded-xl shadow-sm text-sm font-bold text-brand-primary active:scale-95 transition-all"
             >
               <Filter className="w-4 h-4" />
               {t("home.filters")}
@@ -345,7 +349,7 @@ function HomeContent() {
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder="Search lands, cities..."
-                      className="w-full pl-11 pr-11 py-3.5 bg-transparent border-2 border-white/60 rounded-2xl text-sm focus:bg-white/70 focus:border-white focus:ring-4 focus:ring-brand-primary/10 transition-all duration-300 font-bold text-text-main placeholder-text-secondary/60 shadow-inner"
+                      className="w-full pl-11 pr-11 py-3.5 bg-white/60 border border-ui-border rounded-2xl text-sm focus:bg-white focus:border-brand-primary/30 focus:ring-4 focus:ring-brand-primary/10 transition-all duration-300 font-bold text-text-main placeholder-text-secondary/60"
                     />
                     {searchQuery && (
                       <button onClick={clearSearch} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 transition-colors">
@@ -364,7 +368,7 @@ function HomeContent() {
                       { id: "price-low-high", label: "Price: Low → High" },
                       { id: "price-high-low", label: "Price: High → Low" }
                     ].map((sort) => (
-                      <label key={sort.id} className={`flex items-center gap-3 cursor-pointer group/label p-3.5 rounded-2xl transition-all duration-300 border ${activeSort === sort.id ? 'bg-brand-primary/[0.03] border-brand-primary/10 shadow-sm' : 'border-transparent hover:bg-gray-50'}`}>
+                      <label key={sort.id} className={`flex items-center gap-3 cursor-pointer group/label p-3.5 rounded-2xl transition-all duration-300 border ${activeSort === sort.id ? 'bg-brand-primary/[0.04] border-brand-primary/10 shadow-sm' : 'border-transparent hover:bg-gray-50'}`}>
                         <div className="relative w-5 h-5 flex items-center justify-center">
                           <input type="radio" name="sort" value={sort.id} checked={activeSort === sort.id} onChange={() => setActiveSort(sort.id)} className="peer sr-only" />
                           <div className={`w-5 h-5 rounded-full border-2 transition-all duration-300 ${activeSort === sort.id ? 'border-brand-primary border-[6px]' : 'border-gray-200 group-hover/label:border-brand-primary/30'}`} />
@@ -397,7 +401,7 @@ function HomeContent() {
                   <h3 className="text-[11px] font-black text-text-secondary uppercase tracking-[0.2em] mb-4 opacity-60 px-1">{t("home.propertyType")}</h3>
                   <div className="grid grid-cols-2 gap-2">
                     {[{ id: "", label: "All" }, { id: "Land", label: "Land" }, { id: "House", label: "House" }, { id: "Shop", label: "Shop" }].map((type) => (
-                      <button key={type.id} onClick={() => setPropertyType(type.id)} className={`py-2 px-3 rounded-xl text-xs font-bold transition-all border ${propertyType === type.id ? 'bg-brand-primary text-white border-brand-primary shadow-sm' : 'bg-gray-50 text-text-secondary border-transparent hover:bg-gray-100'}`}>
+                      <button key={type.id} onClick={() => setPropertyType(type.id)} className={`py-2 px-3 rounded-xl text-xs font-bold transition-all border ${propertyType === type.id ? 'bg-brand-primary text-white border-brand-primary shadow-sm shadow-brand-primary/20' : 'bg-gray-50 text-text-secondary border-transparent hover:bg-gray-100'}`}>
                         {type.label}
                       </button>
                     ))}
@@ -441,16 +445,11 @@ function HomeContent() {
 
               {/* Smart Filter Chips */}
               <div className="mb-10 overflow-x-auto no-scrollbar -mx-4 px-4 flex items-center gap-3 py-2">
-                {[
-                  { id: 'budget', label: 'Budget Friendly 💰', logic: () => { setMaxPrice("5000000"); setMinPrice(""); } },
-                  { id: 'farming', label: 'Best for Farming 🌾', logic: () => { setPropertyType("Land"); setLandTypeFilter("Agricultural"); setMinSize("1"); setSizeUnitFilter("acres"); } },
-                  { id: 'investment', label: 'High Investment 📈', logic: () => { setSearchQuery("City"); setPropertyType("Land"); } },
-                  { id: 'residential', label: 'Residential Plots 🏡', logic: () => { setPropertyType("Land"); setLandTypeFilter("Residential"); } },
-                ].map((chip) => (
+                {chipOptions.map((chip) => (
                   <button
                     key={chip.id}
                     onClick={() => { if (activeChip === chip.id) clearAllFilters(); else { clearAllFilters(); setActiveChip(chip.id); chip.logic(); } }}
-                    className={`whitespace-nowrap px-6 py-3 rounded-2xl text-[10px] sm:text-xs font-black uppercase tracking-widest transition-all border shadow-sm ${activeChip === chip.id ? "bg-brand-primary text-white border-brand-primary shadow-lg" : "bg-white/60 backdrop-blur-md text-text-secondary border-white/80"}`}
+                    className={`whitespace-nowrap px-6 py-3 rounded-2xl text-[10px] sm:text-xs font-black uppercase tracking-widest transition-all border shadow-sm ${activeChip === chip.id ? "bg-gradient-to-r from-brand-primary to-brand-secondary text-white border-brand-primary shadow-lg shadow-brand-primary/20" : "bg-white/80 backdrop-blur-md text-text-secondary border-ui-border hover:border-brand-primary/20"}`}
                   >
                     {chip.label}
                   </button>
@@ -478,22 +477,15 @@ function HomeContent() {
                     ))}
                   </div>
 
+                  {/* Infinite Scroll Sentinel */}
                   {page < totalPages && (
-                    <div className="flex justify-center pt-8">
-                      <button
-                        onClick={handleLoadMore}
-                        disabled={isFetchingMore}
-                        className="px-12 py-4 bg-white border-2 border-brand-primary text-brand-primary rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-brand-primary hover:text-white transition-all shadow-lg active:scale-95 disabled:opacity-50 disabled:pointer-events-none group"
-                      >
-                        {isFetchingMore ? (
-                          <div className="flex items-center gap-2">
-                            <div className="w-4 h-4 border-2 border-brand-primary border-t-white rounded-full animate-spin" />
-                            Loading...
-                          </div>
-                        ) : (
-                          "Load More Landscapes"
-                        )}
-                      </button>
+                    <div ref={loadMoreRef} className="flex justify-center pt-4 pb-8">
+                      {isFetchingMore && (
+                        <div className="flex items-center gap-3 px-8 py-4 bg-white border border-ui-border rounded-2xl shadow-sm">
+                          <div className="w-5 h-5 border-2 border-gray-200 border-t-brand-primary rounded-full animate-spin" />
+                          <span className="text-xs font-bold text-text-secondary uppercase tracking-widest">Loading more...</span>
+                        </div>
+                      )}
                     </div>
                   )}
                 </motion.div>

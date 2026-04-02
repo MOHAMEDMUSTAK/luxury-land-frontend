@@ -67,11 +67,11 @@ export default function Navbar() {
         
         {/* Logo */}
         <Link href="/" className="flex-shrink-0 flex items-center gap-3 group transition-all">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-primary to-brand-secondary flex items-center justify-center text-white font-black text-xl shadow-lg shadow-brand-primary/20 group-hover:scale-105 group-hover:shadow-brand-primary/30 transition-all duration-500">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-primary to-brand-secondary flex items-center justify-center text-white font-black text-xl shadow-lg shadow-brand-primary/25 group-hover:scale-105 group-hover:shadow-brand-primary/40 transition-all duration-500">
             L
           </div>
-          <span className="text-2xl font-black tracking-tight hidden sm:block text-brand-primary">
-            Land<span className="text-brand-secondary">Market</span>
+          <span className="text-2xl font-black tracking-tight hidden sm:block">
+            <span className="gradient-accent">Land</span><span className="text-brand-secondary">Market</span>
           </span>
         </Link>
 
@@ -284,21 +284,21 @@ export default function Navbar() {
               </AnimatePresence>
             </div>
           ) : (
-            <Link href="/login" className="btn-primary px-6 py-2 text-xs font-bold uppercase tracking-wider">
+            <Link href="/login" className="btn-primary px-6 py-2 text-xs font-bold uppercase tracking-wider shadow-lg shadow-brand-primary/20">
               {t("navbar.login")}
             </Link>
           )}
 
-          <div className="flex items-center bg-gray-50 border border-ui-border rounded-xl p-1">
+          <div className="flex items-center bg-gray-50/80 border border-ui-border rounded-xl p-1">
             <button 
               onClick={() => handleLanguageChange('en')}
-              className={`text-[10px] font-bold px-3 py-1.5 rounded-lg transition-all ${currentLang.startsWith('en') ? 'bg-white text-brand-primary shadow-sm' : 'text-text-secondary hover:text-text-main'}`}
+              className={`text-[10px] font-bold px-3 py-1.5 rounded-lg transition-all ${currentLang.startsWith('en') ? 'bg-white text-brand-primary shadow-sm border border-brand-primary/10' : 'text-text-secondary hover:text-text-main'}`}
             >
               EN
             </button>
             <button 
               onClick={() => handleLanguageChange('ta')}
-              className={`text-[10px] font-bold px-3 py-1.5 rounded-lg transition-all ${currentLang.startsWith('ta') ? 'bg-white text-brand-primary shadow-sm' : 'text-text-secondary hover:text-text-main'}`}
+              className={`text-[10px] font-bold px-3 py-1.5 rounded-lg transition-all ${currentLang.startsWith('ta') ? 'bg-white text-brand-primary shadow-sm border border-brand-primary/10' : 'text-text-secondary hover:text-text-main'}`}
             >
               TA
             </button>

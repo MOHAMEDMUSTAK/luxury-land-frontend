@@ -1,9 +1,8 @@
 "use client";
 
-import { useState, useRef, memo } from "react";
+import { useState, memo, useCallback } from "react";
 import { Heart, MapPin, Maximize2, ImageOff, BarChart2, Star } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { formatCurrency, getTimeOnMarket } from "@/lib/utils";
 import { useWishlistStore } from "@/store/useWishlistStore";
@@ -11,7 +10,6 @@ import { useCompareStore } from "@/store/useCompareStore";
 import toast from "react-hot-toast";
 import { useAuthStore } from "@/store/useAuthStore";
 import dynamic from "next/dynamic";
-import { motion, useMotionTemplate, useMotionValue } from "framer-motion";
 import { useTranslation } from "react-i18next";
 
 const MapModal = dynamic(() => import("./MapModal"), { ssr: false });
@@ -59,7 +57,7 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
   const isWishlisted = hasItem(propertyId);
   const isCompared = isInCompare(propertyId);
   
-  const handleToggleCompare = (e: React.MouseEvent) => {
+  const handleToggleCompare = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (isCompared) {
@@ -68,9 +66,9 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
     } else {
       addProperty(property as any);
     }
-  };
+  }, [isCompared, propertyId, removeProperty, addProperty, property]);
 
-  const handleToggleWishlist = async (e: React.MouseEvent) => {
+  const handleToggleWishlist = useCallback(async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     
@@ -94,7 +92,7 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
     } finally {
       setIsWishlisting(false);
     }
-  };
+  }, [isCheckingAuth, isAuthenticated, isWishlisting, isWishlisted, propertyId, user?.id, toggleItem, t]);
 
   const hasImage = property.images && property.images.length > 0;
   const mainImage = hasImage ? property.images![0] : null;
@@ -106,19 +104,14 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
     ? `${property.size} ${property.sizeUnit || "sq ft"}`
     : null;
 
-  const handleOpenMap = (e: React.MouseEvent) => {
+  const handleOpenMap = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     setIsMapOpen(true);
-  };
+  }, []);
 
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-
-  function handleMouseMove({ currentTarget, clientX, clientY }: React.MouseEvent) {
-    const { left, top } = currentTarget.getBoundingClientRect();
-    mouseX.set(clientX - left);
-    mouseY.set(clientY - top);
-  }
+  const handleNavigate = useCallback(() => {
+    router.push(`/property/${propertyId}`);
+  }, [router, propertyId]);
 
   const getLandTypeIcon = (type: string) => {
     switch (type) {
@@ -135,35 +128,19 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
   return (
     <>
       <div 
-        onClick={() => router.push(`/property/${propertyId}`)}
+        onClick={handleNavigate}
         className="group block h-full cursor-pointer"
       >
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-50px" }}
-        whileTap={{ scale: 0.98 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
+      <div 
         className="premium-card h-full flex flex-col group/card relative"
-        onMouseMove={handleMouseMove}
       >
-        <motion.div
-          className="pointer-events-none absolute -inset-px rounded-2xl opacity-0 transition duration-300 group-hover/card:opacity-100 z-0 hidden md:block"
-          style={{
-            background: useMotionTemplate`
-              radial-gradient(
-                450px circle at ${mouseX}px ${mouseY}px,
-                rgba(255, 255, 255, 0.4),
-                transparent 80%
-              )
-            `,
-          }}
-        />
+        {/* CSS-only spotlight effect — replaces per-card JS mouse tracking */}
+        <div className="pointer-events-none absolute -inset-px rounded-3xl opacity-0 transition duration-300 group-hover/card:opacity-100 z-0 hidden md:block bg-[radial-gradient(400px_circle_at_50%_50%,rgba(99,102,241,0.06),transparent_60%)]" />
         
         <button
           onClick={handleToggleWishlist}
           disabled={isWishlisting}
-          className={`absolute top-4 right-4 z-10 w-11 h-11 rounded-2xl bg-white/80 backdrop-blur-xl flex items-center justify-center hover:bg-white transition-all shadow-xl border border-white/40 group/heart active:scale-95 ${isWishlisting ? 'opacity-50 cursor-not-allowed' : ''}`}
+          className={`absolute top-4 right-4 z-10 w-11 h-11 rounded-2xl bg-white/90 backdrop-blur-xl flex items-center justify-center hover:bg-white transition-all shadow-lg border border-white/60 group/heart active:scale-95 ${isWishlisting ? 'opacity-50 cursor-not-allowed' : ''}`}
           aria-label="Add to Wishlist"
         >
           <Heart
@@ -173,7 +150,7 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
           />
         </button>
 
-        <div className="relative aspect-[4/3] w-full overflow-hidden bg-white/20">
+        <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100 rounded-t-3xl">
           <div className="absolute top-4 left-4 z-10 px-2.5 py-1 bg-black/40 backdrop-blur-md rounded-lg text-[10px] font-bold text-white border border-white/10 shadow-lg">
             {getTimeOnMarket(property.createdAt as string)}
           </div>
@@ -183,7 +160,7 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
               alt={property.title}
               fill
               priority={priority}
-              className="object-cover group-hover/card:scale-110 transition-transform duration-[1200ms] ease-out will-change-transform"
+              className="object-cover group-hover/card:scale-105 transition-transform duration-700 ease-out"
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             />
           ) : (
@@ -192,11 +169,10 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
               <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">{t("home.noResults")}</span>
             </div>
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-transparent opacity-40 group-hover/card:opacity-60 transition-opacity duration-700 pointer-events-none" />
-          <div className="absolute inset-0 bg-gradient-to-tr from-brand-primary/10 via-transparent to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-700 pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-30 group-hover/card:opacity-50 transition-opacity duration-500 pointer-events-none" />
           
           <div className="absolute bottom-4 right-4 z-10 opacity-0 group-hover/card:opacity-100 transition-all duration-500 translate-y-2 group-hover/card:translate-y-0 hidden md:block">
-            <div className="w-10 h-10 rounded-2xl bg-white/90 backdrop-blur-xl flex items-center justify-center shadow-2xl border border-white/50">
+            <div className="w-10 h-10 rounded-2xl bg-white/90 backdrop-blur-xl flex items-center justify-center shadow-xl border border-white/50">
               <Maximize2 className="w-4.5 h-4.5 text-brand-primary" />
             </div>
           </div>
@@ -232,8 +208,8 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
           )}
 
           {property.landType && (
-            <div className="flex mb-3 anim-fade-in">
-              <span className="px-2.5 py-1 bg-[#f3f4f6] text-[#4b5563] text-[12px] font-bold rounded-full flex items-center gap-1.5 border border-gray-200/50 shadow-sm">
+            <div className="flex mb-3">
+              <span className="px-2.5 py-1 bg-brand-primary/[0.04] text-brand-primary/80 text-[12px] font-bold rounded-full flex items-center gap-1.5 border border-brand-primary/10">
                 <span>{getLandTypeIcon(property.landType)}</span>
                 {property.landType} {t("property.landType")}
               </span>
@@ -250,8 +226,8 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
           </button>
 
           {(property.reviewCount! > 0 || property.averageRating! > 0) && (
-            <div className="flex items-center gap-1.5 mb-4 bg-gray-50 w-fit px-2 py-0.5 rounded-lg border border-gray-100">
-              <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+            <div className="flex items-center gap-1.5 mb-4 bg-amber-50 w-fit px-2 py-0.5 rounded-lg border border-amber-100/50">
+              <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
               <span className="text-[11px] font-bold text-text-main">{property.averageRating!.toFixed(1)}</span>
               <span className="text-[10px] text-text-secondary">({property.reviewCount})</span>
             </div>
@@ -260,21 +236,21 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
           <div className="mt-auto space-y-4">
             <div className="flex items-center gap-2 flex-wrap">
               {sizeDisplay && (
-                <span className="px-2.5 py-1 bg-white/40 text-[10px] font-bold tracking-wider uppercase rounded-lg text-text-secondary border border-white/60 shadow-sm backdrop-blur-md">
+                <span className="px-2.5 py-1 bg-gray-50 text-[10px] font-bold tracking-wider uppercase rounded-lg text-text-secondary border border-gray-100">
                   {sizeDisplay}
                 </span>
               )}
               {property.status && (
                 <span className={`px-2.5 py-1 text-[10px] font-bold tracking-wider uppercase rounded-lg border ${
                   property.status === "Available" 
-                    ? "bg-green-50 text-green-600 border-green-100" 
+                    ? "bg-emerald-50 text-emerald-600 border-emerald-100" 
                     : "bg-orange-50 text-orange-600 border-orange-100"
                 }`}>
                   {property.status === "Available" ? t("property.available") : t("property.sold")}
                 </span>
               )}
-              <span className={`px-2.5 py-1 text-[10px] font-bold tracking-wider uppercase rounded-lg border shadow-sm backdrop-blur-md ${
-                property.listingType === "rent" ? "bg-brand-secondary/10 text-brand-secondary border-brand-secondary/20" : "bg-brand-primary/10 text-brand-primary border-brand-primary/20"
+              <span className={`px-2.5 py-1 text-[10px] font-bold tracking-wider uppercase rounded-lg border ${
+                property.listingType === "rent" ? "bg-violet-50 text-violet-600 border-violet-100" : "bg-indigo-50 text-indigo-600 border-indigo-100"
               }`}>
                 {categoryLabel} for {property.listingType === "rent" ? "Rent" : "Sale"}
               </span>
@@ -298,7 +274,7 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
                   className={`min-h-[44px] px-3 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all duration-300 border shadow-sm active:scale-95 ${
                     isCompared 
                       ? "bg-brand-primary text-white border-brand-primary shadow-brand-primary/20" 
-                      : "bg-white/50 text-text-secondary border-gray-200 hover:border-brand-primary hover:text-brand-primary hover:bg-white"
+                      : "bg-white text-text-secondary border-gray-200 hover:border-brand-primary hover:text-brand-primary hover:bg-white"
                   }`}
                 >
                   <BarChart2 className={`w-3.5 h-3.5 ${isCompared ? "text-white" : "text-brand-primary"}`} />
@@ -311,7 +287,7 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
             </div>
           </div>
         </div>
-      </motion.div>
+      </div>
       </div>
 
     <MapModal
@@ -325,7 +301,8 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
   );
 });
 
-// Compare property ids specifically so memo ignores functions / unrelated objects
+PropertyCard.displayName = 'PropertyCard';
+
 export default memo(PropertyCard, (prevProps, nextProps) => {
   const prevId = (prevProps.property._id || prevProps.property.id) as string;
   const nextId = (nextProps.property._id || nextProps.property.id) as string;
