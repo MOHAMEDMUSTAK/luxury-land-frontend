@@ -5,7 +5,7 @@ import { api } from '@/services/api';
 interface WishlistStore {
   items: string[];
   setItems: (items: string[]) => void;
-  toggleItem: (id: string, userId?: string) => Promise<void>;
+  toggleItem: (id: string, userId?: string) => Promise<any>;
   hasItem: (id: string) => boolean;
 }
 
@@ -33,12 +33,15 @@ export const useWishlistStore = create<WishlistStore>()(
               // Ensure we use the server's source of truth, and strictly stringify
               set({ items: response.data.wishlist.map((i: any) => String(i)) });
             }
+            return response.data; // Forward data to caller allowing UI update
           } catch (error) {
             console.error("Failed to sync wishlist with server:", error);
             // Revert changes on failure
             set({ items: currentItems });
+            throw error;
           }
         }
+        return { wishlistCount: undefined };
       },
       hasItem: (id) => get().items.includes(id),
     }),

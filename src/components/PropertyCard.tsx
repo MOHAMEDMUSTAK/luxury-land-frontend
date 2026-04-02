@@ -214,7 +214,7 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
             >
               <div className="w-7 h-7 rounded-full bg-brand-primary/5 border border-brand-primary/10 overflow-hidden relative flex-shrink-0 shadow-sm ring-2 ring-white group-hover/owner:border-brand-primary/30 transition-all duration-300">
                 {property.owner.profileImage ? (
-                  <Image src={property.owner.profileImage} alt={property.owner.name} fill className="object-cover group-hover/owner:scale-110 transition-transform duration-500" />
+                  <Image src={property.owner.profileImage} alt={property.owner.name} fill sizes="28px" className="object-cover group-hover/owner:scale-110 transition-transform duration-500" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-[10px] font-extrabold text-brand-primary bg-gradient-to-br from-brand-primary/10 to-brand-primary/5">
                     {property.owner.name?.[0] || 'O'}

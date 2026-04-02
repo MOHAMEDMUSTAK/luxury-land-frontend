@@ -3,9 +3,10 @@
 import dynamic from "next/dynamic";
 import { use, useState, useEffect, useMemo } from "react";
 import { formatCurrency, getTimeOnMarket } from "@/lib/utils";
-import ImageGallery from "@/components/ImageGallery";
+import PageTransitionProvider from "@/components/PageTransitionProvider";
 const ChatBox = dynamic(() => import("@/components/ChatBox"), { ssr: false });
 const MapModal = dynamic(() => import("@/components/MapModal"), { ssr: false });
+const ImageGallery = dynamic(() => import("@/components/ImageGallery"), { ssr: false });
 import { MapPin, CheckCircle2, Phone, MessageCircle, Heart, Share2, Ruler, Loader2, Tag, ShieldCheck, ImageOff, Calendar, User, Sparkles, TrendingUp, Navigation, Landmark, Eye, Clock, Edit2, Trash2, BarChart2, Star } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -198,8 +199,14 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
                       try {
                         const propertyId = property._id || property.id;
                         const previouslyWishlisted = isWishlisted;
-                        
-                        await toggleItem(propertyId, user?.id);
+                        const response = await toggleItem(propertyId, user?.id);
+
+                        if (response?.wishlistCount !== undefined) {
+                          queryClient.setQueryData(['land', id], (oldData: any) => ({
+                            ...oldData,
+                            wishlistCount: response.wishlistCount
+                          }));
+                        }
 
                         if (!previouslyWishlisted) {
                            toast.success("Added to Wishlist");
