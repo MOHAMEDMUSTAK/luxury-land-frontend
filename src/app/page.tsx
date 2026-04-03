@@ -11,6 +11,7 @@ import { useTranslation } from "react-i18next";
 import PropertySkeleton from "@/components/PropertySkeleton";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { useIntersectionObserver } from "@/lib/useIntersectionObserver";
+import { useReducedMotion } from "@/lib/useReducedMotion";
 import { useQueryClient } from "@tanstack/react-query";
 
 const RecentlyViewed = dynamic(() => import("@/components/RecentlyViewed"), { 
@@ -48,6 +49,13 @@ function HomeContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState(urlSearch);
   const queryClient = useQueryClient();
+  const prefersReducedMotion = useReducedMotion();
+
+  // Detect mobile for animation optimization
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    setIsMobile(window.innerWidth < 768);
+  }, []);
 
   // Filter/Sort State
   const [activeSort, setActiveSort] = useState("latest");
@@ -228,8 +236,8 @@ function HomeContent() {
           
           <div className="relative z-10 w-full max-w-5xl mx-auto px-4 flex flex-col items-center text-center">
             <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease: "easeOut" }}>
-              <span className="inline-block py-1.5 px-5 rounded-full bg-white/[0.06] border border-white/10 text-[10px] sm:text-xs font-black tracking-[0.3em] text-indigo-300 uppercase mb-8 backdrop-blur-md">
-                The Pinnacle of Real Estate
+              <span className="inline-block py-1.5 px-5 rounded-full bg-white/[0.06] border border-white/10 text-[10px] sm:text-xs font-black tracking-[0.3em] uppercase mb-8 backdrop-blur-md">
+                <span className="gold-text">The Pinnacle of Real Estate</span>
               </span>
               <h1 className="text-4xl sm:text-6xl md:text-8xl font-black text-white tracking-tighter leading-[0.9] mb-6">
                 Exclusive <br/>
@@ -478,27 +486,55 @@ function HomeContent() {
                   <button onClick={clearAllFilters} className="mt-4 text-brand-primary font-bold text-sm hover:underline">{t("home.showAll")}</button>
                 </div>
               ) : (
-                <motion.div variants={containerVariants} initial="hidden" animate="visible" className="flex flex-col gap-8">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {properties.map((property, i) => (
-                      <motion.div key={property._id || property.id || i} variants={itemVariants}>
-                        <PropertyCard property={{...property, id: property._id || property.id}} priority={i < 4} />
-                      </motion.div>
-                    ))}
-                  </div>
+                <>
+                  {(isMobile || prefersReducedMotion) ? (
+                    /* Mobile: No motion — instant render for 60fps */
+                    <div className="flex flex-col gap-8">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {properties.map((property, i) => (
+                          <div key={property._id || property.id || i}>
+                            <PropertyCard property={{...property, id: property._id || property.id}} priority={i < 4} />
+                          </div>
+                        ))}
+                      </div>
 
-                  {/* Infinite Scroll Sentinel */}
-                  {page < totalPages && (
-                    <div ref={loadMoreRef} className="flex justify-center pt-4 pb-8">
-                      {isFetchingMore && (
-                        <div className="flex items-center gap-3 px-8 py-4 bg-white border border-ui-border rounded-2xl shadow-sm">
-                          <div className="w-5 h-5 border-2 border-gray-200 border-t-brand-primary rounded-full animate-spin" />
-                          <span className="text-xs font-bold text-text-secondary uppercase tracking-widest">Loading more...</span>
+                      {/* Infinite Scroll Sentinel */}
+                      {page < totalPages && (
+                        <div ref={loadMoreRef} className="flex justify-center pt-4 pb-8">
+                          {isFetchingMore && (
+                            <div className="flex items-center gap-3 px-8 py-4 bg-white border border-ui-border rounded-2xl shadow-sm">
+                              <div className="w-5 h-5 border-2 border-gray-200 border-t-brand-primary rounded-full animate-spin" />
+                              <span className="text-xs font-bold text-text-secondary uppercase tracking-widest">Loading more...</span>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
+                  ) : (
+                    /* Desktop: Premium stagger animation */
+                    <motion.div variants={containerVariants} initial="hidden" animate="visible" className="flex flex-col gap-8">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {properties.map((property, i) => (
+                          <motion.div key={property._id || property.id || i} variants={itemVariants}>
+                            <PropertyCard property={{...property, id: property._id || property.id}} priority={i < 4} />
+                          </motion.div>
+                        ))}
+                      </div>
+
+                      {/* Infinite Scroll Sentinel */}
+                      {page < totalPages && (
+                        <div ref={loadMoreRef} className="flex justify-center pt-4 pb-8">
+                          {isFetchingMore && (
+                            <div className="flex items-center gap-3 px-8 py-4 bg-white border border-ui-border rounded-2xl shadow-sm">
+                              <div className="w-5 h-5 border-2 border-gray-200 border-t-brand-primary rounded-full animate-spin" />
+                              <span className="text-xs font-bold text-text-secondary uppercase tracking-widest">Loading more...</span>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </motion.div>
                   )}
-                </motion.div>
+                </>
               )}
 
               <RecentlyViewed />

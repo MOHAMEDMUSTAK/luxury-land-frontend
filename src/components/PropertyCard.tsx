@@ -323,8 +323,4 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
 
 PropertyCard.displayName = 'PropertyCard';
 
-export default memo(PropertyCard, (prevProps, nextProps) => {
-  const prevId = (prevProps.property._id || prevProps.property.id) as string;
-  const nextId = (nextProps.property._id || nextProps.property.id) as string;
-  return prevId === nextId && prevProps.priority === nextProps.priority;
-});
+export default PropertyCard;

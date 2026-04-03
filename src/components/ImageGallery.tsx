@@ -51,10 +51,10 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
         <AnimatePresence initial={false} mode="wait">
           <motion.div
             key={currentIndex}
-            initial={{ opacity: 0, scale: 1.05 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
+            transition={{ duration: 0.2, ease: "easeInOut" }}
             className="absolute inset-0"
           >
             <Image
@@ -133,9 +133,11 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
               initialScale={1}
               minScale={1}
               maxScale={5}
+              limitToBounds={true}
               centerOnInit
               wheel={{ step: 0.1 }}
-              doubleClick={{ mode: "reset" }}
+              doubleClick={{ mode: "zoomIn" }}
+              pinch={{ step: 5 }}
             >
               {({ zoomIn, zoomOut, resetTransform, ...rest }) => (
                 <>
@@ -203,10 +205,10 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
                     <div className="relative w-screen h-screen flex items-center justify-center p-4 md:p-20">
                       <motion.div
                         key={currentIndex}
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 1.1 }}
-                        transition={{ duration: 0.4, ease: "easeOut" }}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.2, ease: "easeInOut" }}
                         className="relative w-full h-full"
                       >
                         <Image
@@ -241,6 +243,14 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Invisible Performance Prefetching for adjacent slides */}
+      {images[currentIndex + 1] && (
+        <link rel="preload" href={images[currentIndex + 1]} as="image" />
+      )}
+      {images[currentIndex - 1] && (
+        <link rel="preload" href={images[currentIndex - 1]} as="image" />
+      )}
     </div>
   );
 }
