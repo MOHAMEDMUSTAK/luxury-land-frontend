@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, memo } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Search, Heart, User, PlusCircle, Menu, X, LogOut, LayoutDashboard, Bell, CheckCircle2, Settings } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -12,7 +12,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { formatDistanceToNow } from "date-fns";
 
-export default memo(function Navbar() {
+export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -61,7 +61,7 @@ export default memo(function Navbar() {
 
   return (
     <header 
-      className="sticky top-0 sm:top-4 z-[100] mx-0 sm:mx-4 lg:mx-8 xl:mx-auto max-w-7xl sm:rounded-3xl glass-header-dark transition-all duration-500 ease-in-out pb-3 sm:pb-6 pt-[calc(env(safe-area-inset-top)+12px)] sm:pt-[calc(env(safe-area-inset-top)+24px)] shadow-xl border-white/10"
+      className="sticky top-0 sm:top-4 z-[100] mx-0 sm:mx-4 lg:mx-8 xl:mx-auto max-w-7xl sm:rounded-3xl glass-header transition-all duration-500 ease-in-out pb-3 sm:pb-6 pt-[calc(env(safe-area-inset-top)+12px)] sm:pt-[calc(env(safe-area-inset-top)+24px)] shadow-xl border-white/40"
     >
       <div className="px-4 lg:px-8 h-16 flex items-center justify-between gap-4">
         
@@ -84,7 +84,7 @@ export default memo(function Navbar() {
               </div>
               <input
                 autoComplete="off"
-                className="navbar-search-input peer block w-full pl-12 pr-4 py-3 bg-white/10 border-2 border-white/20 rounded-2xl leading-5 text-white placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-brand-primary/20 focus:border-brand-primary focus:bg-white/20 transition-all duration-300 sm:text-sm font-bold shadow-inner"
+                className="navbar-search-input peer block w-full pl-12 pr-4 py-3 bg-white/40 border-2 border-white/60 rounded-2xl leading-5 text-text-main placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-brand-primary/10 focus:border-white focus:bg-white/70 transition-all duration-300 sm:text-sm font-bold shadow-inner"
                 placeholder={mounted ? t("navbar.searchPlaceholder") : "Search..."}
               />
             </form>
@@ -129,7 +129,7 @@ export default memo(function Navbar() {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
                     transition={{ duration: 0.2 }}
-                    className="absolute right-0 mt-3 w-80 glass-card overflow-hidden flex flex-col max-h-[400px] z-50 text-white"
+                    className="absolute right-0 mt-3 w-80 bg-white border border-ui-border rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[400px] z-50"
                   >
                     <div className="flex items-center justify-between px-4 py-3 border-b border-ui-border bg-gray-50/50">
                       <h3 className="text-sm font-bold text-text-main">{t("navbar.notifications")}</h3>
@@ -240,7 +240,7 @@ export default memo(function Navbar() {
                     initial={{ opacity: 0, y: 10, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                    className="absolute right-0 mt-3 w-64 glass-card overflow-hidden py-2"
+                    className="absolute right-0 mt-3 w-64 bg-white border border-ui-border rounded-2xl shadow-xl overflow-hidden py-2"
                   >
                     <div className="px-4 py-3 border-b border-ui-border">
                       <p className="text-sm font-bold text-text-main">{user?.name}</p>
@@ -327,7 +327,7 @@ export default memo(function Navbar() {
                     initial={{ opacity: 0, y: 10, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                    className="fixed inset-x-4 top-20 glass-card shadow-2xl overflow-hidden flex flex-col max-h-[400px] z-[110]"
+                    className="fixed inset-x-4 top-20 bg-white border border-ui-border rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[400px] z-[110]"
                   >
                     <div className="flex items-center justify-between px-4 py-3 border-b border-ui-border bg-gray-50/50">
                       <h3 className="text-sm font-bold text-text-main">{t("navbar.notifications")}</h3>
@@ -403,7 +403,7 @@ export default memo(function Navbar() {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="md:hidden glass-card border-t border-white/10 overflow-hidden shadow-lg absolute w-full rounded-b-3xl"
+            className="md:hidden bg-white border-b border-ui-border overflow-hidden shadow-lg absolute w-full"
           >
             <div className="px-4 py-6 space-y-4">
               {mounted && isAuthenticated && (
@@ -467,4 +467,4 @@ export default memo(function Navbar() {
       </AnimatePresence>
     </header>
   );
-});
+}

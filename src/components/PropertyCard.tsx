@@ -170,7 +170,7 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
           />
         </button>
 
-        <div className="relative aspect-[4/3] w-full overflow-hidden bg-white/5 rounded-t-3xl">
+        <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100 rounded-t-3xl">
           <div className="absolute top-4 left-4 z-10 px-2.5 py-1 bg-black/40 backdrop-blur-md rounded-lg text-[10px] font-bold text-white border border-white/10 shadow-lg">
             {getTimeOnMarket(property.createdAt as string)}
           </div>
@@ -184,7 +184,7 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             />
           ) : (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-white/5">
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-gray-50">
               <ImageOff className="w-8 h-8 text-gray-300" />
               <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">{t("home.noResults")}</span>
             </div>
@@ -246,7 +246,7 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
           </button>
 
           {(property.reviewCount! > 0 || property.averageRating! > 0) && (
-            <div className="flex items-center gap-1.5 mb-4 bg-amber-500/10 w-fit px-2 py-0.5 rounded-lg border border-amber-500/20">
+            <div className="flex items-center gap-1.5 mb-4 bg-amber-50 w-fit px-2 py-0.5 rounded-lg border border-amber-100/50">
               <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
               <span className="text-[11px] font-bold text-text-main">{property.averageRating!.toFixed(1)}</span>
               <span className="text-[10px] text-text-secondary">({property.reviewCount})</span>
@@ -256,21 +256,21 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
           <div className="mt-auto space-y-4">
             <div className="flex items-center gap-2 flex-wrap">
               {sizeDisplay && (
-                <span className="px-2.5 py-1 bg-white/5 text-[10px] font-bold tracking-wider uppercase rounded-lg text-text-secondary border border-white/10">
+                <span className="px-2.5 py-1 bg-gray-50 text-[10px] font-bold tracking-wider uppercase rounded-lg text-text-secondary border border-gray-100">
                   {sizeDisplay}
                 </span>
               )}
               {property.status && (
                 <span className={`px-2.5 py-1 text-[10px] font-bold tracking-wider uppercase rounded-lg border ${
                   property.status === "Available" 
-                    ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" 
-                    : "bg-orange-500/10 text-orange-400 border-orange-500/20"
+                    ? "bg-emerald-50 text-emerald-600 border-emerald-100" 
+                    : "bg-orange-50 text-orange-600 border-orange-100"
                 }`}>
                   {property.status === "Available" ? t("property.available") : t("property.sold")}
                 </span>
               )}
               <span className={`px-2.5 py-1 text-[10px] font-bold tracking-wider uppercase rounded-lg border ${
-                property.listingType === "rent" ? "bg-violet-500/10 text-violet-400 border-violet-500/20" : "bg-indigo-500/10 text-indigo-400 border-indigo-500/20"
+                property.listingType === "rent" ? "bg-violet-50 text-violet-600 border-violet-100" : "bg-indigo-50 text-indigo-600 border-indigo-100"
               }`}>
                 {categoryLabel} for {property.listingType === "rent" ? "Rent" : "Sale"}
               </span>
@@ -294,7 +294,7 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
                   className={`min-h-[44px] px-3 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all duration-300 border shadow-sm active:scale-95 ${
                     isCompared 
                       ? "bg-brand-primary text-white border-brand-primary shadow-brand-primary/20" 
-                      : "bg-white/5 text-text-secondary border-white/10 hover:border-brand-primary hover:text-brand-primary hover:bg-white/10"
+                      : "bg-white text-text-secondary border-gray-200 hover:border-brand-primary hover:text-brand-primary hover:bg-white"
                   }`}
                 >
                   <BarChart2 className={`w-3.5 h-3.5 ${isCompared ? "text-white" : "text-brand-primary"}`} />

@@ -13,7 +13,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 /* Section Card */
 function SectionCard({ icon: Icon, title, children }: { icon: any; title: string; children: React.ReactNode }) {
   return (
-    <div className="glass-card rounded-[24px] border border-white/10 shadow-[0_2px_20px_rgba(0,0,0,0.2)] p-6 sm:p-8 space-y-6 transition-all duration-300 hover:shadow-[0_4px_28px_rgba(0,0,0,0.4)]">
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_2px_20px_rgba(0,0,0,0.04)] p-6 sm:p-8 space-y-6 transition-all duration-300 hover:shadow-[0_4px_28px_rgba(0,0,0,0.06)]">
       <div className="flex items-center gap-3">
         <div className="w-9 h-9 rounded-xl bg-brand-primary/10 flex items-center justify-center flex-shrink-0">
           <Icon className="w-[18px] h-[18px] text-brand-primary" />
@@ -57,8 +57,8 @@ export default function EditAdPage({ params }: { params: Promise<{ id: string }>
   });
 
   const set = (key: string, value: string) => setFormData((p) => ({ ...p, [key]: value }));
-  const inputCls = "w-full py-3 px-4 rounded-xl border border-white/10 bg-white/5 text-sm font-medium outline-none transition-all duration-200 placeholder:text-gray-500 focus:border-brand-primary focus:ring-[3px] focus:ring-brand-primary/10 hover:border-white/20 text-white";
-  const labelCls = "text-[13px] font-semibold text-text-secondary ml-0.5";
+  const inputCls = "w-full py-3 px-4 rounded-xl border border-gray-200 bg-white text-sm font-medium outline-none transition-all duration-200 placeholder:text-gray-400 focus:border-brand-primary focus:ring-[3px] focus:ring-brand-primary/10 hover:border-gray-300";
+  const labelCls = "text-[13px] font-semibold text-text-main ml-0.5";
 
   useEffect(() => {
     const fetchLand = async () => {
@@ -234,22 +234,22 @@ export default function EditAdPage({ params }: { params: Promise<{ id: string }>
             <div className="space-y-2">
               <label className={labelCls}>Listing Type <span className="text-red-500">*</span></label>
               <div className="grid grid-cols-2 gap-3">
-                <button type="button" onClick={() => set("listingType", "sale")} className={`py-3 rounded-xl font-bold text-sm transition-all duration-200 border active:scale-[0.97] ${formData.listingType === "sale" ? "bg-brand-primary text-white border-brand-primary shadow-md shadow-brand-primary/20" : "bg-white/5 text-text-secondary border-white/10 hover:bg-white/10"}`}>For Sale</button>
-                <button type="button" onClick={() => set("listingType", "rent")} className={`py-3 rounded-xl font-bold text-sm transition-all duration-200 border active:scale-[0.97] ${formData.listingType === "rent" ? "bg-brand-secondary text-white border-brand-secondary shadow-md shadow-brand-secondary/20" : "bg-white/5 text-text-secondary border-white/10 hover:bg-white/10"}`}>For Rent</button>
+                <button type="button" onClick={() => set("listingType", "sale")} className={`py-3 rounded-xl font-bold text-sm transition-all duration-200 border active:scale-[0.97] ${formData.listingType === "sale" ? "bg-brand-primary text-white border-brand-primary shadow-md shadow-brand-primary/20" : "bg-gray-50 text-text-secondary border-gray-200 hover:bg-gray-100"}`}>For Sale</button>
+                <button type="button" onClick={() => set("listingType", "rent")} className={`py-3 rounded-xl font-bold text-sm transition-all duration-200 border active:scale-[0.97] ${formData.listingType === "rent" ? "bg-brand-secondary text-white border-brand-secondary shadow-md shadow-brand-secondary/20" : "bg-gray-50 text-text-secondary border-gray-200 hover:bg-gray-100"}`}>For Rent</button>
               </div>
             </div>
             <div className="space-y-2">
               <label className={labelCls}>Property Category <span className="text-red-500">*</span></label>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <button type="button" onClick={() => set("propertyCategory", "land")} className={`py-3 rounded-xl font-bold text-sm transition-all duration-200 border flex items-center justify-center gap-2 active:scale-[0.97] ${formData.propertyCategory === "land" ? "bg-brand-primary text-white border-brand-primary shadow-md" : "bg-white/5 text-text-secondary border-white/10 hover:bg-white/10"}`}><Landmark className="w-4 h-4" /> Land / Plot</button>
-                <button type="button" onClick={() => set("propertyCategory", "house")} className={`py-3 rounded-xl font-bold text-sm transition-all duration-200 border flex items-center justify-center gap-2 active:scale-[0.97] ${formData.propertyCategory === "house" ? "bg-brand-primary text-white border-brand-primary shadow-md" : "bg-white/5 text-text-secondary border-white/10 hover:bg-white/10"}`}><Home className="w-4 h-4" /> House / Villa</button>
-                <button type="button" onClick={() => set("propertyCategory", "shop")} className={`py-3 rounded-xl font-bold text-sm transition-all duration-200 border flex items-center justify-center gap-2 active:scale-[0.97] ${formData.propertyCategory === "shop" ? "bg-brand-primary text-white border-brand-primary shadow-md" : "bg-white/5 text-text-secondary border-white/10 hover:bg-white/10"}`}><Store className="w-4 h-4" /> Shop / Store</button>
+                <button type="button" onClick={() => set("propertyCategory", "land")} className={`py-3 rounded-xl font-bold text-sm transition-all duration-200 border flex items-center justify-center gap-2 active:scale-[0.97] ${formData.propertyCategory === "land" ? "bg-slate-800 text-white border-slate-800 shadow-md" : "bg-gray-50 text-text-secondary border-gray-200 hover:bg-gray-100"}`}><Landmark className="w-4 h-4" /> Land / Plot</button>
+                <button type="button" onClick={() => set("propertyCategory", "house")} className={`py-3 rounded-xl font-bold text-sm transition-all duration-200 border flex items-center justify-center gap-2 active:scale-[0.97] ${formData.propertyCategory === "house" ? "bg-slate-800 text-white border-slate-800 shadow-md" : "bg-gray-50 text-text-secondary border-gray-200 hover:bg-gray-100"}`}><Home className="w-4 h-4" /> House / Villa</button>
+                <button type="button" onClick={() => set("propertyCategory", "shop")} className={`py-3 rounded-xl font-bold text-sm transition-all duration-200 border flex items-center justify-center gap-2 active:scale-[0.97] ${formData.propertyCategory === "shop" ? "bg-slate-800 text-white border-slate-800 shadow-md" : "bg-gray-50 text-text-secondary border-gray-200 hover:bg-gray-100"}`}><Store className="w-4 h-4" /> Shop / Store</button>
               </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <label className={labelCls}>Property Type</label>
-                <select value={formData.type} onChange={(e) => set("type", e.target.value)} className={`${inputCls} bg-[#0B0F1A]`}>
+                <select value={formData.type} onChange={(e) => set("type", e.target.value)} className={`${inputCls} bg-gray-50`}>
                   <option value="Land">Land / Plot</option>
                   <option value="House">House / Villa</option>
                   <option value="Plot">Commercial Plot</option>
@@ -257,7 +257,7 @@ export default function EditAdPage({ params }: { params: Promise<{ id: string }>
               </div>
               <div className="space-y-1.5">
                 <label className={labelCls}>Land Type <span className="text-text-secondary font-normal text-xs">(Optional)</span></label>
-                <select value={formData.landType} onChange={(e) => set("landType", e.target.value)} className={`${inputCls} bg-[#0B0F1A]`}>
+                <select value={formData.landType} onChange={(e) => set("landType", e.target.value)} className={`${inputCls} bg-gray-50`}>
                   <option value="">Select Type</option>
                   <option value="Nanjai">Nanjai</option>
                   <option value="Punjai">Punjai</option>
@@ -304,7 +304,7 @@ export default function EditAdPage({ params }: { params: Promise<{ id: string }>
                 <select 
                   value={formData.sizeUnit} 
                   onChange={(e) => set("sizeUnit", e.target.value)} 
-                  className={`${inputCls.replace('w-full', 'w-32')} bg-[#0B0F1A] cursor-pointer`}
+                  className={`${inputCls.replace('w-full', 'w-32')} bg-gray-50 cursor-pointer`}
                 >
                   <option value="sq ft">sq ft</option>
                   <option value="acres">acres</option>
@@ -345,7 +345,7 @@ export default function EditAdPage({ params }: { params: Promise<{ id: string }>
               <label className={labelCls}>Listing Status</label>
               <div className="grid grid-cols-2 gap-3">
                 {["Available", "Sold"].map((opt) => (
-                  <button key={opt} type="button" onClick={() => set("status", opt)} className={`py-3 rounded-xl font-bold text-sm transition-all duration-200 border active:scale-[0.97] ${formData.status === opt ? (opt === "Available" ? "bg-green-500/20 text-green-400 border-green-500/50 shadow-md shadow-green-500/10" : "bg-orange-500/20 text-orange-400 border-orange-500/50 shadow-md shadow-orange-500/10") : "bg-white/5 text-text-secondary border-white/10 hover:bg-white/10"}`}>
+                  <button key={opt} type="button" onClick={() => set("status", opt)} className={`py-3 rounded-xl font-bold text-sm transition-all duration-200 border active:scale-[0.97] ${formData.status === opt ? (opt === "Available" ? "bg-green-500 text-white border-green-500 shadow-md shadow-green-500/20" : "bg-orange-500 text-white border-orange-500 shadow-md shadow-orange-500/20") : "bg-gray-50 text-text-secondary border-gray-200 hover:bg-gray-100"}`}>
                     {opt}
                   </button>
                 ))}
@@ -362,13 +362,13 @@ export default function EditAdPage({ params }: { params: Promise<{ id: string }>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
               {existingImages.map((img, index) => (
-                <div key={`e-${index}`} className="relative aspect-square rounded-2xl overflow-hidden border border-white/20 group bg-white/5">
+                <div key={`e-${index}`} className="relative aspect-square rounded-2xl overflow-hidden border border-gray-200 group bg-gray-100">
                   <Image src={img} alt="Existing" fill className="object-cover transition-transform duration-500 group-hover:scale-110" />
                   {index === 0 && newPreviews.length === 0 && (
                     <div className="absolute top-2 left-2 px-2 py-0.5 bg-brand-primary text-white text-[8px] font-black uppercase rounded-md shadow z-10">Cover</div>
                   )}
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                    <button type="button" onClick={() => removeExistingImage(index)} className="p-2 bg-black/60 text-red-500 rounded-xl shadow-lg hover:bg-red-500/20 hover:text-red-400 active:scale-90 transition-all">
+                  <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                    <button type="button" onClick={() => removeExistingImage(index)} className="p-2 bg-white text-red-500 rounded-xl shadow-lg hover:bg-red-50 active:scale-90 transition-all">
                       <X className="w-4 h-4" />
                     </button>
                   </div>
@@ -376,11 +376,11 @@ export default function EditAdPage({ params }: { params: Promise<{ id: string }>
               ))}
 
               {newPreviews.map((preview, index) => (
-                <div key={`n-${index}`} className="relative aspect-square rounded-2xl overflow-hidden border border-brand-success/50 group bg-white/5">
+                <div key={`n-${index}`} className="relative aspect-square rounded-2xl overflow-hidden border-2 border-green-200 group bg-gray-100">
                   <Image src={preview} alt="New" fill className="object-cover transition-transform duration-500 group-hover:scale-110" />
-                  <div className="absolute top-2 left-2 px-2 py-0.5 bg-brand-success text-white text-[8px] font-black uppercase rounded-md shadow z-10">New</div>
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                    <button type="button" onClick={() => removeNewFile(index)} className="p-2 bg-black/60 text-red-500 rounded-xl shadow-lg hover:bg-red-500/20 hover:text-red-400 active:scale-90 transition-all">
+                  <div className="absolute top-2 left-2 px-2 py-0.5 bg-green-500 text-white text-[8px] font-black uppercase rounded-md shadow z-10">New</div>
+                  <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                    <button type="button" onClick={() => removeNewFile(index)} className="p-2 bg-white text-red-500 rounded-xl shadow-lg hover:bg-red-50 active:scale-90 transition-all">
                       <X className="w-4 h-4" />
                     </button>
                   </div>
@@ -388,7 +388,7 @@ export default function EditAdPage({ params }: { params: Promise<{ id: string }>
               ))}
 
               {totalCount < 5 && (
-                <button type="button" onClick={() => fileInputRef.current?.click()} className="aspect-square rounded-2xl border border-dashed border-white/20 flex flex-col items-center justify-center gap-2 hover:bg-brand-primary/10 hover:border-brand-primary/50 transition-all text-text-secondary hover:text-brand-primary group active:scale-[0.97]">
+                <button type="button" onClick={() => fileInputRef.current?.click()} className="aspect-square rounded-2xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center gap-2 hover:bg-brand-primary/5 hover:border-brand-primary transition-all text-text-secondary hover:text-brand-primary group active:scale-[0.97]">
                   <PlusCircle className="w-7 h-7 opacity-40 group-hover:opacity-100 transition-opacity" />
                   <span className="text-[10px] font-bold uppercase tracking-widest">Add</span>
                 </button>
