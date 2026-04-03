@@ -91,13 +91,13 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
         <div className="lg:w-2/3 space-y-8">
           
           {/* Gallery */}
-          <div className="rounded-[24px] overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.06)] border border-ui-border bg-gray-50 group/gallery">
+          <div className="rounded-[24px] overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.5)] border border-white/10 glass-card group/gallery">
             {hasImages ? (
               <ImageGallery images={property.images} />
             ) : (
-              <div className="aspect-[16/10] md:aspect-[21/9] w-full bg-gray-100 rounded-3xl flex flex-col items-center justify-center gap-3">
-                <ImageOff className="w-12 h-12 text-gray-300" />
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">No Images Uploaded</p>
+              <div className="aspect-[16/10] md:aspect-[21/9] w-full bg-white/5 rounded-3xl flex flex-col items-center justify-center gap-3">
+                <ImageOff className="w-12 h-12 text-gray-500" />
+                <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">No Images Uploaded</p>
               </div>
             )}
           </div>
@@ -123,7 +123,7 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
                     {getTimeOnMarket(property.createdAt)}
                   </span>
                   {property.averageRating > 0 && (
-                    <span className="px-2 py-1 bg-yellow-50 text-yellow-600 border border-yellow-100 rounded-lg text-[10px] font-bold flex items-center gap-1">
+                    <span className="px-2 py-1 bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 rounded-lg text-[10px] font-bold flex items-center gap-1">
                       <Star className="w-2.5 h-2.5 fill-yellow-500" />
                       {property.averageRating.toFixed(1)}
                     </span>
@@ -182,7 +182,7 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
                         addProperty(property);
                       }
                     }}
-                    className="w-12 h-12 flex items-center justify-center border-2 border-brand-primary/20 bg-white rounded-2xl shadow-sm hover:shadow-lg hover:border-brand-primary hover:scale-110 active:scale-95 transition-all duration-300 group/compare"
+                    className="w-12 h-12 flex items-center justify-center border border-brand-primary/20 bg-white/5 rounded-2xl shadow-sm hover:shadow-lg hover:border-brand-primary hover:bg-white/10 hover:scale-110 active:scale-95 transition-all duration-300 group/compare"
                     title={isInCompare(propertyId) ? "Remove from Compare" : "Add to Compare"}
                   >
                     <BarChart2 className={`w-5 h-5 transition-all duration-300 ${isInCompare(propertyId) ? "text-brand-primary scale-110" : "text-text-secondary group-hover/compare:text-brand-primary"}`} />
@@ -221,7 +221,7 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
                         setIsWishlisting(false);
                       }
                     }}
-                    className={`w-12 h-12 flex items-center justify-center border-2 border-red-500/20 bg-white rounded-2xl shadow-sm hover:shadow-lg hover:border-red-500 hover:scale-110 active:scale-95 transition-all duration-300 group/heart ${isWishlisting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    className={`w-12 h-12 flex items-center justify-center border border-red-500/20 bg-white/5 rounded-2xl shadow-sm hover:shadow-lg hover:border-red-500 hover:bg-white/10 hover:scale-110 active:scale-95 transition-all duration-300 group/heart ${isWishlisting ? 'opacity-50 cursor-not-allowed' : ''}`}
                   >
                     <Heart className={`w-5 h-5 transition-all duration-300 ${isWishlisted ? "fill-red-500 text-red-500 scale-110" : "text-text-secondary group-hover/heart:text-red-500"}`} />
                   </button>
@@ -239,7 +239,7 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
                 { icon: Sparkles, label: t("property.landType"), value: property.landType || "Standard", hide: !property.landType },
                 { icon: MapPin, label: t("property.status"), value: property.status === "Sold" ? t("property.sold") : t("property.available"), color: property.status === "Sold" ? "text-red-600" : "text-green-600" },
               ].filter(spec => !spec.hide).slice(0, 4).map((spec, i) => (
-                <div key={i} className="p-5 bg-white rounded-[20px] border border-ui-border flex flex-col items-center text-center hover:shadow-[0_10px_30px_rgba(0,0,0,0.06)] hover:-translate-y-1.5 transition-all duration-500 group/spec">
+                <div key={i} className="p-5 bg-white/5 rounded-[20px] border border-white/10 flex flex-col items-center text-center hover:shadow-[0_10px_30px_rgba(0,0,0,0.5)] hover:-translate-y-1.5 transition-all duration-500 group/spec">
                   <div className="w-10 h-10 rounded-full bg-brand-primary/[0.04] flex items-center justify-center mb-3 group-hover/spec:bg-brand-primary/10 transition-colors">
                     <spec.icon className="w-5 h-5 text-brand-primary transition-transform duration-500 group-hover/spec:scale-110" />
                   </div>
@@ -262,7 +262,7 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
                  { icon: Sparkles, label: t("property.landType"), value: property.landType || "Standard", hide: !property.landType },
                  { icon: MapPin, label: t("property.status"), value: property.status === "Sold" ? t("property.sold") : t("property.available"), color: property.status === "Sold" ? "text-red-600" : "text-green-600" },
                ].filter(spec => !spec.hide).slice(0, 4).map((spec, i) => (
-                  <div key={i} className="p-5 bg-white rounded-[20px] border border-ui-border flex flex-col items-center text-center hover:shadow-[0_10px_30px_rgba(0,0,0,0.06)] hover:-translate-y-1.5 transition-all duration-500 group/spec">
+                  <div key={i} className="p-5 bg-white/5 rounded-[20px] border border-white/10 flex flex-col items-center text-center hover:shadow-[0_10px_30px_rgba(0,0,0,0.5)] hover:-translate-y-1.5 transition-all duration-500 group/spec">
                     <div className="w-10 h-10 rounded-full bg-brand-primary/[0.04] flex items-center justify-center mb-3 group-hover/spec:bg-brand-primary/10 transition-colors">
                       <spec.icon className="w-5 h-5 text-brand-primary transition-transform duration-500 group-hover/spec:scale-110" />
                     </div>
@@ -279,7 +279,7 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 0.5, delay: 0.2, ease: "easeOut" }}
-            className="bg-white rounded-2xl border border-ui-border shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden"
+            className="glass-card rounded-2xl border border-white/10 shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden"
           >
             {/* Section Header */}
             <div className="px-8 pt-8 pb-6">
@@ -300,7 +300,7 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
             </div>
 
             {/* Property Highlights Grid */}
-            <div className="mx-8 mb-6 p-6 bg-gray-50/80 rounded-2xl border border-ui-border">
+            <div className="mx-8 mb-6 p-6 bg-white/5 rounded-2xl border border-white/10">
               <h3 className="text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em] mb-5 flex items-center gap-2">
                 <Sparkles className="w-3.5 h-3.5 text-brand-primary" />
                 {t("property.highlights")}
@@ -315,7 +315,7 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
                   { icon: Navigation, label: "District", value: property.district || "—" },
                 ].map((item, i) => (
                   <div key={i} className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-white border border-ui-border flex items-center justify-center flex-shrink-0 shadow-sm group-hover:border-brand-primary/30 transition-colors">
+                    <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0 shadow-sm group-hover:border-brand-primary/30 transition-colors">
                       <item.icon className="w-4 h-4 text-brand-primary" />
                     </div>
                     <div className="min-w-0 flex-1">
@@ -333,9 +333,9 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
                 { icon: Calendar, label: "Posted", value: property.createdAt ? new Date(property.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : "Recently" },
                 { icon: Eye, label: "Views", value: `${property.viewCount || property.views || 0} views` },
                 { icon: Heart, label: "Interested", value: `${property.wishlistCount || 0} saved` },
-                { icon: Clock, label: t("property.status"), value: property.status === "Sold" ? t("property.sold") : t("property.available"), color: property.status === "Sold" ? "text-red-600" : "text-green-600" },
+                { icon: Clock, label: t("property.status"), value: property.status === "Sold" ? t("property.sold") : t("property.available"), color: property.status === "Sold" ? "text-red-500" : "text-brand-success" },
               ].map((item, i) => (
-                <div key={i} className="flex items-center gap-2.5 p-3 bg-white border border-ui-border rounded-xl">
+                <div key={i} className="flex items-center gap-2.5 p-3 bg-white/5 border border-white/10 rounded-xl">
                   <item.icon className="w-4 h-4 text-brand-primary flex-shrink-0" />
                   <div className="min-w-0">
                     <p className="text-[9px] font-bold text-text-secondary uppercase tracking-widest">{item.label}</p>
@@ -391,10 +391,10 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
             transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
             className="static lg:sticky lg:top-[100px] space-y-6"
           >
-            <div className="bg-white border border-ui-border rounded-[24px] p-8 shadow-[0_10px_40px_rgba(0,0,0,0.06)] overflow-hidden relative group/owner flex flex-col items-center text-center">
+            <div className="glass-card border border-white/10 rounded-[24px] p-8 shadow-[0_10px_40px_rgba(0,0,0,0.5)] overflow-hidden relative group/owner flex flex-col items-center text-center">
               <div className="absolute top-0 left-0 w-1.5 h-full bg-brand-primary" />
               
-              <div className="w-full mb-6 pb-6 border-b border-gray-100 flex flex-col items-center">
+              <div className="w-full mb-6 pb-6 border-b border-white/10 flex flex-col items-center">
                 <p className="text-[10px] font-bold text-text-secondary tracking-[0.2em] uppercase mb-2">{t("property.askingPrice") || "Asking Price"}</p>
                 <div className="w-full text-center">
                   <p className="font-extrabold gradient-price leading-tight break-words w-full"
@@ -416,9 +416,9 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
               
               <Link 
                 href={`/profile/${property.owner?._id || property.owner}`} 
-                className="flex items-center gap-4 mb-8 group/owner-link hover:bg-gray-50/50 p-2 -ml-2 rounded-2xl w-full text-left transition-all"
+                className="flex items-center gap-4 mb-8 group/owner-link hover:bg-white/5 p-2 -ml-2 rounded-2xl w-full text-left transition-all"
               >
-                <div className="w-14 h-14 bg-white border border-brand-primary/10 text-brand-primary rounded-xl flex items-center justify-center font-bold text-2xl shadow-sm group-hover/owner-link:border-brand-primary transition-all overflow-hidden relative">
+                <div className="w-14 h-14 bg-white/5 border border-brand-primary/10 text-brand-primary rounded-xl flex items-center justify-center font-bold text-2xl shadow-sm group-hover/owner-link:border-brand-primary transition-all overflow-hidden relative">
                   {property.owner?.profileImage ? (
                     <Image src={property.owner.profileImage} alt={property.owner.name} fill className="object-cover" />
                   ) : (
@@ -482,7 +482,7 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
                         toast.error("Failed to delete property");
                       }
                     }}
-                    className="w-full flex items-center justify-center gap-2 bg-red-50 text-red-500 border border-red-100 font-bold py-4 rounded-xl hover:bg-red-100 transition-all active:scale-95"
+                    className="w-full flex items-center justify-center gap-2 bg-red-500/10 text-red-500 border border-red-500/20 font-bold py-4 rounded-xl hover:bg-red-500/20 transition-all active:scale-95"
                   >
                     <Trash2 className="w-5 h-5" />
                     Delete Listing
@@ -511,7 +511,7 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
                         toast.success("Added to Compare!");
                       }
                     }}
-                    className={`w-full flex items-center justify-center gap-2 font-bold py-4 rounded-xl transition-all active:scale-95 border-2 ${isInCompare(propertyId) ? "bg-brand-primary/10 border-brand-primary text-brand-primary" : "bg-white text-brand-primary border-brand-primary/20 hover:bg-brand-primary/5"}`}
+                    className={`w-full flex items-center justify-center gap-2 font-bold py-4 rounded-xl transition-all active:scale-95 border-2 ${isInCompare(propertyId) ? "bg-brand-primary/10 border-brand-primary text-brand-primary" : "bg-white/5 text-brand-primary border-brand-primary/20 hover:bg-brand-primary/10"}`}
                   >
                     <BarChart2 className="w-5 h-5" />
                     {isInCompare(propertyId) ? "In Comparison" : "Add to Compare"}
@@ -519,7 +519,7 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
 
                   <button 
                     onClick={() => setShowPhone(!showPhone)}
-                    className="w-full flex items-center justify-center gap-2 bg-white text-brand-primary border-2 border-brand-primary/10 font-bold py-4 rounded-xl hover:bg-brand-primary/5 transition-all active:scale-95"
+                    className="w-full flex items-center justify-center gap-2 bg-white/5 text-brand-primary border-2 border-brand-primary/10 font-bold py-4 rounded-xl hover:bg-brand-primary/10 transition-all active:scale-95"
                   >
                     <Phone className="w-5 h-5" />
                     {showPhone ? property.ownerPhone || "9876543210" : t("property.showPhone")}
@@ -582,7 +582,7 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
                 if (!requireStrictAuth(isAuthenticated, window.location.pathname)) return;
                 document.getElementById('review-form')?.scrollIntoView({ behavior: 'smooth' });
               }}
-              className="px-6 py-3 bg-white border border-brand-primary text-brand-primary font-bold rounded-xl hover:bg-brand-primary/[0.02] transition-all text-sm"
+              className="px-6 py-3 bg-white/5 border border-brand-primary/50 text-brand-primary font-bold rounded-xl hover:bg-brand-primary/10 transition-all text-sm"
             >
               Write a Review
             </button>
@@ -595,7 +595,7 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
             id="review-form"
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
-            className="bg-gray-50/50 rounded-[24px] p-8 border border-ui-border mb-12"
+            className="glass-card rounded-[24px] p-8 border border-white/10 mb-12"
           >
             <h3 className="text-lg font-bold text-text-main mb-6">How was your experience?</h3>
             <div className="space-y-6">
@@ -626,7 +626,7 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
                   placeholder="Tell us about the property, location, and connectivity..."
-                  className="w-full bg-white border border-ui-border rounded-2xl p-4 text-sm focus:ring-2 focus:ring-brand-primary/20 transition-all outline-none min-h-[120px] shadow-sm"
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm focus:ring-2 focus:ring-brand-primary/20 transition-all outline-none min-h-[120px] shadow-sm text-white placeholder-gray-500"
                 />
               </div>
               <button
@@ -664,7 +664,7 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="bg-white p-6 rounded-2xl border border-ui-border shadow-sm hover:shadow-md transition-all duration-300"
+                className="glass-card p-6 rounded-2xl border border-white/10 shadow-sm hover:shadow-md transition-all duration-300"
               >
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex items-center gap-3">
@@ -688,8 +688,8 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
               </motion.div>
             ))
           ) : (
-            <div className="text-center py-12 bg-gray-50 rounded-[24px] border border-dashed border-gray-200">
-               <p className="text-sm font-bold text-gray-400 uppercase tracking-widest">Be the first to review this property</p>
+            <div className="text-center py-12 bg-white/5 rounded-[24px] border border-dashed border-white/20">
+               <p className="text-sm font-bold text-gray-500 uppercase tracking-widest">Be the first to review this property</p>
             </div>
           )}
         </div>
@@ -710,7 +710,7 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
             {similarProperties.map((sim: any, i: number) => (
               <div key={i} className="min-w-[300px] md:min-w-[350px]">
                 <Link href={`/property/${sim._id}`} className="block group/sim">
-                  <div className="bg-white rounded-3xl border border-ui-border overflow-hidden hover:shadow-xl transition-all duration-500 hover:-translate-y-2">
+                  <div className="glass-card rounded-3xl border border-white/10 overflow-hidden hover:shadow-xl hover:shadow-brand-primary/10 transition-all duration-500 hover:-translate-y-2">
                     <div className="aspect-[4/3] relative overflow-hidden">
                       <Image 
                         src={sim.images?.[0] || "https://images.unsplash.com/photo-1500382017468-9049fee74a62"} 
@@ -718,7 +718,7 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
                         fill 
                         className="object-cover group-hover/sim:scale-110 transition-transform duration-[1200ms]" 
                       />
-                      <div className="absolute top-3 right-3 px-2.5 py-1 bg-white/90 backdrop-blur-md rounded-lg text-[10px] font-bold text-brand-primary shadow-lg border border-white/50">
+                      <div className="absolute top-3 right-3 px-2.5 py-1 bg-black/60 backdrop-blur-md rounded-lg text-[10px] font-bold text-white shadow-lg border border-white/20">
                         {formatCurrency(sim.price || sim.rentPerMonth)}
                       </div>
                     </div>
