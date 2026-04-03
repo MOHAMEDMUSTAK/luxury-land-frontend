@@ -49,7 +49,7 @@ export default function MobileBottomNav() {
 
   return (
     <div 
-      className="md:hidden fixed left-1/2 z-[40] w-[92%] max-w-[420px] flex items-center justify-between bg-white/70 backdrop-blur-xl border border-white/40 h-16 rounded-full shadow-[0_20px_50px_rgba(0,0,0,0.2)] px-4 overflow-hidden pointer-events-auto"
+      className="md:hidden fixed left-1/2 z-[40] w-[92%] max-w-[420px] flex items-center justify-between glass-card h-16 !rounded-full shadow-[0_20px_50px_rgba(0,0,0,0.2)] px-4 overflow-hidden pointer-events-auto"
       style={{ 
         bottom: `calc(16px + env(safe-area-inset-bottom))`,
         transform: `translateX(-50%) translateY(${isVisible ? '0' : '100px'})`,

@@ -152,10 +152,9 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
         className="group block h-full cursor-pointer"
       >
       <div 
-        className="premium-card glass-card h-full flex flex-col group/card relative transition-transform duration-300 hover:scale-[1.02]"
+        className="glass-card w-full h-full flex flex-col group/card relative transition-transform duration-300 hover:scale-[1.02]"
       >
-        {/* CSS-only spotlight effect — replaces per-card JS mouse tracking */}
-        <div className="pointer-events-none absolute -inset-px rounded-3xl opacity-0 transition duration-300 group-hover/card:opacity-100 z-0 hidden md:block bg-[radial-gradient(400px_circle_at_50%_50%,rgba(99,102,241,0.06),transparent_60%)]" />
+        {/* Spotlight effect removed for mobile performance */}
         
         <button
           onClick={handleToggleWishlist}
