@@ -160,7 +160,7 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
         <button
           onClick={handleToggleWishlist}
           disabled={isWishlisting}
-          className={`absolute top-4 right-4 z-10 w-11 h-11 rounded-2xl bg-white/90 backdrop-blur-xl flex items-center justify-center hover:bg-white transition-all shadow-lg border border-white/60 group/heart active:scale-95 ${isWishlisting ? 'opacity-50 cursor-not-allowed' : ''}`}
+          className={`absolute top-4 right-4 z-10 w-11 h-11 rounded-2xl bg-white/95 flex items-center justify-center hover:bg-white transition-all shadow-md border border-white group/heart active:scale-95 ${isWishlisting ? 'opacity-50 cursor-not-allowed' : ''}`}
           aria-label="Add to Wishlist"
         >
           <Heart
@@ -171,7 +171,7 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
         </button>
 
         <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100 rounded-t-3xl">
-          <div className="absolute top-4 left-4 z-10 px-2.5 py-1 bg-black/40 backdrop-blur-md rounded-lg text-[10px] font-bold text-white border border-white/10 shadow-lg">
+          <div className="absolute top-4 left-4 z-10 px-2.5 py-1 bg-black/70 rounded-lg text-[10px] font-bold text-white shadow-md">
             {getTimeOnMarket(property.createdAt as string)}
           </div>
           {mainImage ? (
@@ -181,7 +181,7 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
               fill
               priority={priority}
               className="object-cover group-hover/card:scale-105 transition-transform duration-700 ease-out"
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              sizes="(max-width: 640px) 300px, (max-width: 1024px) 400px, 400px"
             />
           ) : (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-gray-50">
@@ -192,7 +192,7 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-30 group-hover/card:opacity-50 transition-opacity duration-500 pointer-events-none" />
           
           <div className="absolute bottom-4 right-4 z-10 opacity-0 group-hover/card:opacity-100 transition-all duration-500 translate-y-2 group-hover/card:translate-y-0 hidden md:block">
-            <div className="w-10 h-10 rounded-2xl bg-white/90 backdrop-blur-xl flex items-center justify-center shadow-xl border border-white/50">
+            <div className="w-10 h-10 rounded-2xl bg-white/95 flex items-center justify-center shadow-lg border border-gray-100">
               <Maximize2 className="w-4.5 h-4.5 text-brand-primary" />
             </div>
           </div>
