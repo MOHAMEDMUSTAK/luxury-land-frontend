@@ -218,7 +218,7 @@ function HomeContent() {
           <div className="hero-particles" />
           
           <div className="relative z-10 w-full max-w-5xl mx-auto px-4 flex flex-col items-center text-center">
-            <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease: "easeOut" }}>
+            <div className="animate-fade-in-up">
               <span className="inline-block py-1.5 px-5 rounded-full bg-white/[0.06] border border-white/10 text-[10px] sm:text-xs font-black tracking-[0.3em] text-indigo-300 uppercase mb-8 backdrop-blur-md">
                 The Pinnacle of Real Estate
               </span>
@@ -229,21 +229,13 @@ function HomeContent() {
               <p className="text-white/50 text-sm sm:text-lg md:text-xl font-medium max-w-2xl mx-auto mb-10 leading-relaxed px-2">
                 Discover the world's most innovative high-end real estate platform. Find untouched lands and premium properties with an unparalleled user experience.
               </p>
-            </motion.div>
+            </div>
 
             {/* Search Section */}
-            <motion.div initial={{ opacity: 0, y: 30, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ duration: 0.7, delay: 0.2, ease: "easeOut" }} className="w-full max-w-3xl flex flex-col items-center px-0">
+            <div className="w-full max-w-3xl flex flex-col items-center px-0 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
               
-              <AnimatePresence mode="wait">
-                {!isSearchActive ? (
-                  <motion.div 
-                    key="full-search"
-                    initial={{ opacity: 0, y: 15 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -15, scale: 0.95 }}
-                    transition={{ duration: 0.3, ease: "circOut" }}
-                    className="w-full flex flex-col items-center"
-                  >
+              {!isSearchActive ? (
+                <div className="w-full flex flex-col items-center">
                     {/* Buy / Rent Toggle */}
                     <div className="relative flex bg-white/[0.06] backdrop-blur-md p-1.5 rounded-full mb-8 border border-white/10 scale-90 sm:scale-100">
                       <button 
@@ -287,16 +279,9 @@ function HomeContent() {
                         </button>
                       </div>
                     </div>
-                  </motion.div>
-                ) : (
-                  <motion.div 
-                    key="summary-pill"
-                    initial={{ opacity: 0, y: 15, scale: 0.9 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 15, scale: 0.9 }}
-                    transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                    className="w-fit flex items-center justify-center p-1.5 bg-gradient-to-r from-brand-primary to-brand-secondary text-white rounded-full shadow-[0_20px_50px_rgba(99,102,241,0.35)] border border-white/10 backdrop-blur-xl group/summary"
-                  >
+                </div>
+              ) : (
+                <div className="w-fit flex items-center justify-center p-1.5 bg-gradient-to-r from-brand-primary to-brand-secondary text-white rounded-full shadow-[0_20px_50px_rgba(99,102,241,0.35)] border border-white/10 backdrop-blur-xl group/summary animate-fade-in-up">
                     <div className="flex items-center gap-4 pl-6 pr-1.5 py-1.5">
                       <div className="flex flex-col items-start gap-0.5">
                         <span className="text-[14px] font-black tracking-tight leading-none">
@@ -315,10 +300,9 @@ function HomeContent() {
                         <span className="text-[10px] font-black uppercase tracking-widest">Edit Search</span>
                       </button>
                     </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.div>
+                </div>
+              )}
+            </div>
           </div>
         </section>
 
