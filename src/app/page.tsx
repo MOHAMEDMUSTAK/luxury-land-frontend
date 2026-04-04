@@ -28,15 +28,6 @@ const containerVariants: any = {
   }
 };
 
-const itemVariants: any = {
-  hidden: { opacity: 0, y: 10 },
-  visible: { 
-    opacity: 1, 
-    y: 0,
-    transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] }
-  }
-};
-
 function HomeContent() {
   const { t } = useTranslation();
   const searchParams = useSearchParams();
@@ -478,12 +469,12 @@ function HomeContent() {
                   <button onClick={clearAllFilters} className="mt-4 text-brand-primary font-bold text-sm hover:underline">{t("home.showAll")}</button>
                 </div>
               ) : (
-                <motion.div variants={containerVariants} initial="hidden" animate="visible" className="flex flex-col gap-8">
+                <div className="flex flex-col gap-8">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {properties.map((property, i) => (
-                      <motion.div key={property._id || property.id || i} variants={itemVariants}>
+                      <div key={property._id || property.id || i} className="animate-fade-in-up" style={{ animationDelay: `${(i % 12) * 0.05}s` }}>
                         <PropertyCard property={{...property, id: property._id || property.id}} priority={i < 4} />
-                      </motion.div>
+                      </div>
                     ))}
                   </div>
 
@@ -498,7 +489,7 @@ function HomeContent() {
                       )}
                     </div>
                   )}
-                </motion.div>
+                </div>
               )}
 
               <RecentlyViewed />

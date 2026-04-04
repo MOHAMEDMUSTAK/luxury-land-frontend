@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { api } from "@/services/api";
 import PropertyCard from "./PropertyCard";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, Clock, Trash2, Sparkles } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { toast } from "react-hot-toast";
@@ -146,32 +146,23 @@ export default function RecentlyViewed({ activeCategory }: RecentlyViewedProps) 
             ref={scrollRef}
             className="flex gap-8 overflow-x-auto no-scrollbar scroll-smooth pt-8 pb-12 h-full px-1"
           >
-            <AnimatePresence>
-              {items.filter(Boolean).map((item, i) => (
-                <motion.div 
-                  key={item._id} 
-                  className="min-w-[320px] w-[320px] group/card relative"
-                  initial={{ opacity: 0, y: 30, scale: 0.95 }}
-                  whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
-                  viewport={{ once: true }}
-                  transition={{ 
-                    duration: 0.6,
-                    delay: i * 0.1,
-                    ease: [0.23, 1, 0.32, 1] 
-                  }}
-                  whileHover={{ y: -12 }}
-                >
-                  <div className="absolute -top-4 left-8 z-20">
-                    <span className="px-4 py-2 bg-white/95 backdrop-blur-xl border border-brand-primary/10 rounded-2xl text-[10px] font-black text-text-secondary shadow-lg shadow-black/[0.03] flex items-center gap-2 transition-all group-hover/card:text-brand-primary group-hover/card:border-brand-primary/30 group-hover/card:scale-105 group-hover/card:shadow-brand-primary/10 uppercase tracking-widest">
-                      <Clock className="w-3.5 h-3.5" />
-                      {getTimeLabel(item.viewedAt)}
-                    </span>
-                  </div>
+            {items.filter(Boolean).map((item, i) => (
+              <div 
+                key={item._id} 
+                className="min-w-[320px] w-[320px] group/card relative animate-fade-in-up"
+                style={{ animationDelay: `${i * 0.1}s` }}
+              >
+                <div className="absolute -top-4 left-8 z-20">
+                  <span className="px-4 py-2 bg-white/95 backdrop-blur-xl border border-brand-primary/10 rounded-2xl text-[10px] font-black text-text-secondary shadow-lg shadow-black/[0.03] flex items-center gap-2 transition-all group-hover/card:text-brand-primary group-hover/card:border-brand-primary/30 group-hover/card:scale-105 group-hover/card:shadow-brand-primary/10 uppercase tracking-widest">
+                    <Clock className="w-3.5 h-3.5" />
+                    {getTimeLabel(item.viewedAt)}
+                  </span>
+                </div>
+                <div className="transition-transform duration-300 group-hover/card:-translate-y-3 h-full">
                   <PropertyCard property={item} />
-                </motion.div>
-              ))}
-            </AnimatePresence>
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </div>
