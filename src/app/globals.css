@@ -51,7 +51,7 @@ html {
 
 html,
 body {
-  min-height: 100%;
+  height: 100%;
   overflow-x: hidden;
   position: relative;
 }
@@ -72,16 +72,15 @@ body {
 
 body.is-chat-active .page-fade-in,
 body.is-chat-active .premium-card,
-body.is-chat-active main {
+body.is-chat-active main,
+body.is-chat-active header {
   transform: none !important;
   perspective: none !important;
   will-change: auto !important;
 }
 
-/* On mobile chat, we still want the header to be accessible or at least not display:none */
 body.is-chat-active header {
-  opacity: 0.9;
-  pointer-events: auto;
+  display: none !important;
 }
 
 /* Mobile-first touch-action optimizations */
@@ -109,7 +108,12 @@ img {
 body {
   overflow-x: hidden;
   max-width: 100vw;
-  background: linear-gradient(135deg, #f8fafc, #eef2ff, #fdf2f8);
+  background-color: #F8FAFC;
+  background-image:
+    radial-gradient(at 0% 0%, hsla(240, 80%, 96%, 0.8) 0, transparent 50%),
+    radial-gradient(at 100% 0%, hsla(260, 80%, 96%, 0.6) 0, transparent 50%),
+    radial-gradient(at 50% 100%, hsla(240, 60%, 96%, 0.5) 0, transparent 50%);
+  background-attachment: fixed;
   color: var(--foreground);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
@@ -118,28 +122,6 @@ body {
   scroll-behavior: smooth;
   overscroll-behavior-y: none;
   @apply pb-[100px] md:pb-0;
-  position: relative;
-}
-
-/* Layered depth background light spots */
-body::before {
-  content: '';
-  position: absolute;
-  top: -20%; right: -10%;
-  width: 60%; height: 60%;
-  background: radial-gradient(circle, rgba(99,102,241,0.04) 0%, transparent 60%);
-  pointer-events: none;
-  z-index: -1;
-}
-
-body::after {
-  content: '';
-  position: absolute;
-  top: 10%; left: -10%;
-  width: 50%; height: 50%;
-  background: radial-gradient(circle, rgba(236,72,153,0.03) 0%, transparent 60%);
-  pointer-events: none;
-  z-index: -1;
 }
 
 /* ═══════════════════════════════════════════
@@ -279,15 +261,6 @@ body::after {
   background-clip: text;
 }
 
-/* Luxury Gold Text (Limited Use) */
-.gold-text {
-  background: linear-gradient(90deg, #F59E0B, #FFD700, #F59E0B);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  background-size: 200% 100%;
-}
-
 /* ═══════════════════════════════════════════
    ULTRA-LUXURY CARD SYSTEM
    ═══════════════════════════════════════════ */
@@ -315,30 +288,12 @@ body::after {
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.65);
-  backdrop-filter: blur(10px) saturate(180%);
-  -webkit-backdrop-filter: blur(10px) saturate(180%);
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.04);
-  position: relative;
-  overflow: hidden;
-}
-
-/* Realistic light reflection gradient */
-.glass-card::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  border-radius: 20px;
-  background: linear-gradient(
-    135deg, 
-    rgba(255, 255, 255, 0.6) 0%, 
-    rgba(255, 255, 255, 0) 30%, 
-    rgba(255, 255, 255, 0) 60%, 
-    rgba(0, 0, 0, 0.03) 100%
-  );
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  border-radius: 24px;
 }
 
 .glass-panel {
@@ -396,8 +351,6 @@ body::after {
 .glass-header.scrolled {
   background: rgba(255, 255, 255, 0.85);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
-  backdrop-filter: blur(10px) saturate(180%);
-  -webkit-backdrop-filter: blur(10px) saturate(180%);
 }
 
 /* Dark glass header variant (for when over dark hero) */
@@ -424,18 +377,20 @@ body::after {
    BUTTON PREMIUM EFFECT
    ═══════════════════════════════════════════ */
 
-.btn-premium, .btn-primary {
-  background: linear-gradient(135deg, #6366F1, #EC4899);
-  box-shadow: 0 8px 25px rgba(99, 102, 241, 0.25);
+.btn-primary {
+  background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
   color: #FFFFFF;
   font-weight: 700;
   letter-spacing: 0.03em;
   padding: 0.85rem 2rem;
   border-radius: 16px;
-  transition: all 0.2s ease-out;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  box-shadow:
+    0 8px 24px -4px rgba(99, 102, 241, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
   cursor: pointer;
   border: none;
   min-height: 44px;
@@ -443,26 +398,28 @@ body::after {
   overflow: hidden;
 }
 
-.btn-premium::before {
+.btn-primary::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), transparent);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent);
   opacity: 0;
-  transition: opacity 0.2s;
+  transition: opacity 0.3s;
 }
 
-.btn-premium:hover {
-  transform: scale(1.02);
-  box-shadow: 0 12px 30px rgba(99, 102, 241, 0.35);
+.btn-primary:hover {
+  box-shadow:
+    0 16px 40px -4px rgba(99, 102, 241, 0.4),
+    0 0 20px rgba(99, 102, 241, 0.2);
+  transform: translateY(-2px);
 }
 
-.btn-premium:hover::before {
+.btn-primary:hover::before {
   opacity: 1;
 }
 
-.btn-premium:active {
-  transform: scale(0.98);
+.btn-primary:active {
+  transform: scale(0.97);
 }
 
 .btn-outline {
@@ -719,100 +676,5 @@ textarea::placeholder {
   .hero-particles::before,
   .hero-particles::after {
     animation: none;
-  }
-}
-
-/* ═══════════════════════════════════════════
-   MOBILE PERFORMANCE OPTIMIZATION
-   ═══════════════════════════════════════════ */
-
-@media (max-width: 768px) {
-  /* Reduce blur intensity — huge GPU savings on mobile */
-  .glass-header {
-    backdrop-filter: blur(10px) saturate(150%);
-    -webkit-backdrop-filter: blur(10px) saturate(150%);
-  }
-
-  .premium-card {
-    backdrop-filter: blur(10px) saturate(150%);
-    -webkit-backdrop-filter: blur(10px) saturate(150%);
-  }
-
-  .glass-card {
-    backdrop-filter: blur(10px) saturate(150%);
-    -webkit-backdrop-filter: blur(10px) saturate(150%);
-  }
-
-  .glass-sidebar {
-    backdrop-filter: blur(10px) saturate(150%);
-    -webkit-backdrop-filter: blur(10px) saturate(150%);
-  }
-
-  .glass-panel {
-    backdrop-filter: blur(8px) saturate(130%);
-    -webkit-backdrop-filter: blur(8px) saturate(130%);
-  }
-
-  /* Disable hover-only effects on touch devices */
-  .premium-card:hover {
-    transform: none;
-    box-shadow: 0 4px 24px -4px rgba(0, 0, 0, 0.06),
-      0 0 0 1px rgba(255, 255, 255, 0.8);
-  }
-
-  .luxe-lift:hover {
-    transform: none;
-  }
-
-  /* Disable hero particles on mobile — saves GPU */
-  .hero-particles::before,
-  .hero-particles::after {
-    display: none;
-  }
-
-  /* Reduce hero grid complexity */
-  .hero-grid {
-    background-size: 80px 80px;
-    opacity: 0.5;
-  }
-
-  /* Reduce hero overlay gradients */
-  .hero-dark::before {
-    background:
-      radial-gradient(ellipse 400px 300px at 20% 30%, rgba(99, 102, 241, 0.1), transparent);
-  }
-
-  /* Reduce large shadows on mobile */
-  .btn-hero {
-    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
-  }
-
-  .btn-primary {
-    box-shadow: 0 4px 16px -2px rgba(99, 102, 241, 0.25);
-  }
-
-  /* Content-visibility for off-screen cards — lazy render */
-  .premium-card {
-    content-visibility: auto;
-    contain-intrinsic-size: 0 420px;
-  }
-}
-
-/* Touch device detection — disable hover transforms */
-@media (hover: none) and (pointer: coarse) {
-  .premium-card:hover {
-    transform: none !important;
-  }
-
-  .luxe-lift:hover {
-    transform: none !important;
-  }
-
-  .btn-primary:hover {
-    transform: none !important;
-  }
-
-  .btn-hero:hover {
-    transform: none !important;
   }
 }

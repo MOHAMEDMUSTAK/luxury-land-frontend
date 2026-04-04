@@ -11,9 +11,7 @@ export default function Providers({ children }: { children: ReactNode }) {
     defaultOptions: {
       queries: {
         staleTime: 60 * 1000, // 60 seconds
-        gcTime: 5 * 60 * 1000, // Keep unused data in cache for 5 minutes (instant back-nav)
         refetchOnWindowFocus: false, // Prevents lag when switching tabs
-        refetchOnMount: false, // Don't refetch if data is within staleTime
         retry: 1,
       },
     },

@@ -21,7 +21,6 @@ import { useTranslation } from "react-i18next";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import RecentlyViewed from "@/components/RecentlyViewed";
 import { requireStrictAuth } from "@/lib/authUtils";
-import { useReducedMotion } from "@/lib/useReducedMotion";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 
@@ -59,7 +58,6 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
   const [comment, setComment] = useState("");
   const [submittingReview, setSubmittingReview] = useState(false);
   const [isWishlisting, setIsWishlisting] = useState(false);
-  const prefersReducedMotion = useReducedMotion();
 
   useEffect(() => {
     // Scroll to top on mount
@@ -231,14 +229,19 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
           </motion.div>
 
           {/* Quick Specs Grid */}
-          {prefersReducedMotion ? (
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              {[
-                { icon: Ruler, label: t("property.totalSize"), value: `${property.size} ${property.sizeUnit || 'sq ft'}` },
-                { icon: Tag, label: t("property.assetType"), value: property.propertyCategory === "shop" ? "Shop" : property.type || "Land" },
-                { icon: Sparkles, label: t("property.landType"), value: property.landType || "Standard", hide: !property.landType },
-                { icon: MapPin, label: t("property.status"), value: property.status === "Sold" ? t("property.sold") : t("property.available"), color: property.status === "Sold" ? "text-red-600" : "text-green-600" },
-              ].filter(spec => !spec.hide).slice(0, 4).map((spec, i) => (
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
+            className="grid grid-cols-2 sm:grid-cols-4 gap-4"
+          >
+             {[
+               { icon: Ruler, label: t("property.totalSize"), value: `${property.size} ${property.sizeUnit || 'sq ft'}` },
+               { icon: Tag, label: t("property.assetType"), value: property.propertyCategory === "shop" ? "Shop" : property.type || "Land" },
+               { icon: Sparkles, label: t("property.landType"), value: property.landType || "Standard", hide: !property.landType },
+               { icon: MapPin, label: t("property.status"), value: property.status === "Sold" ? t("property.sold") : t("property.available"), color: property.status === "Sold" ? "text-red-600" : "text-green-600" },
+             ].filter(spec => !spec.hide).slice(0, 4).map((spec, i) => (
                 <div key={i} className="p-5 bg-white rounded-[20px] border border-ui-border flex flex-col items-center text-center hover:shadow-[0_10px_30px_rgba(0,0,0,0.06)] hover:-translate-y-1.5 transition-all duration-500 group/spec">
                   <div className="w-10 h-10 rounded-full bg-brand-primary/[0.04] flex items-center justify-center mb-3 group-hover/spec:bg-brand-primary/10 transition-colors">
                     <spec.icon className="w-5 h-5 text-brand-primary transition-transform duration-500 group-hover/spec:scale-110" />
@@ -246,32 +249,8 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
                   <span className="text-[9px] font-bold text-text-secondary uppercase tracking-[0.15em] mb-1">{spec.label}</span>
                   <span className={`font-bold text-sm text-text-main ${spec.color || ""}`}>{spec.value}</span>
                 </div>
-              ))}
-            </div>
-          ) : (
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
-              className="grid grid-cols-2 sm:grid-cols-4 gap-4"
-            >
-               {[
-                 { icon: Ruler, label: t("property.totalSize"), value: `${property.size} ${property.sizeUnit || 'sq ft'}` },
-                 { icon: Tag, label: t("property.assetType"), value: property.propertyCategory === "shop" ? "Shop" : property.type || "Land" },
-                 { icon: Sparkles, label: t("property.landType"), value: property.landType || "Standard", hide: !property.landType },
-                 { icon: MapPin, label: t("property.status"), value: property.status === "Sold" ? t("property.sold") : t("property.available"), color: property.status === "Sold" ? "text-red-600" : "text-green-600" },
-               ].filter(spec => !spec.hide).slice(0, 4).map((spec, i) => (
-                  <div key={i} className="p-5 bg-white rounded-[20px] border border-ui-border flex flex-col items-center text-center hover:shadow-[0_10px_30px_rgba(0,0,0,0.06)] hover:-translate-y-1.5 transition-all duration-500 group/spec">
-                    <div className="w-10 h-10 rounded-full bg-brand-primary/[0.04] flex items-center justify-center mb-3 group-hover/spec:bg-brand-primary/10 transition-colors">
-                      <spec.icon className="w-5 h-5 text-brand-primary transition-transform duration-500 group-hover/spec:scale-110" />
-                    </div>
-                    <span className="text-[9px] font-bold text-text-secondary uppercase tracking-[0.15em] mb-1">{spec.label}</span>
-                    <span className={`font-bold text-sm text-text-main ${spec.color || ""}`}>{spec.value}</span>
-                  </div>
-               ))}
-            </motion.div>
-          )}
+             ))}
+          </motion.div>
 
           {/* Property Details & Description */}
           <motion.div 
