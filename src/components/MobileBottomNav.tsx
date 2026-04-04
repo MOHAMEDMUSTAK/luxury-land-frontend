@@ -51,9 +51,9 @@ export default function MobileBottomNav() {
     <div 
       className="md:hidden fixed left-1/2 z-[40] w-[92%] max-w-[420px] flex items-center justify-between glass-card h-16 !rounded-full shadow-[0_20px_50px_rgba(0,0,0,0.2)] px-4 overflow-hidden pointer-events-auto"
       style={{ 
-        bottom: `calc(16px + env(safe-area-inset-bottom))`,
+        bottom: `calc(16px + env(safe-area-inset-bottom, 0px))`,
         transform: `translateX(-50%) translateY(${isVisible ? '0' : '100px'})`,
-        transition: 'transform 0.3s ease-in-out',
+        transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
         willChange: 'transform',
       }}
     >

@@ -61,7 +61,7 @@ export default function Navbar() {
 
   return (
     <header 
-      className="sticky top-0 sm:top-4 z-[100] mx-0 sm:mx-4 lg:mx-8 xl:mx-auto max-w-7xl sm:rounded-3xl glass-header transition-all duration-500 ease-in-out pb-3 sm:pb-6 pt-[calc(env(safe-area-inset-top)+12px)] sm:pt-[calc(env(safe-area-inset-top)+24px)] shadow-xl border-white/40"
+      className="sticky top-0 sm:top-4 z-[100] mx-0 sm:mx-4 lg:mx-8 xl:mx-auto max-w-7xl sm:rounded-3xl glass-header transition-all duration-500 ease-in-out pb-3 sm:pb-6 pt-[calc(env(safe-area-inset-top,0px)+12px)] sm:pt-[calc(env(safe-area-inset-top,0px)+24px)] shadow-xl border-white/40"
     >
       <div className="px-4 lg:px-8 h-16 flex items-center justify-between gap-4">
         
