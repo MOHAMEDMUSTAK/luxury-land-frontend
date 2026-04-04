@@ -113,7 +113,6 @@ body {
     radial-gradient(at 0% 0%, hsla(240, 80%, 96%, 0.8) 0, transparent 50%),
     radial-gradient(at 100% 0%, hsla(260, 80%, 96%, 0.6) 0, transparent 50%),
     radial-gradient(at 50% 100%, hsla(240, 60%, 96%, 0.5) 0, transparent 50%);
-  background-attachment: fixed;
   color: var(--foreground);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;

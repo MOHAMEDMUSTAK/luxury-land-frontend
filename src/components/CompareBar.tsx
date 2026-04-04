@@ -6,14 +6,14 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { formatCurrency } from "@/lib/utils";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useCompareStore } from "@/store/useCompareStore";
 
 export default function CompareBar() {
   const { properties, removeProperty, clearCompare } = useCompareStore();
   const [isExpanded, setIsExpanded] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
+  const lastScrollY = useRef(0);
   const [isAnalysisOpen, setIsAnalysisOpen] = useState(false);
   const router = useRouter();
 
@@ -21,19 +21,19 @@ export default function CompareBar() {
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      if (Math.abs(currentScrollY - lastScrollY) < 10) return;
+      if (Math.abs(currentScrollY - lastScrollY.current) < 10) return;
 
-      if (currentScrollY > lastScrollY && currentScrollY > 60) {
+      if (currentScrollY > lastScrollY.current && currentScrollY > 60) {
         setIsVisible(false);
       } else {
         setIsVisible(true);
       }
-      setLastScrollY(currentScrollY);
+      lastScrollY.current = currentScrollY;
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [lastScrollY]);
+  }, []);
 
   // Auto-collapse on mobile initially
   useEffect(() => {

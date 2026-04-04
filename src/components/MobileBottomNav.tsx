@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, Search, Heart, PlusCircle, User } from "lucide-react";
@@ -14,27 +14,26 @@ export default function MobileBottomNav() {
   const { isChatActive } = useUIStore();
   const { isAuthenticated } = useAuthStore();
   const [isVisible, setIsVisible] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
+  const lastScrollY = useRef(0);
 
-  // Auto-hide logic on scroll
+  // Auto-hide logic on scroll — stable listener via useRef
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
       
-      // Only hide after 10 pixels of scroll to prevent sensitivity
-      if (Math.abs(currentScrollY - lastScrollY) < 10) return;
+      if (Math.abs(currentScrollY - lastScrollY.current) < 10) return;
 
-      if (currentScrollY > lastScrollY && currentScrollY > 60) {
-        setIsVisible(false); // Scrolling Down
+      if (currentScrollY > lastScrollY.current && currentScrollY > 60) {
+        setIsVisible(false);
       } else {
-        setIsVisible(true); // Scrolling Up
+        setIsVisible(true);
       }
-      setLastScrollY(currentScrollY);
+      lastScrollY.current = currentScrollY;
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [lastScrollY]);
+  }, []);
 
   // Hide on chat pages or if a chat modal is active - Moved here to follow hooks rule
   if (pathname.startsWith('/chat/') || isChatActive) {
