@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
 import { X, ChevronLeft, ChevronRight, Maximize2 } from "lucide-react";
+import { createPortal } from "react-dom";
 
 interface ImageGalleryProps {
   images: string[];
@@ -13,6 +14,11 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const swiperRef = useRef<any>(null);
   const swiperContainerRef = useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleNext = useCallback(() => {
     setCurrentIndex((prev) => (prev + 1) % images.length);
@@ -188,7 +194,7 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
       )}
 
       {/* Fullscreen Overlay — Amazon-style clean viewer with Swiper */}
-      {isFullscreen && (
+      {isFullscreen && mounted && createPortal(
         <div
           className="fs-overlay"
           onClick={(e) => {
@@ -243,7 +249,8 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
           {images.length > 1 && (
             <div className="fs-swiper-pagination" />
           )}
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Performance Prefetching — adjacent images */}
