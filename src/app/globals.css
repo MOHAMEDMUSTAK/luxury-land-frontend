@@ -668,7 +668,7 @@ textarea::placeholder {
   justify-content: center;
   overscroll-behavior: none;
   touch-action: pan-x pinch-zoom;
-  animation: fs-fade-in 0.2s ease-out;
+  animation: fs-fade-in 0.15s ease-out;
   -webkit-user-select: none;
   user-select: none;
 }
@@ -681,54 +681,52 @@ textarea::placeholder {
 /* Close button */
 .fs-close-btn {
   position: absolute;
-  top: env(safe-area-inset-top, 16px);
-  right: 16px;
+  top: env(safe-area-inset-top, 12px);
+  right: 12px;
   z-index: 10002;
-  padding: 12px;
-  background: rgba(255, 255, 255, 0.1);
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 50%;
-  color: #fff;
+  color: rgba(255, 255, 255, 0.85);
   cursor: pointer;
   transition: background 0.2s, transform 0.15s;
   touch-action: manipulation;
-  margin-top: 16px;
+  margin-top: 12px;
 }
 
 .fs-close-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.18);
 }
 
 .fs-close-btn:active {
-  transform: scale(0.92);
+  transform: scale(0.9);
 }
 
 /* Image counter */
 .fs-counter {
   position: absolute;
-  top: env(safe-area-inset-top, 16px);
-  left: 16px;
+  top: env(safe-area-inset-top, 12px);
+  left: 12px;
   z-index: 10002;
-  padding: 6px 14px;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 12px;
+  padding: 5px 12px;
+  background: rgba(0, 0, 0, 0.5);
+  border: none;
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  margin-top: 16px;
+  margin-top: 12px;
 }
 
-/* Swiper container */
+/* Swiper container — full viewport */
 .fs-swiper {
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   overflow: hidden;
 }
 
@@ -736,31 +734,29 @@ textarea::placeholder {
   will-change: transform;
 }
 
+/* Slide — ZERO padding on mobile for edge-to-edge */
 .fs-slide {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  height: 100%;
-  padding: 60px 12px 80px;
+  width: 100vw;
+  height: 100vh;
+  padding: 0;
+  margin: 0;
 }
 
-@media (min-width: 768px) {
-  .fs-slide {
-    padding: 80px 60px 80px;
-  }
-}
-
-/* Fullscreen image */
+/* Image — fills entire screen, edge-to-edge */
 .fs-image {
-  max-width: 100%;
-  max-height: 100%;
-  width: auto;
-  height: auto;
+  width: 100vw;
+  height: 100vh;
   object-fit: contain;
   pointer-events: none;
   -webkit-user-drag: none;
-  border-radius: 4px;
+  border-radius: 0;
+  border: none;
+  margin: 0;
+  padding: 0;
+  display: block;
 }
 
 /* Desktop nav buttons */
@@ -790,8 +786,8 @@ textarea::placeholder {
   }
 }
 
-.fs-nav-prev { left: 20px; }
-.fs-nav-next { right: 20px; }
+.fs-nav-prev { left: 16px; }
+.fs-nav-next { right: 16px; }
 
 .fs-nav-btn:hover {
   background: rgba(255, 255, 255, 0.12);
@@ -811,7 +807,7 @@ textarea::placeholder {
 /* Pagination dots */
 .fs-swiper-pagination {
   position: absolute !important;
-  bottom: 28px !important;
+  bottom: 16px !important;
   left: 50% !important;
   transform: translateX(-50%);
   z-index: 10002;
@@ -826,14 +822,14 @@ textarea::placeholder {
   width: 6px;
   height: 6px;
   border-radius: 6px;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.25);
   cursor: pointer;
   transition: all 0.3s ease;
   display: inline-block;
 }
 
 .fs-bullet-active {
-  width: 22px;
+  width: 20px;
   background: #fff;
 }
 
