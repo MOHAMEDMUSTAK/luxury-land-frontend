@@ -125,7 +125,7 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
       queryKey: ['land', propertyId],
       queryFn: async () => {
         const { api } = await import("@/services/api");
-        const res = await api.get(`/land/${propertyId}`);
+        const res = await api.get(`/land/${propertyId}?prefetch=true`);
         return res.data;
       },
       staleTime: 60 * 1000

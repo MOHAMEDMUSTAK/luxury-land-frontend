@@ -22,7 +22,7 @@ export const useWishlistStore = create<WishlistStore>()(
         if (currentItems.includes(stringId)) {
           set({ items: currentItems.filter((i) => i !== stringId) });
         } else {
-          set({ items: [...currentItems, stringId] });
+          set({ items: Array.from(new Set([...currentItems, stringId])) });
         }
 
         // Sync with backend if logged in
