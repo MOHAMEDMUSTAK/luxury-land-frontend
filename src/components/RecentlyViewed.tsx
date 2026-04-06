@@ -1,9 +1,6 @@
-"use client";
-
 import { useEffect, useState, useRef } from "react";
 import { api } from "@/services/api";
 import PropertyCard from "./PropertyCard";
-import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, Clock, Trash2, Sparkles } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { toast } from "react-hot-toast";
@@ -75,16 +72,11 @@ export default function RecentlyViewed({ activeCategory }: RecentlyViewedProps) 
     <section className="py-24 border-t border-ui-border/50 mt-20 relative overflow-hidden">
       {/* Premium Decorative Elements */}
       <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-brand-primary/20 to-transparent" />
-      <div className="absolute -top-24 -left-24 w-96 h-96 bg-brand-primary/5 rounded-full blur-[100px] pointer-events-none" />
       
       <div className="container mx-auto px-4 relative">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-8">
           <div className="space-y-4">
-            <motion.div 
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              className="flex items-center gap-3"
-            >
+            <div className="flex items-center gap-3 animate-fade-in-up">
               <div className="w-12 h-12 rounded-2xl bg-brand-primary/10 flex items-center justify-center shadow-inner border border-brand-primary/5">
                 <Clock className="w-6 h-6 text-brand-primary" />
               </div>
@@ -92,7 +84,7 @@ export default function RecentlyViewed({ activeCategory }: RecentlyViewedProps) 
                 <Sparkles className="w-3.5 h-3.5" />
                 Continuity
               </span>
-            </motion.div>
+            </div>
             
             <div>
               <h2 className="text-4xl sm:text-5xl font-black text-text-main tracking-tighter leading-none mb-3">

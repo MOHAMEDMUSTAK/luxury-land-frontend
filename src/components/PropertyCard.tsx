@@ -152,7 +152,7 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
         className="group block h-full cursor-pointer"
       >
       <div 
-        className="premium-card glass-card h-full flex flex-col group/card relative transition-transform duration-300 hover:scale-[1.02]"
+        className="premium-card h-full flex flex-col group/card relative"
       >
         {/* CSS-only spotlight effect — replaces per-card JS mouse tracking */}
         <div className="pointer-events-none absolute -inset-px rounded-3xl opacity-0 transition duration-300 group-hover/card:opacity-100 z-0 hidden md:block bg-[radial-gradient(400px_circle_at_50%_50%,rgba(99,102,241,0.06),transparent_60%)]" />
@@ -180,7 +180,7 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
               alt={property.title}
               fill
               priority={priority}
-              className="object-cover group-hover/card:scale-105 transition-transform duration-700 ease-out"
+              className="object-cover transition-transform duration-500 ease-out md:group-hover/card:scale-105"
               sizes="(max-width: 640px) 300px, (max-width: 1024px) 400px, 400px"
             />
           ) : (
@@ -323,8 +323,4 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
 
 PropertyCard.displayName = 'PropertyCard';
 
-export default memo(PropertyCard, (prevProps, nextProps) => {
-  const prevId = (prevProps.property._id || prevProps.property.id) as string;
-  const nextId = (nextProps.property._id || nextProps.property.id) as string;
-  return prevId === nextId && prevProps.priority === nextProps.priority;
-});
+export default PropertyCard;

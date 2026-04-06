@@ -15,7 +15,7 @@ if (process.env.NODE_ENV === 'production' && !process.env.NEXT_PUBLIC_API_URL) {
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 60000, // Increased to 60 seconds for heavy image uploads
+  timeout: 15000, // Reduced from 60s to 15s for normal API calls (faster failure detection)
   withCredentials: true,
 });
 
@@ -48,6 +48,8 @@ api.interceptors.request.use(
     // For all other requests, default to JSON
     if (config.data instanceof FormData) {
       delete config.headers['Content-Type'];
+      // Use longer timeout for file uploads
+      config.timeout = 60000;
     } else {
       config.headers['Content-Type'] = 'application/json';
     }

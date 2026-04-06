@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@/store/useAuthStore";
-import { motion } from "framer-motion";
 
 const PROTECTED_ROUTES = ["/profile", "/dashboard", "/my-ads", "/property", "/wishlist", "/chat", "/post"];
 
@@ -13,15 +12,26 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
   const [showFailSafe, setShowFailSafe] = useState(false);
+  const failSafeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     setMounted(true);
-    // Fail-safe timer: if still checking auth after 5s, show "Proceed Anyway"
-    const timer = setTimeout(() => {
+    // Fail-safe timer: if still checking auth after 3s (reduced from 5s), show "Proceed Anyway"
+    failSafeTimer.current = setTimeout(() => {
       setShowFailSafe(true);
-    }, 5000);
-    return () => clearTimeout(timer);
+    }, 3000);
+    return () => {
+      if (failSafeTimer.current) clearTimeout(failSafeTimer.current);
+    };
   }, []);
+
+  // Clear fail-safe timer as soon as auth check completes
+  useEffect(() => {
+    if (!isCheckingAuth && failSafeTimer.current) {
+      clearTimeout(failSafeTimer.current);
+      failSafeTimer.current = null;
+    }
+  }, [isCheckingAuth]);
 
   const isProtected = PROTECTED_ROUTES.some(route => pathname?.startsWith(route));
 
@@ -46,21 +56,17 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
     return (
       <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-white p-6 text-center">
         <div className="w-16 h-16 relative mb-8">
-          <div className="absolute inset-0 border-4 border-brand-primary/20 rounded-full animate-pulse" />
+          <div className="absolute inset-0 border-4 border-brand-primary/20 rounded-full" />
           <div className="absolute inset-0 border-4 border-t-brand-primary rounded-full animate-spin" />
         </div>
         
         <div className="space-y-4">
-          <p className="text-sm font-bold text-brand-primary tracking-widest uppercase animate-pulse">
+          <p className="text-sm font-bold text-brand-primary tracking-widest uppercase">
             LuxuryLand Secure Access
           </p>
           
           {showFailSafe && (
-            <motion.div 
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="pt-4 space-y-4"
-            >
+            <div className="pt-4 space-y-4">
               <p className="text-xs text-text-secondary font-medium max-w-xs mx-auto">
                 Authentication is taking longer than usual. You can try to proceed anyway or refresh.
               </p>
@@ -71,7 +77,7 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
               >
                 Proceed Anyway
               </button>
-            </motion.div>
+            </div>
           )}
         </div>
       </div>

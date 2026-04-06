@@ -14,7 +14,15 @@ const config: CapacitorConfig = {
   android: {
     // Allows swiping to go back and generic WebView settings
     allowMixedContent: true,
-  }
+    // WebView performance tuning
+    webContentsDebuggingEnabled: false,
+    backgroundColor: '#F8FAFC',
+  },
+  plugins: {
+    SplashScreen: {
+      launchShowDuration: 0, // Disable splash to load faster
+    },
+  },
 };
 
 export default config;

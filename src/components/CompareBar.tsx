@@ -14,21 +14,29 @@ export default function CompareBar() {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const lastScrollY = useRef(0);
+  const ticking = useRef(false);
   const [isAnalysisOpen, setIsAnalysisOpen] = useState(false);
   const router = useRouter();
 
-  // Sync visibility with scroll (matches MobileBottomNav)
+  // Sync visibility with scroll — rAF throttled for 60fps
   useEffect(() => {
     const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      if (Math.abs(currentScrollY - lastScrollY.current) < 10) return;
-
-      if (currentScrollY > lastScrollY.current && currentScrollY > 60) {
-        setIsVisible(false);
-      } else {
-        setIsVisible(true);
-      }
-      lastScrollY.current = currentScrollY;
+      if (ticking.current) return;
+      ticking.current = true;
+      requestAnimationFrame(() => {
+        const currentScrollY = window.scrollY;
+        if (Math.abs(currentScrollY - lastScrollY.current) < 10) {
+          ticking.current = false;
+          return;
+        }
+        if (currentScrollY > lastScrollY.current && currentScrollY > 60) {
+          setIsVisible(false);
+        } else {
+          setIsVisible(true);
+        }
+        lastScrollY.current = currentScrollY;
+        ticking.current = false;
+      });
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });

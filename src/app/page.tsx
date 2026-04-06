@@ -456,7 +456,7 @@ function HomeContent() {
                 <div className="flex flex-col gap-8">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {properties.map((property, i) => (
-                      <div key={property._id || property.id || i} className="animate-fade-in-up" style={{ animationDelay: `${(i % 12) * 0.05}s` }}>
+                      <div key={property._id || property.id || i} className="animate-fade-in-up">
                         <PropertyCard property={{...property, id: property._id || property.id}} priority={i < 4} />
                       </div>
                     ))}

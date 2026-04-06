@@ -98,6 +98,17 @@ export const useAuthStore = create<AuthStore>()(
         }
       },
       checkAuth: async () => {
+        const state = get();
+
+        // FAST PATH: If Zustand already has a cached user+token from persist,
+        // mark authenticated immediately and do a silent background refresh.
+        if (state.user && state.token) {
+          set({ isAuthenticated: true, isCheckingAuth: false });
+          // Silent background refresh — no blocking, no loading screen
+          get().fetchProfile().catch(() => {});
+          return;
+        }
+
         set({ isCheckingAuth: true });
         const token = typeof window !== 'undefined' ? localStorage.getItem('luxuryland-auth-token') : null;
         if (!token) {
@@ -111,8 +122,13 @@ export const useAuthStore = create<AuthStore>()(
       name: 'luxuryland-auth',
       onRehydrateStorage: () => (state) => {
         if (state) {
-          // Trigger a silent check on rehydration to sync with localStorage
-          state.checkAuth();
+          // On rehydration: if we have cached user+token, resolve immediately
+          // instead of making a blocking API call
+          if (state.user && state.token) {
+            state.checkAuth(); // This will now take the fast path above
+          } else {
+            state.checkAuth();
+          }
         }
       },
     }

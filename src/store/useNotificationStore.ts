@@ -22,7 +22,15 @@ interface NotificationStore {
   stopPolling: () => void;
 }
 
-let pollingInterval: NodeJS.Timeout | null = null;
+let pollingInterval: ReturnType<typeof setInterval> | null = null;
+let isPageVisible = true;
+
+// Track page visibility to pause polling when app is in background
+if (typeof window !== 'undefined') {
+  document.addEventListener('visibilitychange', () => {
+    isPageVisible = !document.hidden;
+  }, { passive: true });
+}
 
 export const useNotificationStore = create<NotificationStore>((set, get) => ({
   notifications: [],
@@ -30,6 +38,9 @@ export const useNotificationStore = create<NotificationStore>((set, get) => ({
   isLoading: false,
 
   fetchNotifications: async () => {
+    // Skip fetch if page is not visible (app in background / recent apps)
+    if (!isPageVisible) return;
+
     try {
       // Small optimization: only show loading on very first fetch
       if (get().notifications.length === 0) set({ isLoading: true });
@@ -82,8 +93,11 @@ export const useNotificationStore = create<NotificationStore>((set, get) => ({
     if (pollingInterval) return;
     get().fetchNotifications(); // Initial fetch
     pollingInterval = setInterval(() => {
-      get().fetchNotifications();
-    }, 10000); // 10 seconds
+      // Only fetch when page is visible
+      if (isPageVisible) {
+        get().fetchNotifications();
+      }
+    }, 30000); // Reduced from 10s → 30s to reduce server hammering
   },
 
   stopPolling: () => {
