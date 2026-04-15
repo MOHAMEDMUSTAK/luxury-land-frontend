@@ -454,13 +454,29 @@ function HomeContent() {
                 </div>
               ) : (
                 <div className="flex flex-col gap-8">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <motion.div 
+                    variants={containerVariants}
+                    initial="hidden"
+                    animate="visible"
+                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                  >
                     {properties.map((property, i) => (
-                      <div key={property._id || property.id || i} className="animate-fade-in-up">
+                      <motion.div 
+                        key={property._id || property.id || i} 
+                        variants={{
+                          hidden: { opacity: 0, y: 40, scale: 0.96 },
+                          visible: { 
+                            opacity: 1, 
+                            y: 0, 
+                            scale: 1, 
+                            transition: { type: "spring", stiffness: 350, damping: 30 } 
+                          }
+                        }}
+                      >
                         <PropertyCard property={{...property, id: property._id || property.id}} priority={i < 4} />
-                      </div>
+                      </motion.div>
                     ))}
-                  </div>
+                  </motion.div>
 
                   {/* Infinite Scroll Sentinel */}
                   {page < totalPages && (

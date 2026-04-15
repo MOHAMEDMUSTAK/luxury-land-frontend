@@ -13,6 +13,7 @@ import dynamic from "next/dynamic";
 import { useTranslation } from "react-i18next";
 import { requireStrictAuth } from "@/lib/authUtils";
 import { useQueryClient } from "@tanstack/react-query";
+import { motion } from "framer-motion";
 
 const MapModal = dynamic(() => import("./MapModal"), { ssr: false });
 
@@ -146,13 +147,16 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
 
   return (
     <>
-      <div 
+      <motion.div 
         onClick={handleNavigate}
         onMouseEnter={handlePrefetch}
-        className="group block h-full cursor-pointer"
+        whileHover={{ y: -6, scale: 1.01 }}
+        whileTap={{ scale: 0.98 }}
+        transition={{ type: "spring", stiffness: 400, damping: 30 }}
+        className="group block h-full cursor-pointer rounded-3xl"
       >
       <div 
-        className="premium-card h-full flex flex-col group/card relative"
+        className="premium-card h-full flex flex-col group/card relative shadow-sm hover:shadow-[0_24px_50px_-15px_rgba(0,0,0,0.15)] transition-shadow duration-500"
       >
         {/* CSS-only spotlight effect — replaces per-card JS mouse tracking */}
         <div className="pointer-events-none absolute -inset-px rounded-3xl opacity-0 transition duration-300 group-hover/card:opacity-100 z-0 hidden md:block bg-[radial-gradient(400px_circle_at_50%_50%,rgba(99,102,241,0.06),transparent_60%)]" />
@@ -308,7 +312,7 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
           </div>
         </div>
       </div>
-      </div>
+      </motion.div>
 
     <MapModal
       isOpen={isMapOpen}
