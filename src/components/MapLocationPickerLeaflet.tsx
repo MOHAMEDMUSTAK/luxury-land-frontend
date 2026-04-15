@@ -15,6 +15,18 @@ const customIcon = new L.Icon({
   shadowSize: [41, 41],
 });
 
+// Fixes missing/gray tiles by forcing Leaflet to recalculate canvas sizing
+function MapUpdater() {
+  const map = useMap();
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      map.invalidateSize();
+    }, 250);
+    return () => clearTimeout(timer);
+  }, [map]);
+  return null;
+}
+
 interface LocationPickerProps {
   lat: number | null;
   lng: number | null;
@@ -36,7 +48,6 @@ function LocationMarker({ lat, lng, onChange }: LocationPickerProps) {
   ) : null;
 }
 
-// Default center: India/Chennai or wherever global defaults are
 const DEFAULT_CENTER: [number, number] = [13.0827, 80.2707];
 
 export default function MapLocationPickerLeaflet({ lat, lng, onChange }: LocationPickerProps) {
@@ -45,7 +56,6 @@ export default function MapLocationPickerLeaflet({ lat, lng, onChange }: Locatio
   );
 
   useEffect(() => {
-    // If external props update, update center if it's the first time
     if (lat && lng) {
       setCenter([lat, lng]);
     }
@@ -59,6 +69,7 @@ export default function MapLocationPickerLeaflet({ lat, lng, onChange }: Locatio
         scrollWheelZoom={true}
         style={{ height: "100%", width: "100%" }}
       >
+        <MapUpdater />
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
