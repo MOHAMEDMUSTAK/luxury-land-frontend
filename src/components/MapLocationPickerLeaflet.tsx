@@ -15,14 +15,21 @@ const customIcon = new L.Icon({
   shadowSize: [41, 41],
 });
 
-// Fixes missing/gray tiles by forcing Leaflet to recalculate canvas sizing
 function MapUpdater() {
   const map = useMap();
   useEffect(() => {
-    const timer = setTimeout(() => {
+    const container = map.getContainer();
+    const observer = new ResizeObserver(() => {
       map.invalidateSize();
-    }, 250);
-    return () => clearTimeout(timer);
+    });
+    observer.observe(container);
+    
+    const timer = setTimeout(() => map.invalidateSize(), 300);
+
+    return () => {
+      clearTimeout(timer);
+      observer.disconnect();
+    };
   }, [map]);
   return null;
 }

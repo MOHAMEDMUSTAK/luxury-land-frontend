@@ -16,16 +16,22 @@ const customIcon = new L.Icon({
   shadowSize: [41, 41],
 });
 
-// Fixes gray tiles rendering bug in Modals
 function MapUpdater() {
   const map = useMap();
   useEffect(() => {
-    // A slight delay guarantees the modal's DOM container has fully expanded
-    // before Leaflet attempts to calculate its bounds.
-    const timer = setTimeout(() => {
+    const container = map.getContainer();
+    const observer = new ResizeObserver(() => {
       map.invalidateSize();
-    }, 250);
-    return () => clearTimeout(timer);
+    });
+    observer.observe(container);
+    
+    // Fallback timer just in case the observer fires before the DOM paints
+    const timer = setTimeout(() => map.invalidateSize(), 300);
+
+    return () => {
+      clearTimeout(timer);
+      observer.disconnect();
+    };
   }, [map]);
   return null;
 }
