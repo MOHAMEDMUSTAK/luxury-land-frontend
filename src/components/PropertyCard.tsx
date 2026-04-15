@@ -109,6 +109,7 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
 
   const handleOpenMap = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     setIsMapOpen(true);
   }, []);
 
