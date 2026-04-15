@@ -2,18 +2,19 @@
 
 import { useState } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
-import { useWishlistStore } from "@/store/useWishlistStore";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { api } from "@/services/api";
 import Link from "next/link";
-import { Eye, EyeOff, Mail, Lock } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, Loader2 } from "lucide-react";
+import { motion } from "framer-motion";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const [isLoading, setIsLoading] = useState(false);
 
   const { login } = useAuthStore();
   const router = useRouter();
@@ -32,124 +33,192 @@ export default function LoginPage() {
     e.preventDefault();
     if (!validate()) return;
 
-    const toastId = toast.loading("Signing in...");
+    setIsLoading(true);
 
-      try {
-        const res = await api.post("/auth/login", { email, password });
-        login(
-          { 
-            id: String(res.data.id || res.data._id), 
-            name: res.data.name, 
-            email: res.data.email, 
-            profileImage: res.data.profileImage,
-            phone: res.data.phone,
-            location: res.data.location,
-            role: res.data.role || "user",
-            wishlist: res.data.wishlist || []
-          },
-          res.data.token
-        );
-        toast.success("Welcome back!", { id: toastId });
-        
-        const redirect = localStorage.getItem("redirectAfterLogin");
-        if (redirect) {
-          localStorage.removeItem("redirectAfterLogin");
-          router.replace(redirect);
-        } else {
-          router.replace("/");
-        }
-      } catch (err: any) {
-        toast.error(err.response?.data?.message || "Invalid credentials.", { id: toastId });
+    try {
+      const res = await api.post("/auth/login", { email, password });
+      login(
+        { 
+          id: String(res.data.id || res.data._id), 
+          name: res.data.name, 
+          email: res.data.email, 
+          profileImage: res.data.profileImage,
+          phone: res.data.phone,
+          location: res.data.location,
+          role: res.data.role || "user",
+          wishlist: res.data.wishlist || []
+        },
+        res.data.token
+      );
+      toast.success("Welcome back!");
+      
+      const redirect = localStorage.getItem("redirectAfterLogin");
+      if (redirect) {
+        localStorage.removeItem("redirectAfterLogin");
+        router.replace(redirect);
+      } else {
+        router.replace("/");
       }
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Invalid credentials.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <div className="flex-1 flex items-center justify-center px-4 py-20 page-fade-in">
-      <div className="w-full max-w-[420px]">
+    <div className="flex-1 flex items-center justify-center px-4 py-20 relative overflow-hidden bg-[#F8FAFC]">
+      {/* Background glow effects */}
+      <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-brand-primary/10 rounded-full mix-blend-multiply filter blur-[80px] opacity-70 animate-blob" />
+      <div className="absolute top-1/3 right-1/4 w-[400px] h-[400px] bg-purple-300/20 rounded-full mix-blend-multiply filter blur-[80px] opacity-70 animate-blob animation-delay-2000" />
+      
+      <motion.div 
+        initial={{ opacity: 0, y: 30, scale: 0.95 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.5, type: "spring", stiffness: 100 }}
+        className="w-full max-w-[420px] relative z-10"
+      >
         {/* Card */}
-        <div className="bg-white rounded-[20px] border border-ui-border shadow-[0_8px_40px_rgba(0,0,0,0.06)] p-8 sm:p-10">
+        <div className="bg-white/80 backdrop-blur-xl rounded-3xl border border-white/50 shadow-[0_8px_40px_rgba(0,0,0,0.06)] p-8 sm:p-10 premium-card">
           {/* Logo */}
-          <div className="flex justify-center mb-6">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-brand-primary to-brand-secondary flex items-center justify-center text-white font-black text-2xl shadow-lg shadow-brand-primary/20">
+          <motion.div 
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.2, type: "spring", stiffness: 150 }}
+            className="flex justify-center mb-6"
+          >
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-primary to-brand-secondary flex items-center justify-center text-white font-black text-3xl shadow-[0_8px_20px_rgba(99,102,241,0.3)]">
               L
             </div>
-          </div>
+          </motion.div>
 
           {/* Title */}
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-text-main tracking-tight mb-1.5">Welcome Back</h1>
-            <p className="text-sm text-text-secondary font-medium">Login to continue to your dashboard</p>
+            <motion.h1 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="text-[28px] font-black text-text-main tracking-tight mb-2 gradient-heading"
+            >
+              Welcome Back
+            </motion.h1>
+            <motion.p 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="text-[15px] text-text-secondary font-medium"
+            >
+              Unlock your premium dashboard
+            </motion.p>
           </div>
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Email */}
-            <div className="space-y-1.5">
-              <label className="text-[13px] font-semibold text-text-main ml-0.5">Email Address</label>
-              <div className="relative">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-gray-400 pointer-events-none" />
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.5 }}
+              className="space-y-1.5"
+            >
+              <label className="text-[13px] font-bold text-text-main ml-0.5 tracking-wide">Email Address</label>
+              <div className="relative group">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-gray-400 group-focus-within:text-brand-primary transition-colors duration-300 pointer-events-none" />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => { setEmail(e.target.value); setErrors(p => ({...p, email: undefined})); }}
                   placeholder="you@example.com"
-                  className={`w-full pl-11 pr-4 py-3 rounded-xl border bg-white text-sm font-medium outline-none transition-all duration-200 placeholder:text-gray-400 focus:ring-[3px] focus:ring-brand-primary/10 ${errors.email ? "border-red-400 focus:border-red-400" : "border-gray-200 focus:border-brand-primary hover:border-gray-300"}`}
+                  className={`w-full pl-11 pr-4 py-3.5 rounded-2xl border bg-white/50 text-[15px] font-semibold outline-none transition-all duration-300 placeholder:text-gray-400 focus:bg-white focus:ring-[4px] focus:ring-brand-primary/15 ${errors.email ? "border-red-400 focus:border-red-400" : "border-gray-200 focus:border-brand-primary hover:border-gray-300"}`}
                 />
               </div>
-              {errors.email && <p className="text-[11px] font-semibold text-red-500 ml-1">{errors.email}</p>}
-            </div>
+              {errors.email && <p className="text-[12px] font-bold text-red-500 ml-1 mt-1">{errors.email}</p>}
+            </motion.div>
 
             {/* Password */}
-            <div className="space-y-1.5">
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.6 }}
+              className="space-y-1.5"
+            >
               <div className="flex items-center justify-between">
-                <label className="text-[13px] font-semibold text-text-main ml-0.5">Password</label>
-                <Link href="/forgot-password" className="text-[11px] font-bold text-brand-primary hover:text-brand-secondary transition-colors">Forgot?</Link>
+                <label className="text-[13px] font-bold text-text-main ml-0.5 tracking-wide">Password</label>
+                <Link href="/forgot-password" className="text-[12px] font-bold text-brand-primary hover:text-brand-secondary transition-colors">Forgot?</Link>
               </div>
-              <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-gray-400 pointer-events-none" />
+              <div className="relative group">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-gray-400 group-focus-within:text-brand-primary transition-colors duration-300 pointer-events-none" />
                 <input
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => { setPassword(e.target.value); setErrors(p => ({...p, password: undefined})); }}
                   placeholder="••••••••"
-                  className={`w-full pl-11 pr-12 py-3 rounded-xl border bg-white text-sm font-medium outline-none transition-all duration-200 placeholder:text-gray-400 focus:ring-[3px] focus:ring-brand-primary/10 ${errors.password ? "border-red-400 focus:border-red-400" : "border-gray-200 focus:border-brand-primary hover:border-gray-300"}`}
+                  className={`w-full pl-11 pr-12 py-3.5 rounded-2xl border bg-white/50 text-[15px] font-semibold outline-none transition-all duration-300 placeholder:text-gray-400 focus:bg-white focus:ring-[4px] focus:ring-brand-primary/15 ${errors.password ? "border-red-400 focus:border-red-400" : "border-gray-200 focus:border-brand-primary hover:border-gray-300"}`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-text-main transition-colors p-0.5"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-brand-primary transition-colors p-0.5"
                 >
-                  {showPassword ? <EyeOff className="w-[18px] h-[18px]" /> : <Eye className="w-[18px] h-[18px]" />}
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
-              {errors.password && <p className="text-[11px] font-semibold text-red-500 ml-1">{errors.password}</p>}
-            </div>
+              {errors.password && <p className="text-[12px] font-bold text-red-500 ml-1 mt-1">{errors.password}</p>}
+            </motion.div>
 
             {/* Submit */}
-            <button
-              type="submit"
-              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-brand-primary to-blue-600 text-white font-bold text-[15px] shadow-lg shadow-brand-primary/20 hover:shadow-xl hover:shadow-brand-primary/30 hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-300"
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.7 }}
+              className="pt-2"
             >
-              Sign In
-            </button>
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full relative flex items-center justify-center py-4 rounded-2xl bg-gradient-to-r from-brand-primary to-[#5A5DFA] text-white font-black text-[16px] tracking-wide shadow-[0_8px_20px_rgba(99,102,241,0.25)] hover:shadow-[0_12px_28px_rgba(99,102,241,0.35)] hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-300 disabled:opacity-80 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none overflow-hidden"
+              >
+                {isLoading ? (
+                  <span className="flex items-center gap-2">
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    Authenticating...
+                  </span>
+                ) : (
+                  <span>Sign In</span>
+                )}
+                
+                {/* Shine effect */}
+                <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent hover:animate-[shimmer_1.5s_infinite]" />
+              </button>
+            </motion.div>
           </form>
 
           {/* Divider */}
-          <div className="flex items-center gap-4 my-7">
-            <div className="flex-1 h-px bg-gray-200" />
-            <span className="text-[11px] font-bold text-text-secondary uppercase tracking-widest">or</span>
-            <div className="flex-1 h-px bg-gray-200" />
-          </div>
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8 }}
+            className="flex items-center gap-4 my-7"
+          >
+            <div className="flex-1 h-[1px] bg-gradient-to-r from-transparent via-gray-200 to-gray-200" />
+            <span className="text-[12px] font-black text-gray-400 uppercase tracking-widest">or</span>
+            <div className="flex-1 h-[1px] bg-gradient-to-l from-transparent via-gray-200 to-gray-200" />
+          </motion.div>
 
           {/* Signup Link */}
-          <p className="text-center text-sm text-text-secondary font-medium">
+          <motion.p 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.9 }}
+            className="text-center text-[14px] text-text-secondary font-medium"
+          >
             Don&apos;t have an account?{" "}
-            <Link href="/signup" className="text-brand-primary font-bold hover:text-brand-secondary transition-colors">
-              Sign Up
+            <Link href="/signup" className="text-brand-primary font-black hover:text-brand-secondary transition-colors underline decoration-2 underline-offset-4 decoration-brand-primary/30 hover:decoration-brand-primary">
+              Sign Up Fast
             </Link>
-          </p>
+          </motion.p>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
