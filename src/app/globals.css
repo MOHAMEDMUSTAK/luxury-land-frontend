@@ -36,7 +36,6 @@ html {
   overflow-x: hidden;
   scroll-behavior: smooth;
   width: 100vw;
-  overscroll-behavior-y: none;
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -115,7 +114,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
   -webkit-tap-highlight-color: transparent;
   scroll-behavior: smooth;
-  overscroll-behavior-y: none;
   @apply pb-[100px] md:pb-0;
 }
 
@@ -534,6 +532,36 @@ body {
 
 .glow-active {
   animation: glow-pulse 2s ease-in-out infinite;
+}
+
+/* Premium Button Glow Effect */
+.btn-premium-glow {
+  position: relative;
+  z-index: 1;
+}
+
+.btn-premium-glow::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #6366F1, #8B5CF6, #F59E0B, #6366F1);
+  background-size: 300% 300%;
+  z-index: -1;
+  animation: shift-gradient 3s linear infinite;
+  filter: blur(8px);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.btn-premium-glow:hover::before {
+  opacity: 0.6;
+}
+
+@keyframes shift-gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 /* ═══════════════════════════════════════════

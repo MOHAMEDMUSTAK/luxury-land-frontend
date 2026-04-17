@@ -13,7 +13,7 @@ import dynamic from "next/dynamic";
 import { useTranslation } from "react-i18next";
 import { requireStrictAuth } from "@/lib/authUtils";
 import { useQueryClient } from "@tanstack/react-query";
-import { motion } from "framer-motion";
+// CSS animations used instead of Framer Motion for better grid performance
 
 const MapModal = dynamic(() => import("./MapModal"), { ssr: false });
 
@@ -148,13 +148,11 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
 
   return (
     <>
-      <motion.div 
+      <div 
         onClick={handleNavigate}
         onMouseEnter={handlePrefetch}
-        whileHover={{ y: -6, scale: 1.01 }}
-        whileTap={{ scale: 0.98 }}
-        transition={{ type: "spring", stiffness: 400, damping: 30 }}
-        className="group block h-full cursor-pointer rounded-3xl"
+        className="group block h-full cursor-pointer rounded-3xl transition-transform duration-300 ease-out hover:-translate-y-1.5 hover:scale-[1.01] active:scale-95 will-change-transform"
+        style={{ transform: "translateZ(0)" }}
       >
       <div 
         className="premium-card h-full flex flex-col group/card relative shadow-sm hover:shadow-[0_24px_50px_-15px_rgba(0,0,0,0.15)] transition-shadow duration-500"
@@ -313,7 +311,7 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
           </div>
         </div>
       </div>
-      </motion.div>
+      </div>
 
     <MapModal
       isOpen={isMapOpen}

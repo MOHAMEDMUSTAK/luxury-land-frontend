@@ -273,7 +273,7 @@ function HomeContent() {
                         )}
                         <button 
                           onClick={executeSearch} 
-                          className="flex-shrink-0 btn-hero text-[10px] sm:text-xs px-5 sm:px-10 py-3.5 sm:py-5 rounded-full uppercase tracking-widest font-black ml-1 sm:ml-2"
+                          className="flex-shrink-0 btn-hero btn-premium-glow text-[10px] sm:text-xs px-5 sm:px-10 py-3.5 sm:py-5 rounded-full uppercase tracking-widest font-black ml-1 sm:ml-2"
                         >
                           Explore
                         </button>

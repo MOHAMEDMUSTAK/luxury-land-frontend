@@ -19,8 +19,26 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "LuxuryLand | Premium Real Estate Marketplace",
-  description: "High-end, innovative real estate marketplace for premium properties and land.",
+  title: {
+    default: "LuxuryLand | Premium Real Estate & Land Marketplace",
+    template: "%s | LuxuryLand"
+  },
+  description: "Discover the world's most innovative high-end real estate platform. Find untouched lands, luxury houses, and premium commercial properties with an unparalleled user experience.",
+  keywords: ["real estate", "buy land", "sell land", "luxury real estate", "agricultural land", "commercial property", "premium houses"],
+  authors: [{ name: "LuxuryLand" }],
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://luxuryland.com",
+    title: "LuxuryLand | Premium Real Estate & Land",
+    description: "Discover the world's most innovative high-end real estate platform. Find untouched lands and premium properties.",
+    siteName: "LuxuryLand"
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "LuxuryLand | Premium Real Estate",
+    description: "Discover the world's most innovative high-end real estate platform."
+  },
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
