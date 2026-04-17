@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, memo, useCallback } from "react";
-import { Heart, MapPin, Maximize2, ImageOff, BarChart2, Star } from "lucide-react";
+import { Heart, MapPin, Maximize2, ImageOff, BarChart2, Star, Share2 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { formatCurrency, getTimeOnMarket } from "@/lib/utils";
@@ -75,6 +75,11 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
   const handleToggleWishlist = useCallback(async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+
+    // High premium tactile feedback on interaction 
+    if (typeof navigator !== 'undefined' && navigator.vibrate) {
+      navigator.vibrate([15]);
+    }
     
     if (isCheckingAuth) return;
 
@@ -96,6 +101,32 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
       setIsWishlisting(false);
     }
   }, [isCheckingAuth, isAuthenticated, isWishlisting, isWishlisted, propertyId, user?.id, toggleItem, t]);
+
+  const handleShare = useCallback(async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // High premium tactile feedback on interaction 
+    if (typeof navigator !== 'undefined' && navigator.vibrate) {
+      navigator.vibrate([15]);
+    }
+
+    // Natively invoke OS capabilities like a native app
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: property.title,
+          text: `Check out this amazing property on LuxuryLand: ${property.title}`,
+          url: `${window.location.origin}/property/${propertyId}`
+        });
+      } catch (err) {
+        console.error("Error sharing:", err);
+      }
+    } else {
+      navigator.clipboard.writeText(`${window.location.origin}/property/${propertyId}`);
+      toast.success("Link copied to clipboard!");
+    }
+  }, [property.title, propertyId]);
 
   const hasImage = property.images && property.images.length > 0;
   const mainImage = hasImage ? property.images![0] : null;
@@ -160,18 +191,28 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
         {/* CSS-only spotlight effect — replaces per-card JS mouse tracking */}
         <div className="pointer-events-none absolute -inset-px rounded-3xl opacity-0 transition duration-300 group-hover/card:opacity-100 z-0 hidden md:block bg-[radial-gradient(400px_circle_at_50%_50%,rgba(99,102,241,0.06),transparent_60%)]" />
         
-        <button
-          onClick={handleToggleWishlist}
-          disabled={isWishlisting}
-          className={`absolute top-4 right-4 z-10 w-11 h-11 rounded-2xl bg-white/95 flex items-center justify-center hover:bg-white transition-all shadow-md border border-white group/heart active:scale-95 ${isWishlisting ? 'opacity-50 cursor-not-allowed' : ''}`}
-          aria-label="Add to Wishlist"
-        >
-          <Heart
-            className={`w-5 h-5 transition-all duration-500 ${
-              isWishlisted ? "fill-red-500 text-red-500 scale-110" : "text-gray-400 group-hover/heart:text-red-500"
-            }`}
-          />
-        </button>
+        <div className="absolute top-4 right-4 z-10 flex flex-col gap-2">
+          <button
+            onClick={handleToggleWishlist}
+            disabled={isWishlisting}
+            className={`w-10 h-10 rounded-xl bg-white/95 flex items-center justify-center hover:bg-white transition-all shadow-md border border-white group/heart active:scale-90 ${isWishlisting ? 'opacity-50 cursor-not-allowed' : ''}`}
+            aria-label="Add to Wishlist"
+          >
+            <Heart
+              className={`w-4.5 h-4.5 transition-colors duration-500 ${
+                isWishlisted ? "fill-red-500 text-red-500" : "text-gray-400 group-hover/heart:text-red-500"
+              }`}
+            />
+          </button>
+          
+          <button
+            onClick={handleShare}
+            className="w-10 h-10 rounded-xl bg-white/95 flex items-center justify-center hover:bg-white transition-all shadow-md border border-white group/share active:scale-90"
+            aria-label="Share Property"
+          >
+            <Share2 className="w-4.5 h-4.5 text-text-secondary group-hover/share:text-brand-primary transition-colors duration-300" />
+          </button>
+        </div>
 
         <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100 rounded-t-3xl">
           <div className="absolute top-4 left-4 z-10 px-2.5 py-1 bg-black/70 rounded-lg text-[10px] font-bold text-white shadow-md">
