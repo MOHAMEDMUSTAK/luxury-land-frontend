@@ -62,30 +62,16 @@ api.interceptors.request.use(
 );
 
 // Response Interceptor for global error handling
+// ★ CRITICAL: NEVER auto-logout. User requested explicit-only signout.
+// 401 errors are silently swallowed — the cached auth state remains untouched.
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      if (typeof window !== 'undefined') {
-        const tokenInLocal = localStorage.getItem('luxuryland-auth-token');
-        const zustandData = localStorage.getItem('luxuryland-auth');
-        let hasAuth = !!tokenInLocal;
-        
-        if (!hasAuth && zustandData) {
-          try {
-            const parsed = JSON.parse(zustandData);
-            hasAuth = !!parsed?.state?.token;
-          } catch(e) {}
-        }
-        
-        // ONLY logout if we actually HAD an authentication session
-        if (hasAuth) {
-          import("@/store/useAuthStore").then((mod) => {
-            // store.logout() removed to prevent auto-logout on network errors or session expiry after 2h
-            // User requested explicit-only signout.
-          });
-        }
-      }
+      // Do nothing. The user stays logged in from cached state.
+      // Only an explicit logout() call from the UI can clear auth.
+      // This prevents auto-signout after JWT expiry (2-3 hours).
+      console.debug("[API] 401 received — session preserved (explicit logout only)");
     }
     return Promise.reject(error);
   }

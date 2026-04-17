@@ -12,21 +12,11 @@ import PropertySkeleton from "@/components/PropertySkeleton";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { useIntersectionObserver } from "@/lib/useIntersectionObserver";
 import { useQueryClient } from "@tanstack/react-query";
-
 const RecentlyViewed = dynamic(() => import("@/components/RecentlyViewed"), { 
   ssr: false,
   loading: () => <div className="h-40 animate-pulse bg-gray-50 rounded-3xl mt-12" />
 });
 
-const containerVariants: any = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.04
-    }
-  }
-};
 
 function HomeContent() {
   const { t } = useTranslation();
@@ -454,29 +444,17 @@ function HomeContent() {
                 </div>
               ) : (
                 <div className="flex flex-col gap-8">
-                  <motion.div 
-                    variants={containerVariants}
-                    initial="hidden"
-                    animate="visible"
-                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-                  >
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {properties.map((property, i) => (
-                      <motion.div 
-                        key={property._id || property.id || i} 
-                        variants={{
-                          hidden: { opacity: 0, y: 40, scale: 0.96 },
-                          visible: { 
-                            opacity: 1, 
-                            y: 0, 
-                            scale: 1, 
-                            transition: { type: "spring", stiffness: 350, damping: 30 } 
-                          }
-                        }}
+                      <div 
+                        key={property._id || property.id || i}
+                        className="card-enter"
+                        style={{ '--stagger': `${Math.min(i * 30, 200)}ms` } as React.CSSProperties}
                       >
                         <PropertyCard property={{...property, id: property._id || property.id}} priority={i < 4} />
-                      </motion.div>
+                      </div>
                     ))}
-                  </motion.div>
+                  </div>
 
                   {/* Infinite Scroll Sentinel */}
                   {page < totalPages && (

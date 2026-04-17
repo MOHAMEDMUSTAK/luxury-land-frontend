@@ -16,10 +16,10 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
 
   useEffect(() => {
     setMounted(true);
-    // Fail-safe timer: if still checking auth after 3s (reduced from 5s), show "Proceed Anyway"
+    // Fail-safe timer: reduced to 1.5s — if still checking, let user through
     failSafeTimer.current = setTimeout(() => {
       setShowFailSafe(true);
-    }, 3000);
+    }, 1500);
     return () => {
       if (failSafeTimer.current) clearTimeout(failSafeTimer.current);
     };
@@ -52,34 +52,24 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
   if (!mounted) return null;
 
   // Show loading screen ONLY if we are truly checking auth and it's a private route
+  // ★ Uses ultra-fast skeleton with reduced timeout for snappier UX
   if (isCheckingAuth && isProtected) {
+    // After fail-safe timeout, just render children — don't block the user
+    if (showFailSafe) {
+      return <>{children}</>;
+    }
+    
     return (
-      <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-white p-6 text-center">
-        <div className="w-16 h-16 relative mb-8">
-          <div className="absolute inset-0 border-4 border-brand-primary/20 rounded-full" />
-          <div className="absolute inset-0 border-4 border-t-brand-primary rounded-full animate-spin" />
+      <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-white/95 backdrop-blur-sm p-6 text-center auth-loading-screen">
+        {/* Ultra-smooth spinner using CSS only */}
+        <div className="w-12 h-12 relative mb-6">
+          <div className="absolute inset-0 border-3 border-brand-primary/15 rounded-full" />
+          <div className="absolute inset-0 border-3 border-t-brand-primary rounded-full auth-spinner" />
         </div>
         
-        <div className="space-y-4">
-          <p className="text-sm font-bold text-brand-primary tracking-widest uppercase">
-            LuxuryLand Secure Access
-          </p>
-          
-          {showFailSafe && (
-            <div className="pt-4 space-y-4">
-              <p className="text-xs text-text-secondary font-medium max-w-xs mx-auto">
-                Authentication is taking longer than usual. You can try to proceed anyway or refresh.
-              </p>
-              <button 
-                onClick={() => router.replace("/")}
-                className="text-xs font-black text-brand-primary uppercase tracking-[0.2em] underline underline-offset-4 hover:text-brand-secondary transition-colors"
-                type="button"
-              >
-                Proceed Anyway
-              </button>
-            </div>
-          )}
-        </div>
+        <p className="text-[10px] font-black text-brand-primary/60 tracking-[0.3em] uppercase">
+          Verifying
+        </p>
       </div>
     );
   }

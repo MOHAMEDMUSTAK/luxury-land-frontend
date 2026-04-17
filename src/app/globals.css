@@ -61,12 +61,13 @@ body {
   scroll-behavior: smooth;
 }
 
-/* Hardware accelerate heavy elements — only on interaction */
+/* Hardware accelerate heavy elements — always composited for instant interaction */
 .premium-card,
 .glass-sidebar,
 .page-fade-in {
-  transform: translateZ(0);
+  transform: translate3d(0, 0, 0);
   backface-visibility: hidden;
+  contain: layout style paint;
 }
 
 body.is-chat-active .page-fade-in,
@@ -264,16 +265,18 @@ body {
   -webkit-backdrop-filter: blur(12px) saturate(150%);
   border: 1px solid rgba(255, 255, 255, 0.9);
   border-radius: 24px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 0.15s ease-out, box-shadow 0.2s ease-out;
   box-shadow: 0 4px 20px -4px rgba(0, 0, 0, 0.06);
   overflow: hidden;
-  contain: layout style;
+  contain: layout style paint;
+  will-change: transform;
 }
 
 @media (max-width: 768px) {
   .premium-card {
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    transition: transform 0.1s ease-out, box-shadow 0.15s ease-out;
   }
 }
 
@@ -282,7 +285,7 @@ body {
   box-shadow:
     0 20px 50px -12px rgba(99, 102, 241, 0.15),
     0 0 0 1px rgba(99, 102, 241, 0.1);
-  transform: translateY(-4px) scale(1.01);
+  transform: translate3d(0, -4px, 0) scale(1.01);
 }
 
 .glass-card {
@@ -296,8 +299,8 @@ body {
 
 @media (max-width: 768px) {
   .glass-card {
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
   }
 }
 
@@ -355,8 +358,8 @@ body {
 
 @media (max-width: 768px) {
   .glass-header {
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
   }
 }
 
@@ -486,18 +489,85 @@ body {
    ═══════════════════════════════════════════ */
 
 .page-fade-in {
-  animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: fadeIn 0.15s cubic-bezier(0.2, 0, 0, 1);
 }
 
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translate3d(0, 4px, 0);
   }
 
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* ★ Ultra-fast page progress bar */
+.page-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  width: 0%;
+  background: linear-gradient(90deg, var(--color-brand-primary), var(--color-brand-secondary), var(--color-brand-gold));
+  z-index: 99999;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateZ(0);
+}
+
+.page-progress-bar.page-progress-animate {
+  animation: pageProgress 0.4s cubic-bezier(0.2, 0, 0, 1) forwards;
+}
+
+@keyframes pageProgress {
+  0% {
+    width: 0%;
+    opacity: 1;
+  }
+  60% {
+    width: 100%;
+    opacity: 1;
+  }
+  100% {
+    width: 100%;
+    opacity: 0;
+  }
+}
+
+/* ★ Auth loading spinner — pure CSS, GPU composited */
+.auth-loading-screen {
+  animation: authFadeIn 0.1s ease-out;
+}
+
+@keyframes authFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.auth-spinner {
+  animation: authSpin 0.6s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  transform: translateZ(0);
+}
+
+@keyframes authSpin {
+  to { transform: rotate(360deg) translateZ(0); }
+}
+
+/* ★ Ultra-fast card entrance — stagger via CSS custom property */
+.card-enter {
+  opacity: 0;
+  transform: translate3d(0, 16px, 0);
+  animation: cardEnter 0.2s cubic-bezier(0.2, 0, 0, 1) forwards;
+  animation-delay: var(--stagger, 0ms);
+}
+
+@keyframes cardEnter {
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
   }
 }
 
@@ -880,7 +950,7 @@ textarea::placeholder {
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translate3d(0, 20px, 0);
+    transform: translate3d(0, 12px, 0);
   }
   to {
     opacity: 1;
@@ -890,7 +960,7 @@ textarea::placeholder {
 
 .animate-fade-in-up {
   opacity: 0;
-  animation: fadeInUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: fadeInUp 0.2s cubic-bezier(0.2, 0, 0, 1) forwards;
 }
 
 

@@ -182,8 +182,8 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
       <div 
         onClick={handleNavigate}
         onMouseEnter={handlePrefetch}
-        className="group block h-full cursor-pointer rounded-3xl transition-transform duration-300 ease-out hover:-translate-y-1.5 hover:scale-[1.01] active:scale-95 will-change-transform"
-        style={{ transform: "translateZ(0)" }}
+        className="group block h-full cursor-pointer rounded-3xl transition-transform duration-150 ease-out hover:-translate-y-1.5 hover:scale-[1.01] active:scale-95 will-change-transform"
+        style={{ transform: "translate3d(0,0,0)" }}
       >
       <div 
         className="premium-card h-full flex flex-col group/card relative shadow-sm hover:shadow-[0_24px_50px_-15px_rgba(0,0,0,0.15)] transition-shadow duration-500"
