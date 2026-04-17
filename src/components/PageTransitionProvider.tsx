@@ -11,10 +11,10 @@ export default function PageTransitionProvider({ children }: { children: ReactNo
     <AnimatePresence mode="wait">
       <motion.div 
         key={pathname}
-        initial={{ opacity: 0, scale: 0.98, y: 15 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.98, y: -15 }}
-        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+        initial={{ opacity: 0, y: 5 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -5 }}
+        transition={{ duration: 0.25, ease: "easeOut" }}
         className="flex-1 flex flex-col w-full h-full relative"
       >
         {children}

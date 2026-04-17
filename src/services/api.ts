@@ -81,10 +81,8 @@ api.interceptors.response.use(
         // ONLY logout if we actually HAD an authentication session
         if (hasAuth) {
           import("@/store/useAuthStore").then((mod) => {
-            const store = mod.useAuthStore.getState();
-            if (store.isAuthenticated) {
-              store.logout();
-            }
+            // store.logout() removed to prevent auto-logout on network errors or session expiry after 2h
+            // User requested explicit-only signout.
           });
         }
       }

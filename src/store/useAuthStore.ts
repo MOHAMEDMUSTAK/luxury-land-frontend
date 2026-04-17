@@ -92,7 +92,7 @@ export const useAuthStore = create<AuthStore>()(
           }
         } catch (error) {
           console.error("FETCH_PROFILE_ERROR:", error);
-          get().logout();
+          // get().logout(); // user requested: "ask login means when user explicitly signout"
         } finally {
           set({ isCheckingAuth: false });
         }
