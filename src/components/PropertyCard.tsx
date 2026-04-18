@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, memo, useCallback } from "react";
-import { Heart, MapPin, Maximize2, ImageOff, BarChart2, Star, Share2 } from "lucide-react";
+import { Heart, MapPin, Maximize2, ImageOff, BarChart2, Star, Share2, Camera, ArrowRight } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { formatCurrency, getTimeOnMarket } from "@/lib/utils";
@@ -130,6 +130,12 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
 
   const hasImage = property.images && property.images.length > 0;
   const mainImage = hasImage ? property.images![0] : null;
+  const imageCount = property.images?.length ?? 0;
+
+  // "NEW" badge — show for listings posted within the last 24 hours
+  const isNewListing = property.createdAt
+    ? Date.now() - new Date(property.createdAt).getTime() < 24 * 60 * 60 * 1000
+    : false;
   const location = property.town 
     ? (property.town === property.state ? property.town : `${property.town}, ${property.state}`)
     : (property.location || "Location not available");
@@ -215,9 +221,23 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
         </div>
 
         <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100 rounded-t-3xl">
-          <div className="absolute top-4 left-4 z-10 px-2.5 py-1 bg-black/70 rounded-lg text-[10px] font-bold text-white shadow-md">
-            {getTimeOnMarket(property.createdAt as string)}
+          {/* Top-left: NEW badge or time-on-market */}
+          <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
+            {isNewListing ? (
+              <span className="badge-new">✦ New</span>
+            ) : (
+              <span className="px-2.5 py-1 bg-black/70 rounded-lg text-[10px] font-bold text-white shadow-md">
+                {getTimeOnMarket(property.createdAt as string)}
+              </span>
+            )}
           </div>
+          {/* Bottom-left: Photo count */}
+          {imageCount > 1 && (
+            <div className="absolute bottom-4 left-4 z-10 img-count-badge">
+              <Camera className="w-3 h-3" />
+              {imageCount} Photos
+            </div>
+          )}
           {mainImage ? (
             <Image
               src={mainImage}
@@ -344,8 +364,9 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
                   <BarChart2 className={`w-3.5 h-3.5 ${isCompared ? "text-white" : "text-brand-primary"}`} />
                   <span className="hidden sm:inline-block">{isCompared ? "Added" : "Compare"}</span>
                 </button>
-                <div className="min-h-[44px] flex items-center px-3.5 py-2.5 rounded-xl bg-brand-primary/5 text-brand-primary text-[10px] font-bold uppercase tracking-widest hover:bg-brand-primary hover:text-white transition-all duration-300 border border-brand-primary/10 hover:border-brand-primary shadow-sm hover:shadow-md active:scale-95">
+                <div className="min-h-[44px] flex items-center gap-1 px-3.5 py-2.5 rounded-xl bg-brand-primary/5 text-brand-primary text-[10px] font-bold uppercase tracking-widest hover:bg-brand-primary hover:text-white transition-all duration-300 border border-brand-primary/10 hover:border-brand-primary shadow-sm hover:shadow-md active:scale-95">
                   {t("common.view")}
+                  <ArrowRight className="w-3 h-3" />
                 </div>
               </div>
             </div>

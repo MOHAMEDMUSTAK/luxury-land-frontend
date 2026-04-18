@@ -1,23 +1,21 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { X, Download, Share } from "lucide-react";
+import { X, Download, Share, Smartphone, Home } from "lucide-react";
 
-// Key stored in localStorage so the banner is shown only once total.
 const DISMISSED_KEY = "pwa-install-dismissed";
 const INSTALLED_KEY = "pwa-installed";
 
 type InstallState = "hidden" | "android" | "ios" | "installed";
 
 export default function InstallAppBanner() {
-  // Use a ref for deferredPrompt so the tap handler always has the latest value
-  // (useState creates stale closures in async event handlers).
   const deferredPromptRef = useRef<any>(null);
   const [installState, setInstallState] = useState<InstallState>("hidden");
   const [installing, setInstalling] = useState(false);
+  // iOS: which instruction step to highlight
+  const [iosStep, setIosStep] = useState(0);
 
   useEffect(() => {
-    // ── Already installed (launched in standalone mode) ──────────────────────
     const isStandalone =
       window.matchMedia("(display-mode: standalone)").matches ||
       (window.navigator as any).standalone === true;
@@ -28,12 +26,10 @@ export default function InstallAppBanner() {
       return;
     }
 
-    // ── User already dismissed or installed previously ───────────────────────
     if (
       localStorage.getItem(DISMISSED_KEY) === "true" ||
       localStorage.getItem(INSTALLED_KEY) === "true"
     ) {
-      console.log("[PWA] Install banner suppressed (already dismissed/installed)");
       return;
     }
 
@@ -41,21 +37,17 @@ export default function InstallAppBanner() {
     const isIOS = /iphone|ipad|ipod/.test(ua);
 
     if (isIOS) {
-      // iOS Safari doesn't fire beforeinstallprompt; we show manual instructions
       const delay = setTimeout(() => setInstallState("ios"), 4000);
       return () => clearTimeout(delay);
     }
 
-    // ── Android / Desktop Chrome ─────────────────────────────────────────────
     const handleBeforeInstallPrompt = (e: Event) => {
-      e.preventDefault(); // prevent auto-prompt
+      e.preventDefault();
       deferredPromptRef.current = e;
-      console.log("[PWA] beforeinstallprompt captured — showing install banner");
       setInstallState("android");
     };
 
     const handleAppInstalled = () => {
-      console.log("[PWA] App installed via browser UI");
       localStorage.setItem(INSTALLED_KEY, "true");
       deferredPromptRef.current = null;
       setInstallState("installed");
@@ -70,37 +62,29 @@ export default function InstallAppBanner() {
     };
   }, []);
 
-  // ── Handler: Install button tapped ────────────────────────────────────────
+  // Cycle through iOS instructions
+  useEffect(() => {
+    if (installState !== "ios") return;
+    const timer = setInterval(() => {
+      setIosStep((s) => (s + 1) % 3);
+    }, 2500);
+    return () => clearInterval(timer);
+  }, [installState]);
+
   const handleInstallClick = async () => {
-    if (installState === "ios") {
-      // Slightly nicer than a raw alert — could be a modal, but keep it simple
-      alert(
-        "To install LuxuryLand:\n\n" +
-          "1. Tap the Share button (□↑) at the bottom of Safari\n" +
-          "2. Scroll down and tap 'Add to Home Screen'\n" +
-          "3. Tap 'Add'"
-      );
-      handleDismiss();
-      return;
-    }
+    if (installState === "ios") return; // iOS: banner is instruction-only
 
     const prompt = deferredPromptRef.current;
-    if (!prompt) {
-      console.warn("[PWA] No deferred prompt available — cannot trigger install");
-      return;
-    }
+    if (!prompt) return;
 
     setInstalling(true);
     try {
       prompt.prompt();
       const { outcome } = await prompt.userChoice;
-      console.log("[PWA] User choice:", outcome);
-
       if (outcome === "accepted") {
         localStorage.setItem(INSTALLED_KEY, "true");
         setInstallState("installed");
       } else {
-        // Dismissed from native sheet — record so we don't re-show
         handleDismiss();
       }
     } catch (err) {
@@ -111,70 +95,109 @@ export default function InstallAppBanner() {
     }
   };
 
-  // ── Handler: Close / dismiss ───────────────────────────────────────────────
   const handleDismiss = () => {
     localStorage.setItem(DISMISSED_KEY, "true");
     setInstallState("hidden");
   };
 
-  // Don't render anything in hidden / installed states
   if (installState === "hidden" || installState === "installed") return null;
+
+  const iosSteps = [
+    { icon: Share, label: "Tap the Share button", sub: "at the bottom of Safari" },
+    { icon: Home, label: "Scroll & tap 'Add to Home Screen'" , sub: "in the Share menu" },
+    { icon: Smartphone, label: "Tap 'Add' to install", sub: "enjoy the full app experience" },
+  ];
 
   return (
     <div
       role="dialog"
       aria-label="Install LuxuryLand App"
-      className="fixed bottom-24 left-4 right-4 z-[90] sm:bottom-6 sm:left-auto sm:right-6 sm:w-96 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border border-white/60 dark:border-slate-700/60 rounded-[24px] shadow-2xl p-4 transition-all animate-in slide-in-from-bottom-5 fade-in duration-500"
+      className="fixed bottom-24 left-4 right-4 z-[90] sm:bottom-6 sm:left-auto sm:right-6 sm:w-96 bg-white/95 backdrop-blur-xl border border-white/60 rounded-[24px] shadow-2xl p-5 animate-fade-in-up"
     >
       {/* Close button */}
       <button
         id="pwa-banner-close"
         onClick={handleDismiss}
         aria-label="Dismiss install banner"
-        className="absolute top-3 right-3 p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
+        className="absolute top-3 right-3 p-1.5 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors"
       >
-        <X className="w-5 h-5" />
+        <X className="w-4 h-4" />
       </button>
 
-      {/* App identity row */}
-      <div className="flex gap-4 items-center">
-        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex flex-shrink-0 items-center justify-center text-white shadow-lg shadow-blue-500/25">
+      {/* App identity */}
+      <div className="flex gap-4 items-center mb-4">
+        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-brand-primary to-brand-secondary flex flex-shrink-0 items-center justify-center text-white shadow-lg shadow-brand-primary/25">
           <span className="font-black text-2xl tracking-tighter">L</span>
         </div>
-
         <div className="flex-1 pr-6">
-          <h4 className="font-bold text-gray-900 dark:text-white text-base">
-            LuxuryLand App
-          </h4>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 leading-tight">
+          <h4 className="font-black text-text-main text-base tracking-tight">LuxuryLand App</h4>
+          <p className="text-xs text-text-secondary mt-0.5 leading-tight font-medium">
             {installState === "ios"
-              ? "Add to your Home Screen for the full experience."
+              ? "Follow the 3 steps below to install"
               : "Install for faster loading & offline access."}
           </p>
         </div>
       </div>
 
-      {/* Install / learn button */}
-      <button
-        id="pwa-install-button"
-        onClick={handleInstallClick}
-        disabled={installing}
-        className="mt-4 w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-70 text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-lg shadow-blue-500/25"
-      >
-        {installState === "ios" ? (
-          <>
-            <Share className="w-4 h-4" />
-            How to Install
-          </>
-        ) : installing ? (
-          <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-        ) : (
-          <>
-            <Download className="w-4 h-4" />
-            Install App
-          </>
-        )}
-      </button>
+      {/* iOS Step-by-step instructions */}
+      {installState === "ios" ? (
+        <div className="space-y-2.5 mb-4">
+          {iosSteps.map((step, i) => {
+            const Icon = step.icon;
+            const isActive = iosStep === i;
+            return (
+              <div
+                key={i}
+                className={`flex items-center gap-3 p-3 rounded-xl border transition-all duration-300 ${
+                  isActive
+                    ? "bg-brand-primary/[0.04] border-brand-primary/20 shadow-sm"
+                    : "bg-gray-50 border-transparent"
+                }`}
+              >
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-all ${
+                  isActive ? "bg-brand-primary text-white shadow-sm shadow-brand-primary/30" : "bg-gray-100 text-gray-400"
+                }`}>
+                  <span className={`text-[11px] font-black ${isActive ? "text-white" : "text-gray-400"}`}>{i + 1}</span>
+                </div>
+                <div>
+                  <p className={`text-sm font-bold transition-colors ${isActive ? "text-text-main" : "text-text-secondary"}`}>
+                    {step.label}
+                  </p>
+                  <p className="text-[10px] text-text-secondary opacity-70">{step.sub}</p>
+                </div>
+                {isActive && <Icon className="w-4 h-4 text-brand-primary ml-auto flex-shrink-0" />}
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        /* Android / Desktop: single install button */
+        <button
+          id="pwa-install-button"
+          onClick={handleInstallClick}
+          disabled={installing}
+          className="mt-1 w-full btn-primary py-3 px-4 rounded-xl flex items-center justify-center gap-2 text-sm"
+        >
+          {installing ? (
+            <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+          ) : (
+            <>
+              <Download className="w-4 h-4" />
+              Install App — It&apos;s Free
+            </>
+          )}
+        </button>
+      )}
+
+      {/* iOS: dismiss link */}
+      {installState === "ios" && (
+        <button
+          onClick={handleDismiss}
+          className="w-full text-center text-[11px] font-bold text-text-secondary mt-2 hover:text-text-main transition-colors"
+        >
+          Maybe later
+        </button>
+      )}
     </div>
   );
 }

@@ -16,6 +16,7 @@ import InstallAppBanner from "@/components/InstallAppBanner";
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -23,9 +24,10 @@ export const metadata: Metadata = {
     default: "LuxuryLand | Premium Real Estate & Land Marketplace",
     template: "%s | LuxuryLand"
   },
-  description: "Discover the world's most innovative high-end real estate platform. Find untouched lands, luxury houses, and premium commercial properties with an unparalleled user experience.",
-  keywords: ["real estate", "buy land", "sell land", "luxury real estate", "agricultural land", "commercial property", "premium houses"],
+  description: "Discover the world's most innovative high-end real estate platform. Find untouched lands, luxury houses, and premium commercial properties in Tamil Nadu with an unparalleled user experience.",
+  keywords: ["real estate", "buy land", "sell land", "luxury real estate", "agricultural land", "commercial property", "premium houses", "Tamil Nadu land", "plots for sale"],
   authors: [{ name: "LuxuryLand" }],
+  robots: { index: true, follow: true },
   openGraph: {
     type: "website",
     locale: "en_US",
@@ -51,12 +53,48 @@ export const metadata: Metadata = {
 };
 
 export const viewport = {
-  themeColor: "#2563eb",
+  themeColor: "#6366F1",
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
   userScalable: true,
   viewportFit: "cover",
+};
+
+// JSON-LD structured data for Google rich results
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://luxuryland.com/#organization",
+      "name": "LuxuryLand",
+      "url": "https://luxuryland.com",
+      "description": "Premium real estate and land marketplace in Tamil Nadu.",
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "+91-7094055969",
+        "email": "landmarket@gmail.com",
+        "contactType": "customer support",
+        "availableLanguage": ["English", "Tamil"]
+      }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://luxuryland.com/#website",
+      "url": "https://luxuryland.com",
+      "name": "LuxuryLand",
+      "publisher": { "@id": "https://luxuryland.com/#organization" },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://luxuryland.com/?search={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+      }
+    }
+  ]
 };
 
 export default function RootLayout({
@@ -67,7 +105,13 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} min-h-full antialiased`} data-scroll-behavior="smooth">
       <head>
+        {/* Structured Data — Google Rich Results */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         <link rel="apple-touch-icon" href="/icon-512.png" />
+        {/* CDN pre-connections for faster image load */}
         <link rel="dns-prefetch" href="https://res.cloudinary.com" />
         <link rel="preconnect" href="https://res.cloudinary.com" crossOrigin="anonymous" />
       </head>

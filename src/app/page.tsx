@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useState, useEffect, useCallback, Suspense, useMemo, useRef } from "react";
-import { Filter, ChevronDown, Search, X, SlidersHorizontal, Store, Home as HomeIcon, Landmark, Check as CheckIcon } from "lucide-react";
+import { Filter, Search, X, SlidersHorizontal, Check as CheckIcon, Flame, TrendingUp } from "lucide-react";
 import PropertyCard from "@/components/PropertyCard";
 import { api } from "@/services/api";
 import { useSearchParams } from "next/navigation";
@@ -16,6 +16,134 @@ const RecentlyViewed = dynamic(() => import("@/components/RecentlyViewed"), {
   ssr: false,
   loading: () => <div className="h-40 animate-pulse bg-gray-50 rounded-3xl mt-12" />
 });
+
+// ★ Animated counter hook — counts up from 0 to target over 1.4s
+function useCountUp(target: number, duration = 1400, startOnMount = true) {
+  const [count, setCount] = useState(0);
+  const started = useRef(false);
+  useEffect(() => {
+    if (!startOnMount || started.current) return;
+    started.current = true;
+    const startTime = performance.now();
+    const step = (now: number) => {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      // Ease-out cubic
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setCount(Math.floor(eased * target));
+      if (progress < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }, [target, duration, startOnMount]);
+  return count;
+}
+
+// ★ Hero stat counters — pure JS, no library dependencies
+function HeroStats() {
+  const [visible, setVisible] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setVisible(true); }, { threshold: 0.3 });
+    if (ref.current) obs.observe(ref.current);
+    return () => obs.disconnect();
+  }, []);
+
+  const listings = useCountUp(1200, 1200, visible);
+  const sellers  = useCountUp(850,  1000, visible);
+  const crores   = useCountUp(50,   1400, visible);
+
+  const stats = [
+    { value: `${listings}+`, label: "Active Listings",   suffix: "" },
+    { value: `${sellers}+`,  label: "Happy Sellers",     suffix: "" },
+    { value: `₹${crores}Cr+`,label: "Transacted",        suffix: "" },
+    { value: "5",            label: "Districts",         suffix: "" },
+  ];
+
+  return (
+    <div ref={ref} className="w-full max-w-3xl grid grid-cols-2 sm:grid-cols-4 gap-3 mt-10 px-4 sm:px-0">
+      {stats.map((s, i) => (
+        <div
+          key={s.label}
+          className="stat-counter-card stat-counter-animate"
+          style={{ animationDelay: `${i * 0.1}s` }}
+        >
+          <span className="stat-counter-value">{s.value}</span>
+          <span className="stat-counter-label">{s.label}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ★ Trending Now section — shows top recently-listed properties
+function TrendingSection() {
+  const [items, setItems] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    queryClient.fetchQuery({
+      queryKey: ['trending-properties'],
+      queryFn: async () => {
+        const res = await api.get('/land', { params: { page: 1, limit: 4, sortBy: 'latest' } });
+        return res.data;
+      },
+      staleTime: 5 * 60 * 1000, // 5 min cache
+    }).then((data: any) => {
+      const arr = data?.data || (Array.isArray(data) ? data : []);
+      setItems(arr.slice(0, 4));
+    }).catch(() => {}).finally(() => setLoading(false));
+  }, []);
+
+  if (!loading && items.length === 0) return null;
+
+  return (
+    <section className="container mx-auto px-4 mt-16 mb-8">
+      {/* Section header */}
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center gap-4">
+          {/* Animated gradient border chip */}
+          <div className="trending-chip">
+            <span className="relative z-10 flex items-center gap-2 px-5 py-2.5 bg-white rounded-full text-[11px] font-black uppercase tracking-[0.2em] text-brand-primary">
+              <Flame className="w-3.5 h-3.5 text-orange-500" />
+              Trending Now
+            </span>
+          </div>
+          <div>
+            <h2 className="text-2xl sm:text-3xl font-black text-text-main tracking-tight heading-underline active">
+              Hot Picks
+            </h2>
+            <p className="text-xs text-text-secondary font-medium mt-1">Freshest listings added today</p>
+          </div>
+        </div>
+        <TrendingUp className="w-5 h-5 text-brand-primary opacity-40 hidden sm:block" />
+      </div>
+
+      {/* Cards grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        {loading
+          ? [...Array(4)].map((_, i) => <PropertySkeleton key={i} />)
+          : items.map((property, i) => (
+              <div
+                key={property._id || i}
+                className="card-enter"
+                style={{ '--stagger': `${i * 60}ms` } as React.CSSProperties}
+              >
+                <div className="relative">
+                  {/* Trending rank badge */}
+                  <div className="absolute -top-2 -left-2 z-20 w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center shadow-lg shadow-red-500/30">
+                    <span className="text-white text-[10px] font-black">#{i + 1}</span>
+                  </div>
+                  <PropertyCard property={{ ...property, id: property._id || property.id }} priority={i < 2} />
+                </div>
+              </div>
+            ))
+        }
+      </div>
+    </section>
+  );
+}
 
 
 function HomeContent() {
@@ -217,9 +345,11 @@ function HomeContent() {
                 <span className="gradient-hero-text shimmer-effect inline-block">Landscapes</span>.
               </h1>
               <p className="text-white/50 text-sm sm:text-lg md:text-xl font-medium max-w-2xl mx-auto mb-10 leading-relaxed px-2">
-                Discover the world's most innovative high-end real estate platform. Find untouched lands and premium properties with an unparalleled user experience.
+                Discover premium lands, houses &amp; commercial plots across Tamil Nadu — with an unparalleled experience.
               </p>
             </div>
+            {/* ★ Animated stat counters */}
+            <HeroStats />
 
             {/* Search Section */}
             <div className="w-full max-w-3xl flex flex-col items-center px-0 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
@@ -295,6 +425,9 @@ function HomeContent() {
             </div>
           </div>
         </section>
+
+        {/* ★ Trending Now — directly below hero */}
+        <TrendingSection />
 
         {/* Main Content Area — LIGHT THEME */}
         <div className="container mx-auto px-4 relative z-20">
@@ -470,7 +603,9 @@ function HomeContent() {
                 </div>
               )}
 
-              <RecentlyViewed />
+              <div className="section-offscreen">
+                <RecentlyViewed />
+              </div>
             </div>
           </div>
         </div>

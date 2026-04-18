@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, memo } from "react";
+import { useState, useEffect, useRef, memo, useCallback } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, Search, Heart, PlusCircle, User } from "lucide-react";
@@ -44,6 +44,13 @@ function MobileBottomNav() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Haptic on tap
+  const handleTap = useCallback(() => {
+    if (typeof navigator !== 'undefined' && navigator.vibrate) {
+      navigator.vibrate([8]);
+    }
+  }, []);
+
   // Hide on chat pages or if a chat modal is active
   if (pathname.startsWith('/chat/') || isChatActive) {
     return null;
@@ -59,7 +66,7 @@ function MobileBottomNav() {
 
   return (
     <div 
-      className="md:hidden fixed left-1/2 z-[40] w-[92%] max-w-[420px] flex items-center justify-between bg-white/70 backdrop-blur-xl border border-white/40 h-16 rounded-full shadow-[0_20px_50px_rgba(0,0,0,0.2)] px-4 overflow-hidden pointer-events-auto"
+      className="md:hidden fixed left-1/2 z-[40] w-[92%] max-w-[420px] flex items-center justify-between bg-white/70 backdrop-blur-xl border border-white/40 h-16 rounded-full shadow-[0_20px_50px_rgba(0,0,0,0.2)] px-2 overflow-hidden pointer-events-auto"
       style={{ 
         bottom: `calc(16px + env(safe-area-inset-bottom))`,
         transform: `translateX(-50%) translateY(${isVisible ? '0' : '100px'})`,
@@ -70,24 +77,47 @@ function MobileBottomNav() {
       <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-brand-primary/20 to-transparent" />
       
       {navItems.map((item) => {
-        const isActive = pathname === item.path;
+        const isActive = pathname === item.path || (item.path === '/' && pathname === '/');
         return (
           <Link 
             onClick={(e) => {
+              handleTap();
               if (item.protected && !requireStrictAuth(isAuthenticated, item.path)) {
                 e.preventDefault();
               }
             }}
             key={item.path} 
             href={item.path} 
-            className="relative flex-1 flex flex-col items-center justify-center h-14 rounded-2xl group active:scale-90 transition-transform"
+            className="relative flex-1 flex flex-col items-center justify-center h-14 rounded-2xl group active:scale-90 transition-transform gap-0.5"
           >
-            <item.icon className={`h-5 w-5 transition-colors duration-200 ${isActive ? "text-brand-primary scale-110 drop-shadow-[0_0_8px_rgba(99,102,241,0.5)]" : "text-gray-400 group-hover:text-text-main"}`} />
-            
+            {/* Active background pill */}
             {isActive && (
-              <div className="absolute bottom-2 w-1.5 h-1.5 bg-brand-primary rounded-full shadow-[0_0_10px_rgba(99,102,241,1)]" />
+              <div className="absolute inset-x-1 inset-y-1 bg-brand-primary/[0.08] rounded-xl" />
             )}
-            <span className="sr-only">{item.label}</span>
+
+            <item.icon 
+              className={`h-5 w-5 transition-all duration-200 relative z-10 ${
+                isActive 
+                  ? "text-brand-primary scale-110 drop-shadow-[0_0_8px_rgba(99,102,241,0.5)]" 
+                  : "text-gray-400 group-hover:text-text-main"
+              }`} 
+            />
+
+            {/* Label — visible & animated on active */}
+            <span 
+              className={`text-[9px] font-black tracking-widest uppercase relative z-10 transition-all duration-200 ${
+                isActive 
+                  ? "text-brand-primary nav-label-active opacity-100" 
+                  : "text-gray-400 opacity-0 group-hover:opacity-60"
+              }`}
+            >
+              {item.label}
+            </span>
+            
+            {/* Active dot indicator */}
+            {isActive && (
+              <div className="absolute bottom-1 w-1 h-1 bg-brand-primary rounded-full shadow-[0_0_6px_rgba(99,102,241,0.8)]" />
+            )}
           </Link>
         );
       })}

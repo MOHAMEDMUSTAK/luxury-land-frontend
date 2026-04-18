@@ -1,7 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
-
+// Pure-CSS skeleton — no Framer Motion dependency needed here
 export default function PropertySkeleton() {
   return (
     <div className="premium-card h-[450px] flex flex-col bg-white overflow-hidden border border-ui-border shadow-soft">
