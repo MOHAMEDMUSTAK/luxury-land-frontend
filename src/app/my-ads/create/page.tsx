@@ -8,7 +8,7 @@ import { api } from "@/services/api";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import MapLocationPicker from "@/components/MapLocationPicker";
-import ProtectedRoute from "@/components/ProtectedRoute";
+import { useQueryClient } from "@tanstack/react-query";
 
 /* ─────────────────────────────────────────────
    Section Card wrapper — every form group lives
@@ -35,6 +35,7 @@ export default function CreateAdPage() {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const queryClient = useQueryClient();
 
   const [formData, setFormData] = useState({
     title: "",
@@ -159,6 +160,16 @@ export default function CreateAdPage() {
       setSubmissionStatus("finalizing");
       setIsSuccess(true);
       toast.success("Listing published successfully!");
+      
+      // Invalidate caches to ensure new data appears
+      queryClient.invalidateQueries({ queryKey: ['lands'] });
+      queryClient.invalidateQueries({ queryKey: ['trending-properties'] });
+      
+      // Auto redirect after short delay
+      setTimeout(() => {
+         router.push("/my-ads");
+      }, 1500);
+      
     } catch (error: any) {
       console.error("❌ SUBMISSION_ERROR:", error);
       toast.error(error.response?.data?.message || "Failed to post ad.");
@@ -177,7 +188,6 @@ export default function CreateAdPage() {
      ═══════════════════════════════════════════ */
   if (isSuccess) {
     return (
-      <ProtectedRoute>
       <div className="container mx-auto px-4 py-32 max-w-lg flex flex-col items-center justify-center text-center page-fade-in">
         <div className="w-20 h-20 rounded-full bg-green-50 border border-green-100 flex items-center justify-center mb-8">
           <CheckCircle2 className="w-10 h-10 text-green-500" />
@@ -195,7 +205,6 @@ export default function CreateAdPage() {
           </Link>
         </div>
       </div>
-      </ProtectedRoute>
     );
   }
 
@@ -203,7 +212,6 @@ export default function CreateAdPage() {
      MAIN FORM
      ═══════════════════════════════════════════ */
   return (
-    <ProtectedRoute>
     <div className="container mx-auto px-4 py-10 sm:py-16 max-w-3xl page-fade-in">
       <Link href="/my-ads" className="inline-flex items-center gap-2 text-sm font-semibold text-text-secondary hover:text-brand-primary transition-colors mb-8 group">
         <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
@@ -551,6 +559,5 @@ export default function CreateAdPage() {
         </div>
       </form>
     </div>
-    </ProtectedRoute>
   );
 }

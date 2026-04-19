@@ -7,8 +7,8 @@ import toast from "react-hot-toast";
 import { api } from "@/services/api";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import ProtectedRoute from "@/components/ProtectedRoute";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
 
 /* Section Card */
 function SectionCard({ icon: Icon, title, children }: { icon: any; title: string; children: React.ReactNode }) {
@@ -36,6 +36,7 @@ export default function EditAdPage({ params }: { params: Promise<{ id: string }>
   const [existingImages, setExistingImages] = useState<string[]>([]);
   const [newPreviews, setNewPreviews] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const queryClient = useQueryClient();
 
   const [formData, setFormData] = useState({
     title: "",
@@ -182,6 +183,12 @@ export default function EditAdPage({ params }: { params: Promise<{ id: string }>
       // As per backend convention, our route maps to /land
       await api.put(`/land/${id}`, data);
       toast.success("Listing updated successfully!");
+      
+      queryClient.invalidateQueries({ queryKey: ['lands'] });
+      queryClient.invalidateQueries({ queryKey: ['trending-properties'] });
+      queryClient.invalidateQueries({ queryKey: ['land', id] });
+      queryClient.invalidateQueries({ queryKey: ['my-lands'] });
+      
       router.push("/my-ads");
     } catch (error: any) {
       console.error(error);
@@ -195,16 +202,13 @@ export default function EditAdPage({ params }: { params: Promise<{ id: string }>
 
   if (isLoading || !isAuthorized) {
     return (
-      <ProtectedRoute>
         <div className="min-h-screen flex items-center justify-center">
           <div className="w-10 h-10 border-[3px] border-gray-200 border-t-brand-primary rounded-full animate-spin" />
         </div>
-      </ProtectedRoute>
     );
   }
 
   return (
-    <ProtectedRoute>
       <div className="container mx-auto px-4 py-10 sm:py-16 max-w-3xl page-fade-in">
         <Link href="/my-ads" className="inline-flex items-center gap-2 text-sm font-semibold text-text-secondary hover:text-brand-primary transition-colors mb-8 group">
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
@@ -429,6 +433,5 @@ export default function EditAdPage({ params }: { params: Promise<{ id: string }>
           </div>
         </form>
       </div>
-    </ProtectedRoute>
   );
 }

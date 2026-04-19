@@ -5,11 +5,12 @@ import { formatCurrency } from "@/lib/utils";
 import { Search, Plus, Edit2, Trash2, Eye, Power, Heart, Loader2, MapPin, ImageOff } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import ProtectedRoute from "@/components/ProtectedRoute";
 import { api } from "@/services/api";
 import toast from "react-hot-toast";
 import { useAuthStore } from "@/store/useAuthStore";
 import { motion, AnimatePresence } from "framer-motion";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
+import PropertySkeleton from "@/components/PropertySkeleton";
 
 // Staggered animation variants
 const containerVariants = {
@@ -30,26 +31,22 @@ export default function MyAdsPage() {
   const { isAuthenticated } = useAuthStore();
   const [myAds, setMyAds] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
+
+  const { data: adsData, isLoading: loading, refetch } = useQuery({
+    queryKey: ['my-lands'],
+    queryFn: async () => {
+      const res = await api.get('/land/my-lands');
+      return res.data;
+    },
+    enabled: isAuthenticated
+  });
 
   useEffect(() => {
-    if (isAuthenticated) {
-      fetchMyLands();
+    if (adsData) {
+      setMyAds(adsData);
     }
-  }, [isAuthenticated]);
-
-  const fetchMyLands = async () => {
-    try {
-      setLoading(true);
-      const res = await api.get('/land/my-lands');
-      setMyAds(res.data);
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to fetch ads");
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [adsData]);
 
   const handleDelete = async (id: string) => {
     if (!global.confirm("Are you sure you want to absolute delete this luxury asset?")) return;
@@ -57,6 +54,9 @@ export default function MyAdsPage() {
       await api.delete(`/land/${id}`);
       setMyAds(prev => prev.filter(ad => ad._id !== id));
       toast.success("Asset liquidated successfully");
+      queryClient.invalidateQueries({ queryKey: ['lands'] });
+      queryClient.invalidateQueries({ queryKey: ['trending-properties'] });
+      queryClient.invalidateQueries({ queryKey: ['my-lands'] });
     } catch (error) {
        toast.error("Failed to process deletion");
     }
@@ -67,6 +67,9 @@ export default function MyAdsPage() {
       const res = await api.patch(`/land/${id}/toggle-active`);
       setMyAds(prev => prev.map(ad => ad._id === id ? { ...ad, isActive: !ad.isActive } : ad));
       toast.success("Asset status updated");
+      queryClient.invalidateQueries({ queryKey: ['lands'] });
+      queryClient.invalidateQueries({ queryKey: ['trending-properties'] });
+      queryClient.invalidateQueries({ queryKey: ['land', id] });
     } catch (error) {
        toast.error("Failed to update status");
     }
@@ -75,7 +78,6 @@ export default function MyAdsPage() {
   const filteredAds = myAds.filter(ad => ad.title.toLowerCase().includes(searchQuery.toLowerCase()));
 
   return (
-    <ProtectedRoute>
       <div className="container mx-auto px-4 py-12 max-w-6xl relative">
         
         {/* Background ambient light */}
@@ -120,10 +122,9 @@ export default function MyAdsPage() {
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="py-32 flex flex-col items-center justify-center gap-6"
+              className="grid grid-cols-1 gap-6"
             >
-              <Loader2 className="w-12 h-12 text-brand-primary animate-spin" />
-              <p className="text-[12px] font-black tracking-widest text-text-secondary uppercase">Synchronizing Assets</p>
+               {[...Array(3)].map((_, i) => <PropertySkeleton key={i} />)}
             </motion.div>
           ) : filteredAds.length === 0 ? (
             <motion.div 
@@ -223,8 +224,8 @@ export default function MyAdsPage() {
                             <div className="w-10 h-10 rounded-xl bg-rose-50 flex items-center justify-center border border-rose-100 group-hover:bg-rose-100 transition-colors">
                                <Heart className="w-5 h-5 text-rose-400" />
                             </div>
-                            <div>
-                              <p className="text-text-main font-bold text-[14px]">24</p>
+                             <div>
+                              <p className="text-text-main font-bold text-[14px]">{ad.wishlistCount || 0}</p>
                               <p className="text-[10px] font-black text-text-secondary uppercase tracking-widest">Saves</p>
                             </div>
                          </div>
@@ -269,6 +270,5 @@ export default function MyAdsPage() {
           )}
         </div>
       </div>
-    </ProtectedRoute>
   );
 }

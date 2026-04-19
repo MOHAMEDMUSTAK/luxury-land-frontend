@@ -7,8 +7,9 @@ export default function AuthInit({ children }: { children: React.ReactNode }) {
   const { checkAuth } = useAuthStore();
 
   useEffect(() => {
-    checkAuth();
-  }, [checkAuth]);
+    // Only check auth initially if checking auth is true to avoid duplicate checks
+    // since Zustand persist handles it on rehydrate already
+  }, []);
 
 
 

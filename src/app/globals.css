@@ -269,7 +269,10 @@ body {
   box-shadow: 0 4px 20px -4px rgba(0, 0, 0, 0.06);
   overflow: hidden;
   contain: layout style paint;
-  will-change: transform;
+}
+
+.premium-card:hover, .premium-card:focus-within {
+   will-change: transform;
 }
 
 @media (max-width: 768px) {
@@ -708,9 +711,9 @@ textarea::placeholder {
    SEARCH INPUT FIXES 
    ═══════════════════════════════════════════ */
 .hero-search-input {
-  color: #0a0202 !important;
-  caret-color: #050101 !important;
-  -webkit-text-fill-color: #250505 !important;
+  color: #FFFFFF !important;
+  caret-color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
   opacity: 1 !important;
 }
 
@@ -967,7 +970,13 @@ textarea::placeholder {
 /* ═══════════════════════════════════════════
    REDUCED MOTION SUPPORT
    ═══════════════════════════════════════════ */
-
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* ═══════════════════════════════════════════

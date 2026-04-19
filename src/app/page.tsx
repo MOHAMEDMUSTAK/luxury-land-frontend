@@ -246,40 +246,64 @@ function HomeContent() {
       setIsLoading(false);
       setIsFetchingMore(false);
     }
-  }, []);
-
-  const currentFilters = useCallback(() => ({
-    minPrice, maxPrice, type: propertyType, minSize, maxSize, sizeUnitFilter, landType: landTypeFilter, listingCategory
-  }), [minPrice, maxPrice, propertyType, minSize, maxSize, sizeUnitFilter, landTypeFilter, listingCategory]);
+  }, [queryClient]); // Properly dep the client
 
   const executeSearch = useCallback(() => {
     if (searchQuery.trim()) {
       setIsSearchActive(true);
-      fetchProperties(searchQuery, activeSort, currentFilters());
+      fetchProperties(
+        searchQuery, 
+        activeSort, 
+        { minPrice, maxPrice, type: propertyType, minSize, maxSize, sizeUnitFilter, landType: landTypeFilter, listingCategory }
+      );
     }
-  }, [searchQuery, activeSort, currentFilters, fetchProperties]);
+  }, [searchQuery, activeSort, minPrice, maxPrice, propertyType, minSize, maxSize, sizeUnitFilter, landTypeFilter, listingCategory, fetchProperties]);
+
+  // First mount guard to avoid double fetches
+  const isFirstMount = useRef(true);
 
   useEffect(() => {
     setSearchQuery(urlSearch);
-    fetchProperties(urlSearch, activeSort, currentFilters());
+    fetchProperties(
+        urlSearch, 
+        activeSort, 
+         { minPrice, maxPrice, type: propertyType, minSize, maxSize, sizeUnitFilter, landType: landTypeFilter, listingCategory }
+    );
     if (urlSearch.trim()) setIsSearchActive(true);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [urlSearch]);
 
   useEffect(() => {
+    // Skip debounce on the very first mount since the urlSearch useEffect handles it
+    if (isFirstMount.current) {
+        isFirstMount.current = false;
+        return;
+    }
     const debounce = setTimeout(() => {
       setPage(1);
-      fetchProperties(searchQuery, activeSort, currentFilters(), 1, false);
+      fetchProperties(
+        searchQuery, 
+        activeSort, 
+        { minPrice, maxPrice, type: propertyType, minSize, maxSize, sizeUnitFilter, landType: landTypeFilter, listingCategory }, 
+        1, 
+        false
+      );
     }, 500);
     return () => clearTimeout(debounce);
-  }, [searchQuery, activeSort, minPrice, maxPrice, propertyType, minSize, maxSize, sizeUnitFilter, landTypeFilter, listingCategory, fetchProperties, currentFilters]);
+  }, [searchQuery, activeSort, minPrice, maxPrice, propertyType, minSize, maxSize, sizeUnitFilter, landTypeFilter, listingCategory, fetchProperties]);
 
   // Auto-load more with IntersectionObserver
   const handleLoadMore = useCallback(() => {
     if (page < totalPages && !isFetchingMore) {
-      fetchProperties(searchQuery, activeSort, currentFilters(), page + 1, true);
+      fetchProperties(
+        searchQuery, 
+        activeSort, 
+        { minPrice, maxPrice, type: propertyType, minSize, maxSize, sizeUnitFilter, landType: landTypeFilter, listingCategory }, 
+        page + 1, 
+        true
+      );
     }
-  }, [page, totalPages, isFetchingMore, searchQuery, activeSort, currentFilters, fetchProperties]);
+  }, [page, totalPages, isFetchingMore, searchQuery, activeSort, minPrice, maxPrice, propertyType, minSize, maxSize, sizeUnitFilter, landTypeFilter, listingCategory, fetchProperties]);
 
   useEffect(() => {
     if (isLoadMoreVisible && page < totalPages && !isFetchingMore && !isLoading) {
@@ -290,8 +314,12 @@ function HomeContent() {
   const clearSearch = useCallback(() => {
     setSearchQuery("");
     setIsSearchActive(false);
-    fetchProperties("", activeSort, currentFilters());
-  }, [activeSort, currentFilters, fetchProperties]);
+    fetchProperties(
+      "", 
+      activeSort, 
+      { minPrice, maxPrice, type: propertyType, minSize, maxSize, sizeUnitFilter, landType: landTypeFilter, listingCategory }
+    );
+  }, [activeSort, minPrice, maxPrice, propertyType, minSize, maxSize, sizeUnitFilter, landTypeFilter, listingCategory, fetchProperties]);
 
   const clearAllFilters = useCallback(() => {
     setSearchQuery("");

@@ -153,7 +153,10 @@ export const useAuthStore = create<AuthStore>()(
         // FAST PATH: If Zustand already has a cached user+token from persist,
         // mark authenticated immediately and do a silent background refresh.
         if (state.user && state.token) {
-          set({ isAuthenticated: true, isCheckingAuth: false });
+          // If we're already authenticated, no need to set checking auth to true
+          if (!state.isAuthenticated || state.isCheckingAuth) {
+             set({ isAuthenticated: true, isCheckingAuth: false });
+          }
           // Silent background refresh — no blocking, no loading screen
           get().fetchProfile().catch(() => {});
           return;
