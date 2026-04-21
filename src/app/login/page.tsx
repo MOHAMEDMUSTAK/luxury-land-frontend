@@ -72,55 +72,30 @@ export default function LoginPage() {
       <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-brand-primary/10 rounded-full mix-blend-multiply filter blur-[80px] opacity-70 animate-blob" />
       <div className="absolute top-1/3 right-1/4 w-[400px] h-[400px] bg-purple-300/20 rounded-full mix-blend-multiply filter blur-[80px] opacity-70 animate-blob animation-delay-2000" />
       
-      <motion.div 
-        initial={{ opacity: 0, y: 30, scale: 0.95 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.5, type: "spring", stiffness: 100 }}
-        className="w-full max-w-[420px] relative z-10"
-      >
+      <div className="w-full max-w-[420px] relative z-10">
         {/* Card */}
         <div className="bg-white/80 backdrop-blur-xl rounded-3xl border border-white/50 shadow-[0_8px_40px_rgba(0,0,0,0.06)] p-8 sm:p-10 premium-card">
           {/* Logo */}
-          <motion.div 
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.2, type: "spring", stiffness: 150 }}
-            className="flex justify-center mb-6"
-          >
+          <div className="flex justify-center mb-6">
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-primary to-brand-secondary flex items-center justify-center text-white font-black text-3xl shadow-[0_8px_20px_rgba(99,102,241,0.3)]">
               L
             </div>
-          </motion.div>
+          </div>
 
           {/* Title */}
           <div className="text-center mb-8">
-            <motion.h1 
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="text-[28px] font-black text-text-main tracking-tight mb-2 gradient-heading"
-            >
+            <h1 className="text-[28px] font-black text-text-main tracking-tight mb-2 gradient-heading">
               Welcome Back
-            </motion.h1>
-            <motion.p 
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              className="text-[15px] text-text-secondary font-medium"
-            >
+            </h1>
+            <p className="text-[15px] text-text-secondary font-medium">
               Unlock your premium dashboard
-            </motion.p>
+            </p>
           </div>
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Email */}
-            <motion.div 
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.5 }}
-              className="space-y-1.5"
-            >
+            <div className="space-y-1.5">
               <label className="text-[13px] font-bold text-text-main ml-0.5 tracking-wide">Email Address</label>
               <div className="relative group">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-gray-400 group-focus-within:text-brand-primary transition-colors duration-300 pointer-events-none" />
@@ -133,15 +108,10 @@ export default function LoginPage() {
                 />
               </div>
               {errors.email && <p className="text-[12px] font-bold text-red-500 ml-1 mt-1">{errors.email}</p>}
-            </motion.div>
+            </div>
 
             {/* Password */}
-            <motion.div 
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.6 }}
-              className="space-y-1.5"
-            >
+            <div className="space-y-1.5">
               <div className="flex items-center justify-between">
                 <label className="text-[13px] font-bold text-text-main ml-0.5 tracking-wide">Password</label>
                 <Link href="/forgot-password" className="text-[12px] font-bold text-brand-primary hover:text-brand-secondary transition-colors">Forgot?</Link>
@@ -164,15 +134,10 @@ export default function LoginPage() {
                 </button>
               </div>
               {errors.password && <p className="text-[12px] font-bold text-red-500 ml-1 mt-1">{errors.password}</p>}
-            </motion.div>
+            </div>
 
             {/* Submit */}
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.7 }}
-              className="pt-2"
-            >
+            <div className="pt-2">
               <button
                 type="submit"
                 disabled={isLoading}
@@ -190,33 +155,23 @@ export default function LoginPage() {
                 {/* Shine effect */}
                 <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent hover:animate-[shimmer_1.5s_infinite]" />
               </button>
-            </motion.div>
+            </div>
           </form>
 
           {/* Divider */}
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.8 }}
-            className="flex items-center gap-4 my-7"
-          >
+          <div className="flex items-center gap-4 my-7">
             <div className="flex-1 h-[1px] bg-gradient-to-r from-transparent via-gray-200 to-gray-200" />
             <span className="text-[12px] font-black text-gray-400 uppercase tracking-widest">or</span>
             <div className="flex-1 h-[1px] bg-gradient-to-l from-transparent via-gray-200 to-gray-200" />
-          </motion.div>
+          </div>
 
           {/* Signup Link */}
-          <motion.p 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.9 }}
-            className="text-center text-[14px] text-text-secondary font-medium"
-          >
+          <p className="text-center text-[14px] text-text-secondary font-medium">
             Don&apos;t have an account?{" "}
             <Link href="/signup" className="text-brand-primary font-black hover:text-brand-secondary transition-colors underline decoration-2 underline-offset-4 decoration-brand-primary/30 hover:decoration-brand-primary">
               Sign Up Fast
             </Link>
-          </motion.p>
+          </p>
         </div>
       </motion.div>
     </div>

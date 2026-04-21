@@ -17,8 +17,8 @@ const RecentlyViewed = dynamic(() => import("@/components/RecentlyViewed"), {
   loading: () => <div className="h-40 animate-pulse bg-gray-50 rounded-3xl mt-12" />
 });
 
-// ★ Animated counter hook — counts up from 0 to target over 1.4s
-function useCountUp(target: number, duration = 1400, startOnMount = true) {
+// ★ Animated counter hook — counts up from 0 to target over 400ms
+function useCountUp(target: number, duration = 400, startOnMount = true) {
   const [count, setCount] = useState(0);
   const started = useRef(false);
   useEffect(() => {
@@ -73,75 +73,6 @@ function HeroStats() {
         </div>
       ))}
     </div>
-  );
-}
-
-// ★ Trending Now section — shows top recently-listed properties
-function TrendingSection() {
-  const [items, setItems] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const queryClient = useQueryClient();
-
-  useEffect(() => {
-    queryClient.fetchQuery({
-      queryKey: ['trending-properties'],
-      queryFn: async () => {
-        const res = await api.get('/land', { params: { page: 1, limit: 4, sortBy: 'latest' } });
-        return res.data;
-      },
-      staleTime: 5 * 60 * 1000, // 5 min cache
-    }).then((data: any) => {
-      const arr = data?.data || (Array.isArray(data) ? data : []);
-      setItems(arr.slice(0, 4));
-    }).catch(() => {}).finally(() => setLoading(false));
-  }, []);
-
-  if (!loading && items.length === 0) return null;
-
-  return (
-    <section className="container mx-auto px-4 mt-16 mb-8">
-      {/* Section header */}
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center gap-4">
-          {/* Animated gradient border chip */}
-          <div className="trending-chip">
-            <span className="relative z-10 flex items-center gap-2 px-5 py-2.5 bg-white rounded-full text-[11px] font-black uppercase tracking-[0.2em] text-brand-primary">
-              <Flame className="w-3.5 h-3.5 text-orange-500" />
-              Trending Now
-            </span>
-          </div>
-          <div>
-            <h2 className="text-2xl sm:text-3xl font-black text-text-main tracking-tight heading-underline active">
-              Hot Picks
-            </h2>
-            <p className="text-xs text-text-secondary font-medium mt-1">Freshest listings added today</p>
-          </div>
-        </div>
-        <TrendingUp className="w-5 h-5 text-brand-primary opacity-40 hidden sm:block" />
-      </div>
-
-      {/* Cards grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        {loading
-          ? [...Array(4)].map((_, i) => <PropertySkeleton key={i} />)
-          : items.map((property, i) => (
-              <div
-                key={property._id || i}
-                className="card-enter"
-                style={{ '--stagger': `${i * 60}ms` } as React.CSSProperties}
-              >
-                <div className="relative">
-                  {/* Trending rank badge */}
-                  <div className="absolute -top-2 -left-2 z-20 w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center shadow-lg shadow-red-500/30">
-                    <span className="text-white text-[10px] font-black">#{i + 1}</span>
-                  </div>
-                  <PropertyCard property={{ ...property, id: property._id || property.id }} priority={i < 2} />
-                </div>
-              </div>
-            ))
-        }
-      </div>
-    </section>
   );
 }
 
@@ -288,7 +219,7 @@ function HomeContent() {
         1, 
         false
       );
-    }, 500);
+    }, 0); // Ultra-fast query resolve
     return () => clearTimeout(debounce);
   }, [searchQuery, activeSort, minPrice, maxPrice, propertyType, minSize, maxSize, sizeUnitFilter, landTypeFilter, listingCategory, fetchProperties]);
 
@@ -364,7 +295,7 @@ function HomeContent() {
           <div className="hero-particles" />
           
           <div className="relative z-10 w-full max-w-5xl mx-auto px-4 flex flex-col items-center text-center">
-            <div className="animate-fade-in-up">
+            <div>
               <span className="inline-block py-1.5 px-5 rounded-full bg-white/[0.06] border border-white/10 text-[10px] sm:text-xs font-black tracking-[0.3em] text-indigo-300 uppercase mb-8 backdrop-blur-md">
                 The Pinnacle of Real Estate
               </span>
@@ -380,7 +311,7 @@ function HomeContent() {
             <HeroStats />
 
             {/* Search Section */}
-            <div className="w-full max-w-3xl flex flex-col items-center px-0 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+            <div className="w-full max-w-3xl flex flex-col items-center px-0">
               
               {!isSearchActive ? (
                 <div className="w-full flex flex-col items-center">
@@ -429,7 +360,7 @@ function HomeContent() {
                     </div>
                 </div>
               ) : (
-                <div className="w-fit flex items-center justify-center p-1.5 bg-gradient-to-r from-brand-primary to-brand-secondary text-white rounded-full shadow-[0_20px_50px_rgba(99,102,241,0.35)] border border-white/10 backdrop-blur-xl group/summary animate-fade-in-up">
+                <div className="w-fit flex items-center justify-center p-1.5 bg-gradient-to-r from-brand-primary to-brand-secondary text-white rounded-full shadow-[0_20px_50px_rgba(99,102,241,0.35)] border border-white/10 backdrop-blur-xl group/summary">
                     <div className="flex items-center gap-4 pl-6 pr-1.5 py-1.5">
                       <div className="flex flex-col items-start gap-0.5">
                         <span className="text-[14px] font-black tracking-tight leading-none">
@@ -454,8 +385,7 @@ function HomeContent() {
           </div>
         </section>
 
-        {/* ★ Trending Now — directly below hero */}
-        <TrendingSection />
+
 
         {/* Main Content Area — LIGHT THEME */}
         <div className="container mx-auto px-4 relative z-20">

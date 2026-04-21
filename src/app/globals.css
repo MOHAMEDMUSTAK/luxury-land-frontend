@@ -492,15 +492,14 @@ body {
    ═══════════════════════════════════════════ */
 
 .page-fade-in {
-  animation: fadeIn 0.15s cubic-bezier(0.2, 0, 0, 1);
+  /* Instant render */
 }
 
 @keyframes fadeIn {
   from {
-    opacity: 0;
-    transform: translate3d(0, 4px, 0);
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
   }
-
   to {
     opacity: 1;
     transform: translate3d(0, 0, 0);
@@ -561,10 +560,8 @@ body {
 
 /* ★ Ultra-fast card entrance — stagger via CSS custom property */
 .card-enter {
-  opacity: 0;
-  transform: translate3d(0, 16px, 0);
-  animation: cardEnter 0.2s cubic-bezier(0.2, 0, 0, 1) forwards;
-  animation-delay: var(--stagger, 0ms);
+  opacity: 1;
+  transform: none;
 }
 
 @keyframes cardEnter {
