@@ -81,8 +81,41 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
   // Use ONLY real uploaded images
   const hasImages = property.images && property.images.length > 0;
 
+  // SEO: Dynamic JSON-LD Structured Data for Rich Snippets
+  const jsonLd = useMemo(() => {
+    if (!property) return null;
+    return {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      "name": property.title,
+      "image": hasImages ? property.images : [],
+      "description": property.description || `Premium ${property.propertyCategory || "property"} located in ${property.town || property.location || "Tamil Nadu"}.`,
+      "sku": propertyId,
+      "offers": {
+        "@type": "Offer",
+        "priceCurrency": "INR",
+        "price": property.price || property.rentPerMonth || 0,
+        "availability": property.status === "Sold" ? "https://schema.org/SoldOut" : "https://schema.org/InStock",
+        "url": typeof window !== "undefined" ? window.location.href : `https://luxuryland.com/property/${propertyId}`
+      },
+      ...(property.reviewCount > 0 && {
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": property.averageRating,
+          "reviewCount": property.reviewCount
+        }
+      })
+    };
+  }, [property, propertyId, hasImages]);
+
   return (
     <div className="container mx-auto px-4 py-10 max-w-6xl page-fade-in scroll-smooth">
+      {jsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      )}
       <div className="flex flex-col lg:flex-row gap-8">
         
         {/* Main Content (Left) */}
@@ -142,12 +175,13 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
                 <div className="flex gap-2">
                   <button 
                     onClick={async () => {
+                      if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate([15]);
                       const shareUrl = window.location.href;
                       if (navigator.share) {
                         try {
                           await navigator.share({
                             title: property.title,
-                            text: `${property.title} - ${formatCurrency(property.price)}`,
+                            text: `Found this incredible property on LuxuryLand ✨ ${property.title} in ${property.town || property.location || "Tamil Nadu"} for ${formatCurrency(property.price || property.rentPerMonth)}. Check it out!`,
                             url: shareUrl,
                           });
                         } catch (err: any) {
@@ -173,6 +207,7 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
                   </button>
                   <button 
                     onClick={() => {
+                      if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate([10]);
                       if (isInCompare(propertyId)) {
                         removeProperty(propertyId);
                         toast("Removed from Compare", { icon: "📊" });
@@ -188,6 +223,7 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
                   <button 
                     disabled={isWishlisting}
                     onClick={async () => {
+                      if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate([15]);
                       if (isCheckingAuth) return;
                       
                       if (!requireStrictAuth(isAuthenticated, window.location.pathname)) {

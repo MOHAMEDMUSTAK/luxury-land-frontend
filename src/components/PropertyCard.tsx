@@ -64,6 +64,8 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
   const handleToggleCompare = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate([10]);
+    
     if (isCompared) {
       removeProperty(propertyId as string);
       toast("Removed from Compare", { icon: "ℹ️" });
@@ -114,9 +116,13 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
     // Natively invoke OS capabilities like a native app
     if (navigator.share) {
       try {
+        const formattedPrice = property.listingType === "rent" ? property.rentPerMonth : property.price;
+        const priceText = formattedPrice ? ` for ${formatCurrency(formattedPrice)}` : "";
+        const locationText = property.town ? ` in ${property.town}` : "";
+        
         await navigator.share({
           title: property.title,
-          text: `Check out this amazing property on LuxuryLand: ${property.title}`,
+          text: `Found this incredible property on LuxuryLand ✨ ${property.title}${locationText}${priceText}. Check it out!`,
           url: `${window.location.origin}/property/${propertyId}`
         });
       } catch (err) {

@@ -112,7 +112,7 @@ export default function InstallAppBanner() {
     <div
       role="dialog"
       aria-label="Install LuxuryLand App"
-      className="fixed bottom-24 left-4 right-4 z-[90] sm:bottom-6 sm:left-auto sm:right-6 sm:w-96 bg-white/95 backdrop-blur-xl border border-white/60 rounded-[24px] shadow-2xl p-5 animate-fade-in-up"
+      className="fixed bottom-24 left-4 right-4 z-[90] sm:bottom-6 sm:left-auto sm:right-6 sm:w-[400px] bg-white/95 backdrop-blur-2xl border border-white/80 rounded-[32px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)] p-6 animate-fade-in-up"
     >
       {/* Close button */}
       <button
@@ -125,12 +125,12 @@ export default function InstallAppBanner() {
       </button>
 
       {/* App identity */}
-      <div className="flex gap-4 items-center mb-4">
-        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-brand-primary to-brand-secondary flex flex-shrink-0 items-center justify-center text-white shadow-lg shadow-brand-primary/25">
-          <span className="font-black text-2xl tracking-tighter">L</span>
+      <div className="flex gap-5 items-center mb-5">
+        <div className="w-16 h-16 rounded-[20px] bg-gradient-to-br from-brand-primary via-[#818cf8] to-brand-secondary flex flex-shrink-0 items-center justify-center text-white shadow-[0_8px_20px_rgba(99,102,241,0.3)] border border-white/20">
+          <span className="font-black text-3xl tracking-tighter">L</span>
         </div>
         <div className="flex-1 pr-6">
-          <h4 className="font-black text-text-main text-base tracking-tight">LuxuryLand App</h4>
+          <h4 className="font-black text-text-main text-[17px] tracking-tight">LuxuryLand App</h4>
           <p className="text-xs text-text-secondary mt-0.5 leading-tight font-medium">
             {installState === "ios"
               ? "Follow the 3 steps below to install"
@@ -176,14 +176,14 @@ export default function InstallAppBanner() {
           id="pwa-install-button"
           onClick={handleInstallClick}
           disabled={installing}
-          className="mt-1 w-full btn-primary py-3 px-4 rounded-xl flex items-center justify-center gap-2 text-sm"
+          className="mt-2 w-full bg-black text-white hover:bg-gray-900 active:scale-95 transition-all duration-300 py-3.5 px-4 rounded-[18px] flex items-center justify-center gap-2.5 text-[15px] font-bold shadow-[0_4px_14px_0_rgba(0,0,0,0.2)]"
         >
           {installing ? (
             <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
           ) : (
             <>
-              <Download className="w-4 h-4" />
-              Install App — It&apos;s Free
+              <Download className="w-4.5 h-4.5 animate-bounce" style={{ animationDuration: '2s' }} />
+              Get the Full Experience
             </>
           )}
         </button>
