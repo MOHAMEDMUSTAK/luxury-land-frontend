@@ -164,6 +164,7 @@ export default function CreateAdPage() {
       // Invalidate caches to ensure new data appears
       queryClient.invalidateQueries({ queryKey: ['lands'] });
       queryClient.invalidateQueries({ queryKey: ['trending-properties'] });
+      queryClient.invalidateQueries({ queryKey: ['my-lands'] });
       
       // Auto redirect after short delay
       setTimeout(() => {

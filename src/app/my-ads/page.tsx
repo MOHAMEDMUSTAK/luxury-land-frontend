@@ -8,24 +8,8 @@ import Image from "next/image";
 import { api } from "@/services/api";
 import toast from "react-hot-toast";
 import { useAuthStore } from "@/store/useAuthStore";
-import { motion, AnimatePresence } from "framer-motion";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import PropertySkeleton from "@/components/PropertySkeleton";
-
-// Staggered animation variants
-const containerVariants = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: { staggerChildren: 0.1 }
-  }
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 300, damping: 24 } },
-  exit: { opacity: 0, scale: 0.95, transition: { duration: 0.2 } }
-};
 
 export default function MyAdsPage() {
   const { isAuthenticated } = useAuthStore();
@@ -33,7 +17,7 @@ export default function MyAdsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const queryClient = useQueryClient();
 
-  const { data: adsData, isLoading: loading, refetch } = useQuery({
+  const { data: adsData, isLoading: loading } = useQuery({
     queryKey: ['my-lands'],
     queryFn: async () => {
       const res = await api.get('/land/my-lands');
@@ -84,11 +68,7 @@ export default function MyAdsPage() {
         <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-brand-primary/5 rounded-full mix-blend-multiply filter blur-[100px] opacity-60 pointer-events-none" />
 
         {/* Header */}
-        <motion.div 
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-12 pb-8 border-b border-ui-border relative z-10"
-        >
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-12 pb-8 border-b border-ui-border relative z-10 animate-fade-in-up">
           <div>
             <h1 className="text-4xl font-black text-text-main mb-3 tracking-tight gradient-heading">Property Portfolio</h1>
             <p className="text-text-secondary font-semibold max-w-md text-[15px]">
@@ -114,24 +94,16 @@ export default function MyAdsPage() {
               New Listing
             </Link>
           </div>
-        </motion.div>
+        </div>
 
         {/* Ads List */}
         <div className="space-y-6 relative z-10">
           {loading ? (
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="grid grid-cols-1 gap-6"
-            >
+            <div className="grid grid-cols-1 gap-6">
                {[...Array(3)].map((_, i) => <PropertySkeleton key={i} />)}
-            </motion.div>
+            </div>
           ) : filteredAds.length === 0 ? (
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="py-32 px-4 bg-white/70 backdrop-blur-xl border border-ui-border rounded-[32px] text-center shadow-[0_8px_40px_rgba(0,0,0,0.04)] relative overflow-hidden group"
-            >
+            <div className="py-32 px-4 bg-white/70 backdrop-blur-xl border border-ui-border rounded-[32px] text-center shadow-[0_8px_40px_rgba(0,0,0,0.04)] relative overflow-hidden group animate-fade-in-up">
               <div className="absolute inset-0 bg-gradient-to-br from-brand-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
                  <Search className="w-10 h-10 text-gray-300" />
@@ -141,20 +113,12 @@ export default function MyAdsPage() {
               <Link href="/my-ads/create" className="btn-primary inline-flex">
                 Initiate Your First Listing
               </Link>
-            </motion.div>
+            </div>
           ) : (
-            <motion.div 
-              variants={containerVariants}
-              initial="hidden"
-              animate="show"
-              className="grid grid-cols-1 gap-6"
-            >
-              <AnimatePresence>
+            <div className="grid grid-cols-1 gap-6 animate-fade-in-up">
                 {filteredAds.map((ad) => (
-                  <motion.div 
+                  <div 
                     key={ad._id} 
-                    variants={itemVariants}
-                    layout // Animate layout changes like removal
                     className={`p-6 flex flex-col lg:flex-row gap-6 items-center bg-white/80 backdrop-blur-md border border-ui-border rounded-3xl shadow-[0_4px_24px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_40px_rgba(99,102,241,0.08)] hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group ${!ad.isActive && "opacity-65 grayscale-[30%] hover:grayscale-0"}`}
                   >
                     {/* Status Glow Bar */}
@@ -234,39 +198,32 @@ export default function MyAdsPage() {
 
                     {/* Actions Panel */}
                     <div className="flex flex-row lg:flex-col items-center gap-3 w-full lg:w-auto pt-6 lg:pt-0 border-t lg:border-t-0 border-gray-100 justify-between lg:justify-center flex-shrink-0 lg:pl-6 lg:border-l">
-                      <motion.button 
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
+                      <button 
                         onClick={() => handleToggleStatus(ad._id)}
-                        className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm ${ad.isActive ? "bg-orange-50 hover:bg-orange-100 text-orange-500 border border-orange-200" : "bg-green-50 hover:bg-green-100 text-green-600 border border-green-200"}`}
+                        className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm hover:scale-105 active:scale-95 transition-all ${ad.isActive ? "bg-orange-50 hover:bg-orange-100 text-orange-500 border border-orange-200" : "bg-green-50 hover:bg-green-100 text-green-600 border border-green-200"}`}
                         title={ad.isActive ? "Deactivate Asset" : "Relist Asset"}
                       >
                         <Power className="w-[22px] h-[22px]" />
-                      </motion.button>
+                      </button>
                       <Link href={`/edit-property/${ad._id}`}>
-                        <motion.div
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          className="w-12 h-12 rounded-2xl bg-gray-50 text-text-secondary border border-gray-200 hover:bg-white hover:shadow-md hover:text-brand-primary transition-all flex items-center justify-center"
+                        <div
+                          className="w-12 h-12 rounded-2xl bg-gray-50 text-text-secondary border border-gray-200 hover:bg-white hover:shadow-md hover:text-brand-primary transition-all flex items-center justify-center hover:scale-105 active:scale-95"
                           title="Edit Specifications"
                         >
                           <Edit2 className="w-[22px] h-[22px]" />
-                        </motion.div>
+                        </div>
                       </Link>
-                      <motion.button 
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
+                      <button 
                         onClick={() => handleDelete(ad._id)}
-                        className="w-12 h-12 rounded-2xl bg-red-50 text-red-500 border border-red-100 hover:bg-red-100 transition-all flex items-center justify-center"
+                        className="w-12 h-12 rounded-2xl bg-red-50 text-red-500 border border-red-100 hover:bg-red-100 transition-all flex items-center justify-center hover:scale-105 active:scale-95"
                         title="Liquidate Asset (Delete)"
                       >
                         <Trash2 className="w-[22px] h-[22px]" />
-                      </motion.button>
+                      </button>
                     </div>
-                  </motion.div>
+                  </div>
                 ))}
-              </AnimatePresence>
-            </motion.div>
+            </div>
           )}
         </div>
       </div>
