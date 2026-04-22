@@ -21,7 +21,7 @@ export default function MyAdsPage() {
     queryKey: ['my-lands'],
     queryFn: async () => {
       const res = await api.get('/land/my-lands');
-      return res.data;
+      return res.data?.data || res.data;
     },
     enabled: isAuthenticated
   });
@@ -33,7 +33,7 @@ export default function MyAdsPage() {
   }, [adsData]);
 
   const handleDelete = async (id: string) => {
-    if (!global.confirm("Are you sure you want to absolute delete this luxury asset?")) return;
+    if (!window.confirm("Are you sure you want to completely delete this luxury asset?")) return;
     try {
       await api.delete(`/land/${id}`);
       setMyAds(prev => prev.filter(ad => ad._id !== id));
@@ -59,7 +59,7 @@ export default function MyAdsPage() {
     }
   };
 
-  const filteredAds = myAds.filter(ad => ad.title.toLowerCase().includes(searchQuery.toLowerCase()));
+  const filteredAds = (Array.isArray(myAds) ? myAds : []).filter(ad => (ad?.title || "").toLowerCase().includes((searchQuery || "").toLowerCase()));
 
   return (
       <div className="container mx-auto px-4 py-12 max-w-6xl relative">
@@ -88,7 +88,7 @@ export default function MyAdsPage() {
             </div>
             <Link
               href="/my-ads/create"
-              className="btn-primary shadow-[0_8px_20px_rgba(99,102,241,0.25)] hover:shadow-[0_12px_28px_rgba(99,102,241,0.35)] whitespace-nowrap text-[15px] px-6 h-[52px]"
+              className="btn-primary btn-premium-glow shadow-[0_8px_20px_rgba(99,102,241,0.25)] hover:shadow-[0_12px_28px_rgba(99,102,241,0.35)] whitespace-nowrap text-[15px] px-6 h-[52px]"
             >
               <Plus className="w-5 h-5 mr-1" />
               New Listing
@@ -110,7 +110,7 @@ export default function MyAdsPage() {
               </div>
               <h3 className="text-2xl font-black text-text-main mb-2">Portfolio Vacant</h3>
               <p className="text-text-secondary font-medium mb-8 max-w-sm mx-auto">You currently have no active listings matching your criteria.</p>
-              <Link href="/my-ads/create" className="btn-primary inline-flex">
+              <Link href="/my-ads/create" className="btn-primary btn-premium-glow inline-flex">
                 Initiate Your First Listing
               </Link>
             </div>
@@ -119,7 +119,7 @@ export default function MyAdsPage() {
                 {filteredAds.map((ad) => (
                   <div 
                     key={ad._id} 
-                    className={`p-6 flex flex-col lg:flex-row gap-6 items-center bg-white/80 backdrop-blur-md border border-ui-border rounded-3xl shadow-[0_4px_24px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_40px_rgba(99,102,241,0.08)] hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group ${!ad.isActive && "opacity-65 grayscale-[30%] hover:grayscale-0"}`}
+                    className={`premium-card p-6 flex flex-col lg:flex-row gap-6 items-center w-full transition-all duration-500 relative overflow-hidden group ${!ad.isActive ? "opacity-65 grayscale-[30%] hover:grayscale-0" : "luxe-lift"}`}
                   >
                     {/* Status Glow Bar */}
                     <div className={`absolute left-0 top-0 bottom-0 w-1 ${ad.isActive ? 'bg-green-400' : 'bg-orange-400'} shadow-[0_0_12px_currentColor] opacity-70`} />
@@ -175,7 +175,7 @@ export default function MyAdsPage() {
                       </div>
                       
                       <div className="flex items-center gap-8 mt-auto pt-5 border-t border-gray-100">
-                         <div className="flex Items-center gap-3">
+                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center border border-indigo-100 group-hover:bg-indigo-100 transition-colors">
                                <Eye className="w-5 h-5 text-brand-primary" />
                             </div>
