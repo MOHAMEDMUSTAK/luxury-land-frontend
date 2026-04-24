@@ -64,26 +64,12 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
     window.scrollTo(0, 0);
   }, [id]);
 
-  if (loading) {
-    return (
-      <div className="container mx-auto px-4 py-20 flex flex-col justify-center items-center h-64 gap-4">
-        <div className="w-12 h-12 border-4 border-gray-100 border-t-brand-primary rounded-full animate-spin" />
-        <p className="text-xs font-bold text-text-secondary uppercase tracking-widest">{t("common.loading")}</p>
-      </div>
-    );
-  }
-
-  if (!property) return notFound();
-
-  const propertyId = String(property._id || property.id);
-  const isWishlisted = hasItem(propertyId);
-
-  // Use ONLY real uploaded images
-  const hasImages = property.images && property.images.length > 0;
-
   // SEO: Dynamic JSON-LD Structured Data for Rich Snippets
   const jsonLd = useMemo(() => {
     if (!property) return null;
+    const propertyId = String(property._id || property.id);
+    const hasImages = property.images && property.images.length > 0;
+    
     return {
       "@context": "https://schema.org",
       "@type": "Product",
@@ -106,7 +92,26 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
         }
       })
     };
-  }, [property, propertyId, hasImages]);
+  }, [property]);
+
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-20 flex flex-col justify-center items-center h-64 gap-4">
+        <div className="w-12 h-12 border-4 border-gray-100 border-t-brand-primary rounded-full animate-spin" />
+        <p className="text-xs font-bold text-text-secondary uppercase tracking-widest">{t("common.loading")}</p>
+      </div>
+    );
+  }
+
+  if (!property) return notFound();
+
+  const propertyId = String(property._id || property.id);
+  const isWishlisted = hasItem(propertyId);
+
+  // Use ONLY real uploaded images
+  const hasImages = property.images && property.images.length > 0;
+
+
 
   return (
     <div className="container mx-auto px-4 py-10 max-w-6xl page-fade-in scroll-smooth">

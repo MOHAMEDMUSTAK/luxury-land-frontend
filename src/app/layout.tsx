@@ -12,6 +12,9 @@ import PWARegistration from "@/components/PWARegistration";
 import MobileBottomNav from "@/components/MobileBottomNav";
 import PageTransitionProvider from "@/components/PageTransitionProvider";
 import InstallAppBanner from "@/components/InstallAppBanner";
+import ActivityFeed from "@/components/ActivityFeed";
+import MarketPulseTicker from "@/components/MarketPulseTicker";
+import QuickToolsFAB from "@/components/QuickToolsFAB";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -133,6 +136,7 @@ export default function RootLayout({
           />
           <PWARegistration />
           <Navbar />
+          <MarketPulseTicker />
 
           <main className="flex-1 flex flex-col relative z-10 pb-[160px] md:pb-0">
             <AuthInit>
@@ -147,6 +151,8 @@ export default function RootLayout({
           <MobileBottomNav />
           <CompareBar />
           <InstallAppBanner />
+          <ActivityFeed />
+          <QuickToolsFAB />
         </Providers>
       </body>
     </html>
