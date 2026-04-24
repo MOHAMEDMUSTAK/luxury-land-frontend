@@ -15,6 +15,7 @@ import InstallAppBanner from "@/components/InstallAppBanner";
 import ActivityFeed from "@/components/ActivityFeed";
 import MarketPulseTicker from "@/components/MarketPulseTicker";
 import QuickToolsFAB from "@/components/QuickToolsFAB";
+import NextTopLoader from 'nextjs-toploader';
 
 const inter = Inter({
   variable: "--font-inter",
@@ -120,6 +121,17 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col bg-[var(--background)] text-[var(--foreground)] selection:bg-brand-primary/10">
         <Providers>
+          <NextTopLoader
+            color="#6366F1"
+            initialPosition={0.08}
+            crawlSpeed={200}
+            height={3}
+            crawl={true}
+            showSpinner={false}
+            easing="ease"
+            speed={200}
+            shadow="0 0 10px #6366F1,0 0 5px #6366F1"
+          />
           <Toaster
             position="top-right"
             toastOptions={{

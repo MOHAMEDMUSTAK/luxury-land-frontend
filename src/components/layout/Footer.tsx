@@ -61,7 +61,7 @@ export default function Footer() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8 items-start">
-          
+
           {/* Column 1: Brand */}
           <div className="lg:col-span-4 space-y-6">
             <Link href="/" className="flex items-center gap-3 group">
@@ -140,13 +140,13 @@ export default function Footer() {
             <div className="premium-card luxe-lift p-8 relative bg-white border border-ui-border group/card">
               {/* Glow Line Top */}
               <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-brand-primary to-brand-secondary opacity-80" />
-              
+
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div className="space-y-1">
                   <h5 className="text-lg font-black text-text-main tracking-tight">MOHAMED MUSTAK M</h5>
                   <p className="text-[10px] font-black text-brand-primary uppercase tracking-[0.15em]">{t("footer.trusted")}</p>
                 </div>
-                
+
                 <div className="flex flex-col gap-3">
                   <a href="mailto:landmarket@gmail.com" className="flex items-center gap-3 text-sm font-bold text-text-secondary hover:text-brand-primary transition-colors group/link">
                     <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center group-hover/link:bg-brand-primary/10 transition-colors">
@@ -178,7 +178,7 @@ export default function Footer() {
         <div className="mt-16 pt-8 border-t border-ui-border/40 flex flex-col md:flex-row justify-between items-center gap-4 text-[11px] font-bold text-text-secondary uppercase tracking-[0.1em] opacity-60">
           <p>© {new Date().getFullYear()} LuxuryLand. All rights reserved.</p>
           <p className="flex items-center gap-2">
-            Made with ❤️ in <span className="gradient-accent">Tamil Nadu 🌾</span>
+            Made with ❤️ in <span className="gradient-accent">Tamil Nadu </span>
           </p>
         </div>
       </div>

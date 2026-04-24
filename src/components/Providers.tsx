@@ -1,23 +1,64 @@
 "use client";
 
-import { ReactNode, useState } from "react";
+import { ReactNode, useState, useEffect } from "react";
 import { I18nextProvider } from "react-i18next";
 import i18n from "@/lib/i18n";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
+import { persistQueryClient } from "@tanstack/react-query-persist-client";
 
-export default function Providers({ children }: { children: ReactNode }) {
-  // Setup a default QueryClient with 60 seconds caching
-  const [queryClient] = useState(() => new QueryClient({
+// Create a singleton QueryClient with aggressive caching — Amazon-tier speed
+const makeQueryClient = () =>
+  new QueryClient({
     defaultOptions: {
       queries: {
-        staleTime: 5 * 60 * 1000, // 5 minutes — instant navigation, prevents redundant fetching
-        gcTime: 30 * 60 * 1000, // 30 minutes memory keeping
-        refetchOnWindowFocus: false,
-        refetchOnMount: false, // Use cache when navigating back
-        retry: false, // Prevents massive retries on 401/404s
+        staleTime: 5 * 60 * 1000,       // 5 min — data considered fresh, no re-fetch
+        gcTime: 30 * 60 * 1000,         // 30 min — in-memory cache retention
+        refetchOnWindowFocus: false,     // Don't re-fetch when tab regains focus
+        refetchOnMount: false,           // Use cache when navigating back — instant
+        refetchOnReconnect: false,       // Don't re-fetch on reconnect
+        retry: 1,                        // Only one retry on failure
+        retryDelay: 500,
       },
     },
-  }));
+  });
+
+export default function Providers({ children }: { children: ReactNode }) {
+  const [queryClient] = useState(() => makeQueryClient());
+  const [persisted, setPersisted] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      // Create localStorage persister — data survives page refresh (0ms reload)
+      const localStoragePersister = createSyncStoragePersister({
+        storage: window.localStorage,
+        key: "luxuryland-query-cache",
+        throttleTime: 1000,              // Throttle writes to localStorage
+      });
+
+      persistQueryClient({
+        queryClient,
+        persister: localStoragePersister,
+        maxAge: 24 * 60 * 60 * 1000,   // Persist for 24 hours
+        buster: "v1",                   // Cache buster — bump to invalidate old caches
+        // Only persist non-sensitive, high-value queries
+        hydrateOptions: {},
+        dehydrateOptions: {
+          shouldDehydrateQuery: (query) => {
+            const key = query.queryKey[0] as string;
+            // Only persist public listing data — never persist auth or personal data
+            return ["lands", "trending-properties", "land"].includes(key) && 
+                   query.state.status === "success";
+          },
+        },
+      });
+    } catch (e) {
+      // Silently fail if localStorage is unavailable (e.g., private browsing)
+      console.debug("[Providers] Could not initialize query persistence:", e);
+    }
+    setPersisted(true);
+  }, [queryClient]);
 
   return (
     <QueryClientProvider client={queryClient}>
