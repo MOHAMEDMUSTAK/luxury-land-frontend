@@ -38,9 +38,18 @@ export default function UserProfilePage({ params }: { params: Promise<{ userId: 
 
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-32 flex flex-col items-center justify-center gap-4">
-        <div className="w-12 h-12 border-4 border-gray-100 border-t-brand-primary rounded-full animate-spin" />
-        <p className="text-xs font-bold text-text-secondary uppercase tracking-widest">Loading Profile...</p>
+      <div className="container mx-auto px-4 py-16 max-w-6xl">
+        <div className="flex flex-col lg:flex-row gap-8 lg:items-start animate-pulse">
+          <aside className="lg:w-1/3 xl:w-1/4">
+            <div className="bg-gray-200 rounded-3xl h-[400px] w-full" />
+          </aside>
+          <main className="flex-1 min-w-0">
+            <div className="h-10 bg-gray-200 rounded-xl w-1/3 mb-10" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {[1, 2].map(i => <div key={i} className="aspect-[4/3] bg-gray-200 rounded-[24px]" />)}
+            </div>
+          </main>
+        </div>
       </div>
     );
   }
