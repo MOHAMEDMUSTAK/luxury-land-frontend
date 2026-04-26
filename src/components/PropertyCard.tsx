@@ -194,14 +194,9 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
       <div 
         onClick={handleNavigate}
         onMouseEnter={handlePrefetch}
-        className="group block h-full cursor-pointer rounded-3xl transition-transform duration-150 ease-out hover:-translate-y-1.5 hover:scale-[1.01] active:scale-95 will-change-transform"
-        style={{ transform: "translate3d(0,0,0)" }}
+        className="group block h-full cursor-pointer transition-all duration-200 active:scale-[0.98] outline-none"
       >
-      <div 
-        className="premium-card h-full flex flex-col group/card relative shadow-sm hover:shadow-[0_24px_50px_-15px_rgba(0,0,0,0.15)] transition-shadow duration-500"
-      >
-        {/* CSS-only spotlight effect — replaces per-card JS mouse tracking */}
-        <div className="pointer-events-none absolute -inset-px rounded-3xl opacity-0 transition duration-300 group-hover/card:opacity-100 z-0 hidden md:block bg-[radial-gradient(400px_circle_at_50%_50%,rgba(99,102,241,0.06),transparent_60%)]" />
+      <div className="premium-card h-full flex flex-col relative group/card">
         
         <div className="absolute top-4 right-4 z-10 flex flex-col gap-2">
           <button
@@ -226,7 +221,7 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
           </button>
         </div>
 
-        <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100 rounded-t-3xl">
+        <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100/50 rounded-t-3xl">
           {/* Top-left: NEW badge or time-on-market */}
           <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
             {isNewListing ? (
@@ -250,7 +245,7 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
               alt={property.title}
               fill
               priority={priority}
-              className="object-cover transition-transform duration-500 ease-out md:group-hover/card:scale-105"
+              className="object-cover transition-transform duration-300 ease-out md:group-hover/card:scale-105"
               sizes="(max-width: 640px) 300px, (max-width: 1024px) 400px, 400px"
             />
           ) : (
@@ -259,9 +254,9 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
               <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">{t("home.noResults")}</span>
             </div>
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-30 group-hover/card:opacity-50 transition-opacity duration-500 pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-20 group-hover/card:opacity-40 transition-opacity duration-300 pointer-events-none" />
           
-          <div className="absolute bottom-4 right-4 z-10 opacity-0 group-hover/card:opacity-100 transition-all duration-500 translate-y-2 group-hover/card:translate-y-0 hidden md:block">
+          <div className="absolute bottom-4 right-4 z-10 opacity-0 group-hover/card:opacity-100 transition-all duration-300 translate-y-2 group-hover/card:translate-y-0 hidden md:block">
             <div className="w-10 h-10 rounded-2xl bg-white/95 flex items-center justify-center shadow-lg border border-gray-100">
               <Maximize2 className="w-4.5 h-4.5 text-brand-primary" />
             </div>
@@ -269,7 +264,7 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
         </div>
 
         <div className="p-5 flex flex-col flex-grow">
-          <h3 className="font-bold text-text-main text-[17px] leading-snug line-clamp-2 mb-2 group-hover/card:text-brand-primary transition-colors duration-300">
+          <h3 className="font-bold text-gray-900 text-lg leading-snug line-clamp-2 mb-2 group-hover/card:text-brand-primary transition-colors duration-200 tracking-tight">
             {property.title}
           </h3>
 
@@ -349,12 +344,12 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
             <div className="premium-divider" />
             <div className="flex items-center gap-2 pt-1 border-t border-gray-100/50 mt-4 h-12">
               <div className="flex-1 min-w-0 pr-1">
-                <p className="font-extrabold text-sm sm:text-base gradient-price flex items-baseline leading-tight truncate">
+                <p className="font-black text-xl sm:text-[22px] text-gray-900 flex items-baseline leading-tight truncate tracking-tight">
                   <span className="truncate">
                     {formatCurrency(property.listingType === "rent" ? (property.rentPerMonth || 0) : (property.price || 0))}
                   </span>
                   {property.listingType === "rent" && (
-                    <span className="text-[9px] font-semibold text-text-secondary ml-1 lowercase">/ mth</span>
+                    <span className="text-[10px] font-bold text-gray-500 ml-1 lowercase tracking-normal">/ mo</span>
                   )}
                 </p>
               </div>

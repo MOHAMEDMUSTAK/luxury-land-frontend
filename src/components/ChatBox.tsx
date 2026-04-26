@@ -176,12 +176,16 @@ export default function ChatBox({ isOpen, onClose, receiverId, receiverName, lan
     socket.on('receiveMessage', (data: any) => {
       // Only add if it's from the current chat
       if (data.chatId === chatId || data.senderId === receiverId) {
-        setMessages((prev: Message[]) => [...prev, {
-          sender: data.senderId,
-          text: data.text,
-          isRead: false,
-          timestamp: new Date(data.timestamp || Date.now()),
-        }]);
+        setMessages((prev: Message[]) => {
+          if (data.senderId === user?.id) return prev;
+          
+          return [...prev, {
+            sender: data.senderId,
+            text: data.text,
+            isRead: false,
+            timestamp: new Date(data.timestamp || Date.now()),
+          }];
+        });
 
         // If chat is open and window is focused, mark the new message as read immediately
         if (isOpen && chatId && document.hasFocus()) {
@@ -252,10 +256,10 @@ export default function ChatBox({ isOpen, onClose, receiverId, receiverName, lan
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 sm:inset-auto sm:bottom-6 sm:right-6 z-[9999] w-full h-full sm:h-[600px] sm:max-h-[85vh] sm:max-w-[400px] bg-[#f0f2f5] border-none sm:border border-gray-200 rounded-none sm:rounded-[1.5rem] shadow-2xl overflow-hidden flex flex-col animate-in slide-in-from-bottom-5">
+    <div className="fixed inset-0 sm:inset-auto sm:bottom-6 sm:right-6 z-[9999] w-full h-[100dvh] sm:h-[600px] sm:max-h-[85vh] sm:max-w-[400px] bg-[#f8fafc] border-none sm:border border-gray-200/60 rounded-none sm:rounded-[1.5rem] shadow-[0_8px_40px_rgba(0,0,0,0.08)] overflow-hidden flex flex-col animate-in slide-in-from-bottom-5 backdrop-blur-3xl supports-[backdrop-filter]:bg-white/90">
       
-      {/* Header */}
-      <div className="bg-[#f0f2f5] p-4 flex items-center justify-between border-b border-gray-200 shadow-sm relative z-20">
+        {/* Header */}
+        <div className="bg-white/85 backdrop-blur-xl p-4 flex items-center justify-between border-b border-gray-100 z-20 shadow-sm supports-[backdrop-filter]:bg-white/60">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-brand-primary text-white rounded-full flex items-center justify-center font-bold shadow-sm border border-white overflow-hidden ring-2 ring-white/50">
             {receiverName.charAt(0).toUpperCase()}
@@ -282,8 +286,8 @@ export default function ChatBox({ isOpen, onClose, receiverId, receiverName, lan
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3 relative bg-[#e5ddd5]">
-          <div className="absolute inset-0 opacity-[0.05] pointer-events-none" 
+      <div className="flex-1 overflow-y-auto p-4 space-y-3 relative z-10 w-full bg-[#f8fafc]">
+          <div className="absolute inset-0 opacity-[0.03] pointer-events-none" 
                style={{ 
                  backgroundImage: 'url("https://w7.pngwing.com/pngs/315/127/png-transparent-whatsapp-iphone-background-whatsapp-doodle-pattern-feature-whatsapp-logo-thumbnail.png")',
                  backgroundSize: '300px'
@@ -301,7 +305,7 @@ export default function ChatBox({ isOpen, onClose, receiverId, receiverName, lan
             const isMe = user && msg.sender.toString() === user.id.toString();
             return (
                 <div key={i} className={`flex ${isMe ? "justify-end" : "justify-start"} relative z-10 mb-1`}>
-                  <div className={`max-w-[85%] px-3 py-1.5 rounded-lg shadow-sm text-[14px] relative group transition-all hover:shadow-md ${isMe ? "bg-[#dcf8c6] text-[#111b21] rounded-tr-none" : "bg-white text-[#111b21] rounded-tl-none border border-gray-100"}`}>
+                  <div className={`max-w-[85%] px-3.5 py-2 rounded-2xl shadow-sm text-[14px] relative group transition-all hover:shadow-md ${isMe ? "bg-gradient-to-br from-brand-primary to-indigo-600 text-white rounded-tr-sm" : "bg-white text-[#111b21] rounded-tl-sm border border-gray-100"}`}>
                     
                     {msg.type === 'offer' ? (
                       <div className="py-2 flex flex-col gap-2 min-w-[180px]">
@@ -346,13 +350,13 @@ export default function ChatBox({ isOpen, onClose, receiverId, receiverName, lan
                     )}
 
                     {/* Triangle */}
-                    <div className={`absolute top-0 w-2.5 h-2.5 ${isMe ? "-right-2 bg-[#dcf8c6]" : "-left-2 bg-white"}`} 
+                    <div className={`absolute top-0 w-2.5 h-2.5 ${isMe ? "-right-1 bg-indigo-600" : "-left-1 bg-white"}`} 
                          style={{ clipPath: isMe ? 'polygon(0 0, 0 100%, 100% 0)' : 'polygon(100% 0, 100% 100%, 0 0)' }} />
                     
                     <div className="absolute bottom-1 right-1.5 flex items-center gap-1">
-                       <span className="text-[9px] text-gray-500/70 font-bold">{format(msg.timestamp, "h:mm a")}</span>
+                       <span className={`text-[9px] font-medium tabular-nums ${isMe ? "text-white/80" : "text-gray-500/70"}`}>{format(msg.timestamp, "h:mm a")}</span>
                        {isMe && (
-                         <CheckCheck className={`w-3.5 h-3.5 ${msg.isRead ? "text-blue-500" : "text-gray-400"}`} />
+                         <CheckCheck className={`w-3.5 h-3.5 ${msg.isRead ? "text-cyan-300" : "text-white/50"}`} />
                        )}
                     </div>
                   </div>
@@ -363,7 +367,7 @@ export default function ChatBox({ isOpen, onClose, receiverId, receiverName, lan
       </div>
 
       {/* Input */}
-      <div className="p-3 bg-[#f0f2f5] border-t border-gray-200 flex flex-col gap-2 relative z-20 pb-[calc(env(safe-area-inset-bottom)+12px)]">
+      <div className="p-3 bg-white/80 backdrop-blur-xl border-t border-gray-100 flex flex-col gap-2 relative z-20 pb-[calc(env(safe-area-inset-bottom)+12px)] shadow-[0_-4px_30px_rgba(0,0,0,0.03)] supports-[backdrop-filter]:bg-white/60">
         
         {landId && (
           <button 
@@ -390,8 +394,8 @@ export default function ChatBox({ isOpen, onClose, receiverId, receiverName, lan
             disabled={!inputText.trim()}
             className={`w-11 h-11 rounded-full flex items-center justify-center transition-all shadow-lg flex-shrink-0 active:scale-95 ${
               inputText.trim() 
-                ? "bg-brand-primary text-white hover:scale-110" 
-                : "bg-gray-300 text-gray-500 cursor-default"
+                ? "bg-gradient-to-r from-brand-primary to-indigo-600 text-white hover:scale-110 hover:shadow-brand-primary/30" 
+                : "bg-gray-200 text-gray-400 cursor-default"
             }`}
           >
             <Send className={`w-5 h-5 ml-0.5 transition-transform ${inputText.trim() ? "translate-x-0" : "-translate-x-0.5"}`} />

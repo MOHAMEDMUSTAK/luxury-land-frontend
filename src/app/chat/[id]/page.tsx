@@ -220,9 +220,11 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
         if (currentChat && data.chatId === currentChat._id) {
           setMessages((prev: Message[]) => {
             // Avoid duplicate messages if already added locally
+            if (data.senderId === user?.id) return prev;
+
             const isDuplicate = prev.some(m => 
               m.text === data.text && 
-              Math.abs(new Date(m.timestamp).getTime() - new Date(data.timestamp).getTime()) < 1000
+              Math.abs(new Date(m.timestamp).getTime() - new Date(data.timestamp).getTime()) < 2000
             );
             if (isDuplicate) return prev;
 
@@ -326,10 +328,10 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
 
   return (
     <ProtectedRoute>
-      <div className="fixed inset-0 md:relative md:flex md:flex-col md:h-[calc(100vh-64px)] bg-[#f0f2f5] z-[9999] md:z-10 flex flex-col h-full overflow-hidden page-fade-in">
+      <div className="fixed inset-0 md:relative md:flex md:flex-col md:h-[calc(100vh-64px)] bg-[#f9fafb] z-[9999] md:z-10 flex flex-col h-[100dvh] overflow-hidden page-fade-in">
         
-        {/* Upper WhatsApp Header */}
-        <div className="bg-[#f0f2f5] px-4 py-3 flex items-center justify-between border-b border-gray-200 z-20 shadow-sm">
+        {/* Upper Premium Header */}
+        <div className="bg-white/85 backdrop-blur-2xl px-4 py-3 flex items-center justify-between border-b border-gray-100 z-30 shadow-[0_4px_30px_rgba(0,0,0,0.03)] supports-[backdrop-filter]:bg-white/60">
           <div className="flex items-center gap-3">
             <button 
               onClick={() => router.back()} 
@@ -395,14 +397,14 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
           </div>
         )}
 
-        <div className="flex-1 flex overflow-hidden w-full relative bg-[#e5ddd5]">
+        <div className="flex-1 flex overflow-hidden w-full relative bg-[#f8fafc]">
           
           {/* Chat Background Pattern */}
-          <div className="absolute inset-0 opacity-[0.06] pointer-events-none z-0" 
+          <div className="absolute inset-0 opacity-[0.03] pointer-events-none z-0" 
                style={{ 
                  backgroundImage: 'url("https://w7.pngwing.com/pngs/315/127/png-transparent-whatsapp-iphone-background-whatsapp-doodle-pattern-feature-whatsapp-logo-thumbnail.png")', 
                  backgroundSize: '400px',
-                 backgroundColor: '#e5ddd5' 
+                 backgroundColor: '#f8fafc' 
                }} 
           />
 
@@ -588,7 +590,7 @@ const ChatInput = ({ onSend, landId, onShowOffer }: { onSend: (text: string) => 
   };
 
   return (
-    <div className="p-3 bg-[#f0f2f5] border-t border-gray-200 relative pb-[calc(env(safe-area-inset-bottom)+12px)]">
+    <div className="p-3 bg-white/80 backdrop-blur-xl border-t border-gray-100/50 relative pb-[calc(env(safe-area-inset-bottom)+12px)] shadow-[0_-4px_30px_rgba(0,0,0,0.03)] z-50">
       {showEmojiShelf && (
         <div className="absolute bottom-full left-4 mb-2 bg-white rounded-2xl shadow-2xl border border-gray-100 p-3 grid grid-cols-6 gap-2 animate-in fade-in slide-in-from-bottom-2 duration-200 z-50">
           {['👍', '❤️', '👋', '😊', '🏠', '🙌', '🔥', '✨', '🤝', '📍', '💰', '📞'].map(e => (
@@ -637,8 +639,8 @@ const ChatInput = ({ onSend, landId, onShowOffer }: { onSend: (text: string) => 
           disabled={!inputText.trim()}
           className={`w-12 h-12 rounded-full flex items-center justify-center transition-all shadow-lg flex-shrink-0 active:scale-95 ${
             inputText.trim() 
-              ? "bg-brand-primary text-white hover:bg-brand-primary/90 hover:scale-110" 
-              : "bg-gray-300 text-gray-500 cursor-default"
+              ? "bg-gradient-to-r from-brand-primary to-indigo-600 text-white hover:scale-110 hover:shadow-brand-primary/40" 
+              : "bg-gray-200 text-gray-400 cursor-default"
           }`}
         >
           <Send className={`w-5 h-5 ml-0.5 transition-transform ${inputText.trim() ? "translate-x-0" : "-translate-x-0.5"}`} />
@@ -667,14 +669,14 @@ const MessageBubble = memo(({ message, isMe, showDate, onUpdateOfferStatus }: {
       )}
       <div className={`flex ${isMe ? "justify-end" : "justify-start"} mb-1`}>
         <div 
-          className={`max-w-[85%] md:max-w-[65%] rounded-lg px-3 py-2 shadow-sm relative group transition-all hover:shadow-md ${
+          className={`max-w-[85%] md:max-w-[65%] rounded-2xl px-4 py-2.5 shadow-sm relative group transition-all hover:shadow-md ${
             isMe 
-              ? "bg-[#dcf8c6] text-[#111b21] rounded-tr-none" 
-              : "bg-white text-[#111b21] rounded-tl-none border border-gray-100"
+              ? "bg-gradient-to-br from-brand-primary to-indigo-600 text-white rounded-tr-sm shadow-brand-primary/20" 
+              : "bg-white text-[#111b21] rounded-tl-sm border border-gray-100"
           }`}
         >
           {/* Message Triangle */}
-          <div className={`absolute top-0 w-3 h-3 ${isMe ? "-right-2 bg-[#dcf8c6]" : "-left-2 bg-white"}`} 
+          <div className={`absolute top-0 w-3 h-3 ${isMe ? "-right-1 bg-indigo-600" : "-left-1 bg-white"}`} 
                 style={{ clipPath: isMe ? 'polygon(0 0, 0 100%, 100% 0)' : 'polygon(100% 0, 100% 100%, 0 0)' }} />
           
           {message.type === 'offer' ? (
@@ -719,11 +721,11 @@ const MessageBubble = memo(({ message, isMe, showDate, onUpdateOfferStatus }: {
             <p className="text-[14.5px] leading-relaxed pr-12 whitespace-pre-wrap">{message.text}</p>
           )}
           <div className="absolute bottom-1 right-1.5 flex items-center gap-1">
-            <span className="text-[10px] text-gray-500/70 font-bold tabular-nums">
+            <span className={`text-[10px] tabular-nums font-medium ${isMe ? "text-white/80" : "text-gray-500/70"}`}>
               {format(new Date(message.timestamp), "h:mm a")}
             </span>
             {isMe && (
-              <CheckCheck className={`w-3.5 h-3.5 ${message.isRead ? "text-blue-500" : "text-gray-400"}`} />
+              <CheckCheck className={`w-3.5 h-3.5 ${message.isRead ? "text-cyan-300" : "text-white/50"}`} />
             )}
           </div>
         </div>

@@ -12,7 +12,6 @@ import PWARegistration from "@/components/PWARegistration";
 import MobileBottomNav from "@/components/MobileBottomNav";
 import PageTransitionProvider from "@/components/PageTransitionProvider";
 import InstallAppBanner from "@/components/InstallAppBanner";
-import ActivityFeed from "@/components/ActivityFeed";
 import MarketPulseTicker from "@/components/MarketPulseTicker";
 import QuickToolsFAB from "@/components/QuickToolsFAB";
 import NextTopLoader from 'nextjs-toploader';
@@ -163,7 +162,6 @@ export default function RootLayout({
           <MobileBottomNav />
           <CompareBar />
           <InstallAppBanner />
-          <ActivityFeed />
           <QuickToolsFAB />
         </Providers>
       </body>
