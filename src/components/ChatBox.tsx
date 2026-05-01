@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { X, Send, MoreVertical, Phone, ShieldCheck, CheckCheck, Trash2, Tag } from "lucide-react";
 import { format } from "date-fns";
 import { io, Socket } from "socket.io-client";
@@ -39,6 +39,15 @@ export default function ChatBox({ isOpen, onClose, receiverId, receiverName, lan
   const socketRef = useRef<Socket | null>(null);
   const { user } = useAuthStore();
   
+  // ★ FIX: useRef to give socket handlers access to the latest chatId
+  // Without this, the receiveMessage handler captures chatId as null in its closure
+  const chatIdRef = useRef<string | null>(null);
+  
+  // Keep ref in sync with state
+  useEffect(() => {
+    chatIdRef.current = chatId;
+  }, [chatId]);
+  
   // Offer System State
   const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
   const [offerPrice, setOfferPrice] = useState(initialPrice?.toString() || "");
@@ -63,7 +72,7 @@ export default function ChatBox({ isOpen, onClose, receiverId, receiverName, lan
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const markMessagesRead = async (id: string) => {
+  const markMessagesRead = useCallback(async (id: string) => {
     if (!id || !user || !document.hasFocus()) return;
     try {
       await api.patch(`/chat/mark-as-read/${id}`);
@@ -75,13 +84,13 @@ export default function ChatBox({ isOpen, onClose, receiverId, receiverName, lan
     } catch (err) {
       console.error("MARK_READ_ERROR:", err);
     }
-  };
+  }, [user, receiverId]);
 
   const handleClearChat = async () => {
-    if (!chatId) return;
+    if (!chatIdRef.current) return;
     if (!window.confirm("Clear message history for this chat? This won't affect the other person.")) return;
     try {
-      await api.delete(`/chat/clear/${chatId}`);
+      await api.delete(`/chat/clear/${chatIdRef.current}`);
       setMessages([]);
     } catch (err) {
       console.error("CLEAR_CHAT_ERROR:", err);
@@ -90,11 +99,11 @@ export default function ChatBox({ isOpen, onClose, receiverId, receiverName, lan
 
   const handleMakeOffer = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!chatId || !offerPrice || !landId || !user) return;
+    if (!chatIdRef.current || !offerPrice || !landId || !user) return;
 
     try {
       const res = await api.post('/chat/offer', {
-        chatId,
+        chatId: chatIdRef.current,
         price: Number(offerPrice),
         landId
       });
@@ -104,7 +113,7 @@ export default function ChatBox({ isOpen, onClose, receiverId, receiverName, lan
 
       // Socket Emit
       socketRef.current?.emit('sendMessage', {
-        chatId,
+        chatId: chatIdRef.current,
         senderId: user.id,
         recipientId: receiverId,
         text: `Offer: ₹${offerPrice}`,
@@ -120,10 +129,10 @@ export default function ChatBox({ isOpen, onClose, receiverId, receiverName, lan
   };
 
   const updateOfferStatus = async (messageId: string, status: 'accepted' | 'rejected') => {
-    if (!chatId) return;
+    if (!chatIdRef.current) return;
     try {
-      const res = await api.patch('/chat/offer-status', {
-        chatId,
+      await api.patch('/chat/offer-status', {
+        chatId: chatIdRef.current,
         messageId,
         status
       });
@@ -135,7 +144,7 @@ export default function ChatBox({ isOpen, onClose, receiverId, receiverName, lan
 
       // Socket Emit for status update
       socketRef.current?.emit('update_offer_status', {
-        chatId,
+        chatId: chatIdRef.current,
         messageId,
         status,
         senderId: user?.id,
@@ -146,20 +155,26 @@ export default function ChatBox({ isOpen, onClose, receiverId, receiverName, lan
     }
   };
 
+  // ★ Effect 1: Initialize chat session (fetch/create chat)
   useEffect(() => {
     if (!isOpen || !user || !receiverId) return;
 
-    // 1. Get or Create Chat session
     api.get(`/chat/${receiverId}`).then(res => {
       const id = res.data._id;
       setChatId(id);
+      chatIdRef.current = id; // Immediately update ref
       setMessages(res.data.messages.map((m: any) => ({ ...m, timestamp: new Date(m.timestamp) })));
       
       // Mark as read on open if we have messages from them
       markMessagesRead(id);
     }).catch(err => console.error("CHAT_BOX_INIT_ERROR:", err));
+  }, [isOpen, receiverId, user, markMessagesRead]);
 
-    // 2. Socket Connection
+  // ★ Effect 2: Socket connection — DOES NOT depend on chatId
+  // Uses chatIdRef.current inside handlers for real-time access
+  useEffect(() => {
+    if (!isOpen || !user || !receiverId) return;
+
     const socketURL = process.env.NEXT_PUBLIC_SOCKET_URL || 
                       process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 
                       "http://localhost:5000";
@@ -174,8 +189,9 @@ export default function ChatBox({ isOpen, onClose, receiverId, receiverName, lan
     });
 
     socket.on('receiveMessage', (data: any) => {
-      // Only add if it's from the current chat
-      if (data.chatId === chatId || data.senderId === receiverId) {
+      // ★ FIX: Use chatIdRef.current instead of captured chatId
+      const currentChatId = chatIdRef.current;
+      if (data.chatId === currentChatId || data.senderId === receiverId) {
         setMessages((prev: Message[]) => {
           if (data.senderId === user?.id) return prev;
           
@@ -188,13 +204,13 @@ export default function ChatBox({ isOpen, onClose, receiverId, receiverName, lan
         });
 
         // If chat is open and window is focused, mark the new message as read immediately
-        if (isOpen && chatId && document.hasFocus()) {
-          markMessagesRead(chatId);
+        if (isOpen && currentChatId && document.hasFocus()) {
+          markMessagesRead(currentChatId);
         }
       }
     });
 
-    socket.on('messages_read', (data: any) => {
+    socket.on('messages_read', () => {
       // Update local status of my messages to 'read' (blue ticks)
       setMessages((prev: Message[]) => prev.map(m => 
         m.sender === user.id ? { ...m, isRead: true } : m
@@ -209,8 +225,9 @@ export default function ChatBox({ isOpen, onClose, receiverId, receiverName, lan
 
     // Add focus listener to mark messages read when user returns to window
     const handleFocus = () => {
-      if (isOpen && chatId) {
-        markMessagesRead(chatId);
+      const currentChatId = chatIdRef.current;
+      if (isOpen && currentChatId) {
+        markMessagesRead(currentChatId);
       }
     };
     window.addEventListener('focus', handleFocus);
@@ -219,7 +236,7 @@ export default function ChatBox({ isOpen, onClose, receiverId, receiverName, lan
       window.removeEventListener('focus', handleFocus);
       socket.disconnect();
     };
-  }, [isOpen, receiverId, user, chatId]);
+  }, [isOpen, receiverId, user, markMessagesRead]);
 
   useEffect(() => {
     scrollToBottom();
@@ -227,14 +244,14 @@ export default function ChatBox({ isOpen, onClose, receiverId, receiverName, lan
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputText.trim() || !socketRef.current || !chatId || !user) return;
+    if (!inputText.trim() || !socketRef.current || !chatIdRef.current || !user) return;
 
     const messageText = inputText.trim();
     setInputText("");
 
     try {
       // 1. Save to DB
-      await api.post(`/chat/message`, { chatId, text: messageText });
+      await api.post(`/chat/message`, { chatId: chatIdRef.current, text: messageText });
 
       // 2. Local State
       const newMsg = { sender: user.id, text: messageText, isRead: false, timestamp: new Date() };
@@ -242,7 +259,7 @@ export default function ChatBox({ isOpen, onClose, receiverId, receiverName, lan
 
       // 3. Socket Emit
       socketRef.current.emit('sendMessage', {
-        chatId,
+        chatId: chatIdRef.current,
         senderId: user.id,
         recipientId: receiverId,
         text: messageText,

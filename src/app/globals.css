@@ -115,7 +115,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
   -webkit-tap-highlight-color: transparent;
   scroll-behavior: smooth;
-  @apply pb-[100px] md:pb-0;
 }
 
 /* ═══════════════════════════════════════════
@@ -485,17 +484,15 @@ body {
    ═══════════════════════════════════════════ */
 
 .page-fade-in {
-  /* Instant render */
+  animation: pageFadeIn 0.15s ease-out;
 }
 
-@keyframes fadeIn {
+@keyframes pageFadeIn {
   from {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
+    opacity: 0.92;
   }
   to {
     opacity: 1;
-    transform: translate3d(0, 0, 0);
   }
 }
 
@@ -553,14 +550,16 @@ body {
 
 /* ★ Ultra-fast card entrance — stagger via CSS custom property */
 .card-enter {
-  opacity: 1;
-  transform: none;
+  opacity: 0;
+  transform: translateY(12px);
+  animation: cardEnter 0.35s cubic-bezier(0.2, 0, 0, 1) forwards;
+  animation-delay: var(--stagger, 0ms);
 }
 
 @keyframes cardEnter {
   to {
     opacity: 1;
-    transform: translate3d(0, 0, 0);
+    transform: translateY(0);
   }
 }
 
@@ -1172,4 +1171,134 @@ section:hover .heading-underline::after {
 
 .nav-label-active {
   animation: nav-label-in 0.2s ease-out forwards;
+}
+
+/* ═══════════════════════════════════════════
+   TICKER TRACK — CSS-only infinite scroll
+   ═══════════════════════════════════════════ */
+.ticker-track {
+  animation: ticker-scroll 40s linear infinite;
+  will-change: transform;
+}
+
+@keyframes ticker-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-33.33%); }
+}
+
+.ticker-track:hover {
+  animation-play-state: paused;
+}
+
+/* ═══════════════════════════════════════════
+   ACTIVITY FEED TOAST — CSS enter/exit
+   ═══════════════════════════════════════════ */
+.activity-feed-toast {
+  transform: translateZ(0);
+}
+
+.activity-feed-enter {
+  animation: activityEnter 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.activity-feed-exit {
+  animation: activityExit 0.3s ease-in forwards;
+}
+
+@keyframes activityEnter {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.9) translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1) translateX(0);
+  }
+}
+
+@keyframes activityExit {
+  from {
+    opacity: 1;
+    transform: scale(1) translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.9) translateX(-10px);
+  }
+}
+
+/* ═══════════════════════════════════════════
+   LOGIN PAGE — Premium floating orb animation
+   ═══════════════════════════════════════════ */
+.login-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+.login-orb-1 {
+  width: 500px;
+  height: 500px;
+  background: rgba(99, 102, 241, 0.15);
+  top: 10%;
+  left: 15%;
+  animation: orbFloat1 8s ease-in-out infinite;
+}
+
+.login-orb-2 {
+  width: 400px;
+  height: 400px;
+  background: rgba(139, 92, 246, 0.12);
+  top: 40%;
+  right: 10%;
+  animation: orbFloat2 10s ease-in-out infinite;
+}
+
+.login-orb-3 {
+  width: 300px;
+  height: 300px;
+  background: rgba(245, 158, 11, 0.08);
+  bottom: 10%;
+  left: 30%;
+  animation: orbFloat3 12s ease-in-out infinite;
+}
+
+@keyframes orbFloat1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%      { transform: translate(30px, -20px) scale(1.05); }
+  66%      { transform: translate(-15px, 15px) scale(0.95); }
+}
+
+@keyframes orbFloat2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%      { transform: translate(-25px, 20px) scale(1.08); }
+  66%      { transform: translate(20px, -10px) scale(0.92); }
+}
+
+@keyframes orbFloat3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%      { transform: translate(20px, -25px) scale(1.1); }
+}
+
+/* Premium login shimmer effect on button */
+@keyframes loginShimmer {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.login-btn-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.login-btn-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transform: translateX(-100%);
+  animation: loginShimmer 2.5s ease-in-out infinite;
+  animation-delay: 1s;
 }

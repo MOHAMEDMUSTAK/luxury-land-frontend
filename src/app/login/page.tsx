@@ -1,5 +1,4 @@
 "use client";
-
 import { useState } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useRouter } from "next/navigation";
@@ -7,13 +6,13 @@ import toast from "react-hot-toast";
 import { api } from "@/services/api";
 import Link from "next/link";
 import { Eye, EyeOff, Mail, Lock, Loader2 } from "lucide-react";
+
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const [isLoading, setIsLoading] = useState(false);
-
   const { login } = useAuthStore();
   const router = useRouter();
 
@@ -30,9 +29,7 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
-
     setIsLoading(true);
-
     try {
       const res = await api.post("/auth/login", { email, password });
       login(
@@ -49,7 +46,6 @@ export default function LoginPage() {
         res.data.token
       );
       toast.success("Welcome back!");
-      
       const redirect = localStorage.getItem("redirectAfterLogin");
       if (redirect) {
         localStorage.removeItem("redirectAfterLogin");
@@ -62,20 +58,29 @@ export default function LoginPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }
 
   return (
-    <div className="flex-1 flex items-center justify-center px-4 py-20 relative overflow-hidden bg-[#F8FAFC]">
-      {/* Background glow effects */}
-      <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-brand-primary/10 rounded-full mix-blend-multiply filter blur-[80px] opacity-70 animate-blob" />
-      <div className="absolute top-1/3 right-1/4 w-[400px] h-[400px] bg-purple-300/20 rounded-full mix-blend-multiply filter blur-[80px] opacity-70 animate-blob animation-delay-2000" />
+    <div className="flex-1 flex items-center justify-center px-4 py-20 relative overflow-hidden bg-[#F8FAFC] min-h-screen">
+      {/* ★ Animated floating orbs — pure CSS, no JS overhead */}
+      <div className="login-orb login-orb-1" />
+      <div className="login-orb login-orb-2" />
+      <div className="login-orb login-orb-3" />
       
+      {/* Subtle grid pattern */}
+      <div className="absolute inset-0 opacity-[0.015] pointer-events-none"
+        style={{
+          backgroundImage: 'linear-gradient(rgba(99,102,241,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(99,102,241,0.5) 1px, transparent 1px)',
+          backgroundSize: '60px 60px',
+        }}
+      />
+
       <div className="w-full max-w-[420px] relative z-10">
         {/* Card */}
-        <div className="bg-white/80 backdrop-blur-xl rounded-3xl border border-white/50 shadow-[0_8px_40px_rgba(0,0,0,0.06)] p-8 sm:p-10 premium-card">
+        <div className="bg-white/70 backdrop-blur-2xl rounded-[32px] border border-white/60 shadow-[0_20px_60px_rgba(0,0,0,0.08),0_0_0_1px_rgba(255,255,255,0.5)_inset] p-8 sm:p-10 transition-all duration-500 hover:shadow-[0_25px_70px_rgba(99,102,241,0.12),0_0_0_1px_rgba(255,255,255,0.5)_inset]">
           {/* Logo */}
-          <div className="flex justify-center mb-6">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-primary to-brand-secondary flex items-center justify-center text-white font-black text-3xl shadow-[0_8px_20px_rgba(99,102,241,0.3)]">
+          <div className="flex justify-center mb-7">
+            <div className="w-[68px] h-[68px] rounded-[20px] bg-gradient-to-br from-brand-primary via-indigo-500 to-brand-secondary flex items-center justify-center text-white font-black text-3xl shadow-[0_12px_30px_rgba(99,102,241,0.35)] ring-4 ring-white/30">
               L
             </div>
           </div>
@@ -102,7 +107,7 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => { setEmail(e.target.value); setErrors(p => ({...p, email: undefined})); }}
                   placeholder="you@example.com"
-                  className={`w-full pl-11 pr-4 py-3.5 rounded-2xl border bg-white/50 text-[15px] font-semibold outline-none transition-all duration-300 placeholder:text-gray-400 focus:bg-white focus:ring-[4px] focus:ring-brand-primary/15 ${errors.email ? "border-red-400 focus:border-red-400" : "border-gray-200 focus:border-brand-primary hover:border-gray-300"}`}
+                  className={`w-full pl-11 pr-4 py-3.5 rounded-2xl border bg-white/60 text-[15px] font-semibold outline-none transition-all duration-300 placeholder:text-gray-400 focus:bg-white focus:ring-[4px] focus:ring-brand-primary/15 ${errors.email ? "border-red-400 focus:border-red-400" : "border-gray-200 focus:border-brand-primary hover:border-gray-300"}`}
                 />
               </div>
               {errors.email && <p className="text-[12px] font-bold text-red-500 ml-1 mt-1">{errors.email}</p>}
@@ -121,7 +126,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => { setPassword(e.target.value); setErrors(p => ({...p, password: undefined})); }}
                   placeholder="••••••••"
-                  className={`w-full pl-11 pr-12 py-3.5 rounded-2xl border bg-white/50 text-[15px] font-semibold outline-none transition-all duration-300 placeholder:text-gray-400 focus:bg-white focus:ring-[4px] focus:ring-brand-primary/15 ${errors.password ? "border-red-400 focus:border-red-400" : "border-gray-200 focus:border-brand-primary hover:border-gray-300"}`}
+                  className={`w-full pl-11 pr-12 py-3.5 rounded-2xl border bg-white/60 text-[15px] font-semibold outline-none transition-all duration-300 placeholder:text-gray-400 focus:bg-white focus:ring-[4px] focus:ring-brand-primary/15 ${errors.password ? "border-red-400 focus:border-red-400" : "border-gray-200 focus:border-brand-primary hover:border-gray-300"}`}
                 />
                 <button
                   type="button"
@@ -139,7 +144,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full relative flex items-center justify-center py-4 rounded-2xl bg-gradient-to-r from-brand-primary to-[#5A5DFA] text-white font-black text-[16px] tracking-wide shadow-[0_8px_20px_rgba(99,102,241,0.25)] hover:shadow-[0_12px_28px_rgba(99,102,241,0.35)] hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-300 disabled:opacity-80 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none overflow-hidden"
+                className="login-btn-shimmer w-full relative flex items-center justify-center py-4 rounded-2xl bg-gradient-to-r from-brand-primary to-[#5A5DFA] text-white font-black text-[16px] tracking-wide shadow-[0_8px_24px_rgba(99,102,241,0.3)] hover:shadow-[0_16px_40px_rgba(99,102,241,0.4)] hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-300 disabled:opacity-80 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none"
               >
                 {isLoading ? (
                   <span className="flex items-center gap-2">
@@ -149,9 +154,6 @@ export default function LoginPage() {
                 ) : (
                   <span>Sign In</span>
                 )}
-                
-                {/* Shine effect */}
-                <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent hover:animate-[shimmer_1.5s_infinite]" />
               </button>
             </div>
           </form>
@@ -170,6 +172,19 @@ export default function LoginPage() {
               Sign Up Fast
             </Link>
           </p>
+        </div>
+
+        {/* Trust badges below the card */}
+        <div className="flex items-center justify-center gap-6 mt-6 opacity-50">
+          <span className="text-[10px] font-bold text-text-secondary uppercase tracking-widest flex items-center gap-1.5">
+            🔒 Secure Login
+          </span>
+          <span className="text-[10px] font-bold text-text-secondary uppercase tracking-widest flex items-center gap-1.5">
+            ⚡ Ultra Fast
+          </span>
+          <span className="text-[10px] font-bold text-text-secondary uppercase tracking-widest flex items-center gap-1.5">
+            🛡️ Private
+          </span>
         </div>
       </div>
     </div>

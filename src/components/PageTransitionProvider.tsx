@@ -1,31 +1,17 @@
 "use client";
 
-import { usePathname } from "next/navigation";
-import { ReactNode, useRef, useEffect, useState } from "react";
+import { ReactNode } from "react";
 
 /**
  * Ultra-fast zero-delay page transition.
  * No artificial CSS transition blocking, instant content display.
+ * ★ FIX: Removed the key={pathname} that was forcing full unmount/remount of all children
+ * on every route change, causing massive performance degradation.
  */
 export default function PageTransitionProvider({ children }: { children: ReactNode }) {
-  const pathname = usePathname();
-  const [displayKey, setDisplayKey] = useState(pathname);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    // Instant update
-    setDisplayKey(pathname);
-  }, [pathname]);
-
   return (
-    <>
-      <div
-        ref={containerRef}
-        key={displayKey}
-        className="flex-1 flex flex-col w-full h-full relative"
-      >
-        {children}
-      </div>
-    </>
+    <div className="flex-1 flex flex-col w-full h-full relative page-fade-in">
+      {children}
+    </div>
   );
 }

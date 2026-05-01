@@ -149,7 +149,7 @@ export default function RootLayout({
           <Navbar />
           <MarketPulseTicker />
 
-          <main className="flex-1 flex flex-col relative z-10 pb-[160px] md:pb-0">
+          <main className="flex-1 flex flex-col relative z-10 pb-[100px] md:pb-0">
             <AuthInit>
               <ProtectedRoute>
                 <PageTransitionProvider>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, use, memo } from "react";
+import { useState, useRef, useEffect, use, memo, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { ArrowLeft, Send, Phone, ShieldCheck, MapPin, ImageOff, User, MoreVertical, Search, CheckCheck, Smile, X, Trash2, Tag } from "lucide-react";
 import { format, isSameDay } from "date-fns";
@@ -59,6 +59,14 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
   const router = useRouter();
   const { setIsChatActive } = useUIStore();
 
+  // ★ FIX: useRef to give socket handlers & focus listener access to latest state
+  const chatRef = useRef<Chat | null>(null);
+  const receiverRef = useRef<Participant | null>(null);
+
+  // Keep refs in sync
+  useEffect(() => { chatRef.current = chat; }, [chat]);
+  useEffect(() => { receiverRef.current = receiver; }, [receiver]);
+
   useEffect(() => {
     setIsChatActive(true);
     document.body.style.overflow = "hidden"; // Lock scroll
@@ -72,26 +80,26 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const markMessagesRead = async (cId: string) => {
+  const markMessagesRead = useCallback(async (cId: string) => {
     if (!cId || !user || !document.hasFocus()) return;
     try {
       await api.patch(`/chat/mark-as-read/${cId}`);
-      // Notify the other person that we've read their messages
+      // ★ FIX: Use receiverRef for real-time access
       socketRef.current?.emit('mark_read', { 
         chatId: cId, 
-        senderId: receiver?._id, // Who I'm reading messages FROM
+        senderId: receiverRef.current?._id, // Who I'm reading messages FROM
         recipientId: user.id // ME
       });
     } catch (err) {
       console.error("MARK_READ_ERROR:", err);
     }
-  };
+  }, [user]);
 
   const handleClearChat = async () => {
-    if (!chat?._id) return;
+    if (!chatRef.current?._id) return;
     if (!window.confirm("Clear message history for this chat? This won't affect the other person.")) return;
     try {
-      await api.delete(`/chat/clear/${chat._id}`);
+      await api.delete(`/chat/clear/${chatRef.current._id}`);
       setMessages([]);
       toast.success("Chat cleared");
     } catch (err) {
@@ -102,11 +110,11 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
 
   const handleMakeOffer = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!chat?._id || !offerPrice || !landId || !user) return;
+    if (!chatRef.current?._id || !offerPrice || !landId || !user) return;
 
     try {
       const res = await api.post('/chat/offer', {
-        chatId: chat._id,
+        chatId: chatRef.current._id,
         price: Number(offerPrice),
         landId
       });
@@ -116,9 +124,9 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
 
       // Socket Emit
       socketRef.current?.emit('sendMessage', {
-        chatId: chat._id,
+        chatId: chatRef.current._id,
         senderId: user.id,
-        recipientId: receiver?._id,
+        recipientId: receiverRef.current?._id,
         text: `Offer: ₹${offerPrice}`,
         type: 'offer',
         offer: newMsg.offer,
@@ -134,10 +142,10 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
   };
 
   const updateOfferStatus = async (messageId: string, status: 'accepted' | 'rejected') => {
-    if (!chat?._id) return;
+    if (!chatRef.current?._id) return;
     try {
-      const res = await api.patch('/chat/offer-status', {
-        chatId: chat._id,
+      await api.patch('/chat/offer-status', {
+        chatId: chatRef.current._id,
         messageId,
         status
       });
@@ -149,11 +157,11 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
 
       // Socket Emit for status update
       socketRef.current?.emit('update_offer_status', {
-        chatId: chat._id,
+        chatId: chatRef.current._id,
         messageId,
         status,
         senderId: user?.id,
-        recipientId: receiver?._id
+        recipientId: receiverRef.current?._id
       });
       
       toast.success(`Offer ${status}`);
@@ -172,6 +180,7 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
     api.get(`/chat/${urlId}`).then(res => {
       const chatData = res.data;
       setChat(chatData);
+      chatRef.current = chatData; // ★ Immediately update ref
       setMessages(chatData.messages.map((m: any) => ({ ...m, timestamp: new Date(m.timestamp) })));
       
       // Identify the "other" person (be resilient with ID types)
@@ -187,6 +196,7 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
       }
 
       setReceiver(other || null);
+      receiverRef.current = other || null; // ★ Immediately update ref
       setLoading(false);
 
       // Mark as read initially if focused
@@ -195,7 +205,6 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
       }
     }).catch(err => {
       console.error("CHAT_INIT_ERROR:", err);
-      // Fallback: If it was already a chatId, we might need a different endpoint or handle it
       setLoading(false);
     });
 
@@ -215,38 +224,36 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
     });
 
     socket.on('receiveMessage', (data: any) => {
-      // Robust check to ensure message belongs to THIS chat
-      setChat((currentChat: Chat | null) => {
-        if (currentChat && data.chatId === currentChat._id) {
-          setMessages((prev: Message[]) => {
-            // Avoid duplicate messages if already added locally
-            if (data.senderId === user?.id) return prev;
+      // ★ FIX: Use chatRef.current instead of setChat pattern for stale closure
+      const currentChat = chatRef.current;
+      if (currentChat && data.chatId === currentChat._id) {
+        setMessages((prev: Message[]) => {
+          // Avoid duplicate messages if already added locally
+          if (data.senderId === user?.id) return prev;
 
-            const isDuplicate = prev.some(m => 
-              m.text === data.text && 
-              Math.abs(new Date(m.timestamp).getTime() - new Date(data.timestamp).getTime()) < 2000
-            );
-            if (isDuplicate) return prev;
+          const isDuplicate = prev.some(m => 
+            m.text === data.text && 
+            Math.abs(new Date(m.timestamp).getTime() - new Date(data.timestamp).getTime()) < 2000
+          );
+          if (isDuplicate) return prev;
 
-            const newMessage = {
-              sender: data.senderId,
-              text: data.text,
-              isRead: false,
-              type: data.type || 'text',
-              offer: data.offer,
-              timestamp: new Date(data.timestamp || Date.now()),
-            };
+          const newMessage = {
+            sender: data.senderId,
+            text: data.text,
+            isRead: false,
+            type: data.type || 'text',
+            offer: data.offer,
+            timestamp: new Date(data.timestamp || Date.now()),
+          };
 
-            // If focused, mark as read immediately
-            if (document.hasFocus()) {
-              markMessagesRead(currentChat._id);
-            }
+          // If focused, mark as read immediately
+          if (document.hasFocus()) {
+            markMessagesRead(currentChat._id);
+          }
 
-            return [...prev, newMessage];
-          });
-        }
-        return currentChat;
-      });
+          return [...prev, newMessage];
+        });
+      }
     });
 
     socket.on('messages_read', (data: any) => {
@@ -262,9 +269,10 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
       ));
     });
 
+    // ★ FIX: Use chatRef.current so focus handler always sees latest chat
     const handleFocus = () => {
-      if (chat?._id) {
-        markMessagesRead(chat._id);
+      if (chatRef.current?._id) {
+        markMessagesRead(chatRef.current._id);
       }
     };
     window.addEventListener('focus', handleFocus);
@@ -273,14 +281,14 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
       window.removeEventListener('focus', handleFocus);
       socket.disconnect();
     };
-  }, [urlId, user]);
+  }, [urlId, user, markMessagesRead]);
 
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
   const handleSend = async (text: string) => {
-    if (!text.trim() || !socketRef.current || !chat || !user || !receiver) {
+    if (!text.trim() || !socketRef.current || !chatRef.current || !user || !receiverRef.current) {
       return;
     }
 
@@ -288,8 +296,8 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
 
     try {
       // 1. Save to Database
-      const res = await api.post(`/chat/message`, {
-        chatId: chat._id,
+      await api.post(`/chat/message`, {
+        chatId: chatRef.current._id,
         text: messageText
       });
 
@@ -303,9 +311,9 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
 
       // 3. Emit via Socket
       socketRef.current.emit('sendMessage', {
-        chatId: chat._id,
+        chatId: chatRef.current._id,
         senderId: user.id,
-        recipientId: receiver._id,
+        recipientId: receiverRef.current._id,
         text: messageText,
         timestamp: new Date()
       });
