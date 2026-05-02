@@ -36,12 +36,12 @@ export default function QuickToolsFAB() {
                     exit={{ opacity: 0, x: 20 }}
                     transition={{ delay: i * 0.05 }}
                     onClick={tool.onClick}
-                    className="flex items-center gap-3 bg-white pl-4 pr-2.5 py-2.5 rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-gray-100 hover:scale-105 hover:border-brand-primary active:scale-95 transition-all group origin-right"
+                    className="flex items-center gap-3 bg-[var(--surface)] pl-4 pr-2.5 py-2.5 rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-[var(--ui-border)] hover:scale-105 hover:border-brand-primary active:scale-95 transition-all group origin-right"
                   >
-                    <span className="text-[10px] font-black uppercase tracking-widest text-text-main group-hover:text-brand-primary transition-colors whitespace-nowrap">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-[var(--text-main)] group-hover:text-brand-primary transition-colors whitespace-nowrap">
                       {tool.label}
                     </span>
-                    <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-text-secondary group-hover:bg-brand-primary/10 group-hover:text-brand-primary transition-colors">
+                    <div className="w-8 h-8 rounded-full bg-[var(--surface-elevated)] flex items-center justify-center text-[var(--text-secondary)] group-hover:bg-brand-primary/10 group-hover:text-brand-primary transition-colors">
                       {tool.icon}
                     </div>
                   </motion.button>

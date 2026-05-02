@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Search, Heart, User, PlusCircle, Menu, X, LogOut, LayoutDashboard, Bell, CheckCircle2, Settings } from "lucide-react";
+import { Search, Heart, User, PlusCircle, Menu, X, LogOut, LayoutDashboard, Bell, CheckCircle2, Settings, Sun, Moon } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useUIStore } from "@/store/useUIStore";
 import { useLanguageStore } from "@/store/useLanguageStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useNotificationStore } from "@/store/useNotificationStore";
@@ -24,6 +25,7 @@ export default function Navbar() {
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const router = useRouter();
   const currentLang = i18n.language || 'en';
+  const { resolvedTheme, toggleTheme } = useUIStore();
 
   useEffect(() => {
     setMounted(true);
@@ -61,7 +63,7 @@ export default function Navbar() {
 
   return (
     <header 
-      className="sticky top-0 sm:top-4 z-[100] mx-0 sm:mx-4 lg:mx-8 xl:mx-auto max-w-7xl sm:rounded-3xl glass-header transition-all duration-500 ease-in-out pb-3 sm:pb-6 pt-[calc(env(safe-area-inset-top,0px)+12px)] sm:pt-[calc(env(safe-area-inset-top,0px)+24px)] shadow-xl border-white/40"
+      className="sticky top-0 sm:top-4 z-[100] mx-0 sm:mx-4 lg:mx-8 xl:mx-auto max-w-7xl sm:rounded-3xl glass-header transition-all duration-500 ease-in-out pb-3 sm:pb-6 pt-[calc(env(safe-area-inset-top,0px)+12px)] sm:pt-[calc(env(safe-area-inset-top,0px)+24px)] shadow-xl"
     >
       <div className="px-4 lg:px-8 h-16 flex items-center justify-between gap-4">
         
@@ -70,7 +72,7 @@ export default function Navbar() {
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-primary to-brand-secondary flex items-center justify-center text-white font-black text-xl shadow-lg shadow-brand-primary/25 group-hover:scale-105 group-hover:shadow-brand-primary/40 transition-all duration-500">
             L
           </div>
-          <span className="text-2xl font-black tracking-tight hidden sm:block">
+          <span className="text-2xl font-black tracking-tight hidden sm:block text-[var(--text-main)]">
             <span className="gradient-accent">Land</span><span className="text-brand-secondary">Market</span>
           </span>
         </Link>
@@ -87,7 +89,7 @@ export default function Navbar() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch(e)}
-                className="navbar-search-input peer block w-full pl-12 pr-4 py-3 bg-white/40 border-2 border-white/60 rounded-2xl leading-5 text-text-main placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-brand-primary/10 focus:border-white focus:bg-white/70 transition-all duration-300 sm:text-sm font-bold shadow-inner"
+                className="navbar-search-input peer block w-full pl-12 pr-4 py-3 bg-[var(--input-bg)] border-2 border-[var(--ui-border)] rounded-2xl leading-5 text-[var(--text-main)] placeholder-[var(--text-secondary)] focus:outline-none focus:ring-4 focus:ring-brand-primary/10 focus:border-[var(--primary)] focus:bg-[var(--surface)] transition-all duration-300 sm:text-sm font-bold"
                 placeholder={mounted ? t("navbar.searchPlaceholder") : "Search..."}
               />
             </form>
@@ -132,10 +134,10 @@ export default function Navbar() {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
                     transition={{ duration: 0.2 }}
-                    className="absolute right-0 mt-3 w-80 bg-white border border-ui-border rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[400px] z-50"
+                    className="absolute right-0 mt-3 w-80 bg-[var(--surface)] border border-[var(--ui-border)] rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[400px] z-50"
                   >
-                    <div className="flex items-center justify-between px-4 py-3 border-b border-ui-border bg-gray-50/50">
-                      <h3 className="text-sm font-bold text-text-main">{t("navbar.notifications")}</h3>
+                    <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--ui-border)] bg-[var(--surface-elevated)]">
+                      <h3 className="text-sm font-bold text-[var(--text-main)]">{t("navbar.notifications")}</h3>
                       <div className="flex items-center gap-3">
                         {unreadCount > 0 && (
                           <button 
@@ -243,23 +245,23 @@ export default function Navbar() {
                     initial={{ opacity: 0, y: 10, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                    className="absolute right-0 mt-3 w-64 bg-white border border-ui-border rounded-2xl shadow-xl overflow-hidden py-2"
+                    className="absolute right-0 mt-3 w-64 bg-[var(--surface)] border border-[var(--ui-border)] rounded-2xl shadow-xl overflow-hidden py-2"
                   >
-                    <div className="px-4 py-3 border-b border-ui-border">
-                      <p className="text-sm font-bold text-text-main">{user?.name}</p>
-                      <p className="text-xs text-text-secondary truncate">{user?.email}</p>
+                    <div className="px-4 py-3 border-b border-[var(--ui-border)]">
+                      <p className="text-sm font-bold text-[var(--text-main)]">{user?.name}</p>
+                      <p className="text-xs text-[var(--text-secondary)] truncate">{user?.email}</p>
                     </div>
                     
                     <div className="py-1">
-                      <Link href={`/profile/${user?.id}`} onClick={() => setIsProfileOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm text-text-secondary hover:bg-gray-50 hover:text-brand-primary transition-colors font-medium">
+                      <Link href={`/profile/${user?.id}`} onClick={() => setIsProfileOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--text-secondary)] hover:bg-[var(--surface-elevated)] hover:text-brand-primary transition-colors font-medium">
                         <User className="w-4 h-4" />
                         My Profile
                       </Link>
-                      <Link href="/profile/edit" onClick={() => setIsProfileOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm text-text-secondary hover:bg-gray-50 hover:text-brand-primary transition-colors font-medium">
+                      <Link href="/profile/edit" onClick={() => setIsProfileOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--text-secondary)] hover:bg-[var(--surface-elevated)] hover:text-brand-primary transition-colors font-medium">
                         <Settings className="w-4 h-4" />
                         Account Settings
                       </Link>
-                      <Link href="/my-ads" onClick={() => setIsProfileOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm text-text-secondary hover:bg-gray-50 hover:text-brand-primary transition-colors font-medium">
+                      <Link href="/my-ads" onClick={() => setIsProfileOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--text-secondary)] hover:bg-[var(--surface-elevated)] hover:text-brand-primary transition-colors font-medium">
                         <LayoutDashboard className="w-4 h-4" />
                         Manage My Ads
                       </Link>
@@ -273,10 +275,10 @@ export default function Navbar() {
                       </Link>
                     </div>
                     
-                    <div className="pt-1 mt-1 border-t border-ui-border">
+                    <div className="pt-1 mt-1 border-t border-[var(--ui-border)]">
                       <button 
                         onClick={handleLogout}
-                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors font-medium"
+                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-500 hover:bg-red-500/10 transition-colors font-medium"
                       >
                         <LogOut className="w-4 h-4" />
                         Sign Out
@@ -292,16 +294,29 @@ export default function Navbar() {
             </Link>
           )}
 
-          <div className="flex items-center bg-gray-50/80 border border-ui-border rounded-xl p-1">
+          {/* ★ Theme Toggle */}
+          <button
+            onClick={toggleTheme}
+            className="relative w-10 h-10 rounded-xl flex items-center justify-center border border-[var(--ui-border)] hover:border-brand-primary/30 bg-[var(--surface)] hover:bg-[var(--surface-elevated)] transition-all duration-300 active:scale-95 group/theme"
+            aria-label="Toggle theme"
+          >
+            {mounted && resolvedTheme === 'dark' ? (
+              <Sun className="w-4.5 h-4.5 text-amber-400 group-hover/theme:rotate-45 transition-transform duration-500" />
+            ) : (
+              <Moon className="w-4.5 h-4.5 text-[var(--text-secondary)] group-hover/theme:text-brand-primary group-hover/theme:-rotate-12 transition-all duration-500" />
+            )}
+          </button>
+
+          <div className="flex items-center bg-[var(--surface-elevated)] border border-[var(--ui-border)] rounded-xl p-1">
             <button 
               onClick={() => handleLanguageChange('en')}
-              className={`text-[10px] font-bold px-3 py-1.5 rounded-lg transition-all ${currentLang.startsWith('en') ? 'bg-white text-brand-primary shadow-sm border border-brand-primary/10' : 'text-text-secondary hover:text-text-main'}`}
+              className={`text-[10px] font-bold px-3 py-1.5 rounded-lg transition-all ${currentLang.startsWith('en') ? 'bg-[var(--surface)] text-brand-primary shadow-sm border border-brand-primary/10' : 'text-[var(--text-secondary)] hover:text-[var(--text-main)]'}`}
             >
               EN
             </button>
             <button 
               onClick={() => handleLanguageChange('ta')}
-              className={`text-[10px] font-bold px-3 py-1.5 rounded-lg transition-all ${currentLang.startsWith('ta') ? 'bg-white text-brand-primary shadow-sm border border-brand-primary/10' : 'text-text-secondary hover:text-text-main'}`}
+              className={`text-[10px] font-bold px-3 py-1.5 rounded-lg transition-all ${currentLang.startsWith('ta') ? 'bg-[var(--surface)] text-brand-primary shadow-sm border border-brand-primary/10' : 'text-[var(--text-secondary)] hover:text-[var(--text-main)]'}`}
             >
               TA
             </button>
@@ -406,12 +421,11 @@ export default function Navbar() {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="md:hidden bg-white border-b border-ui-border overflow-hidden shadow-lg absolute w-full"
+            className="md:hidden bg-[var(--surface)] border-b border-[var(--ui-border)] overflow-hidden shadow-lg absolute w-full"
           >
             <div className="px-4 py-6 space-y-4">
-              {mounted && isAuthenticated && (
-                <div className="flex items-center gap-3 pb-4 border-b border-ui-border">
-                  {user?.profileImage ? (
+              {mounted && isAuthenticated && <div className="flex items-center gap-3 pb-4 border-b border-[var(--ui-border)]">
+                    {user?.profileImage ? (
                     <div className="w-10 h-10 rounded-xl overflow-hidden border border-brand-primary/10">
                       <Image src={user.profileImage} alt={user.name!} width={40} height={40} className="w-full h-full object-cover" />
                     </div>
@@ -420,34 +434,39 @@ export default function Navbar() {
                       {user?.name?.charAt(0)}
                     </div>
                   )}
-                  <div>
-                    <p className="text-text-main font-bold text-sm">{user?.name}</p>
-                    <p className="text-xs text-text-secondary">{user?.email}</p>
+                    <div>
+                      <p className="text-[var(--text-main)] font-bold text-sm">{user?.name}</p>
+                      <p className="text-xs text-[var(--text-secondary)]">{user?.email}</p>
                   </div>
                 </div>
-              )}
+              }
               {mounted && isAuthenticated ? (
                 <>
-                  <Link onClick={() => setIsMobileMenuOpen(false)} href={`/profile/${user?.id}`} className="flex items-center gap-3 text-text-main font-semibold py-2">
+                  <Link onClick={() => setIsMobileMenuOpen(false)} href={`/profile/${user?.id}`} className="flex items-center gap-3 text-[var(--text-main)] font-semibold py-2">
                     <User className="w-5 h-5 text-brand-primary" />
                     My Profile
                   </Link>
-                  <Link onClick={() => setIsMobileMenuOpen(false)} href="/profile/edit" className="flex items-center gap-3 text-text-main font-semibold py-2">
+                  <Link onClick={() => setIsMobileMenuOpen(false)} href="/profile/edit" className="flex items-center gap-3 text-[var(--text-main)] font-semibold py-2">
                     <Settings className="w-5 h-5 text-brand-primary" />
                     Account Settings
                   </Link>
-                  <Link onClick={() => setIsMobileMenuOpen(false)} href="/my-ads" className="flex items-center gap-3 text-text-main font-semibold py-2">
+                  <Link onClick={() => setIsMobileMenuOpen(false)} href="/my-ads" className="flex items-center gap-3 text-[var(--text-main)] font-semibold py-2">
                     <LayoutDashboard className="w-5 h-5 text-brand-primary" />
                     My Ads
                   </Link>
-                  <Link onClick={() => setIsMobileMenuOpen(false)} href="/my-ads/create" className="flex items-center gap-3 text-text-main font-semibold py-2">
+                  <Link onClick={() => setIsMobileMenuOpen(false)} href="/my-ads/create" className="flex items-center gap-3 text-[var(--text-main)] font-semibold py-2">
                     <PlusCircle className="w-5 h-5 text-brand-primary" />
                     Post Property
                   </Link>
-                  <Link onClick={() => setIsMobileMenuOpen(false)} href="/wishlist" className="flex items-center gap-3 text-text-main font-semibold py-2">
+                  <Link onClick={() => setIsMobileMenuOpen(false)} href="/wishlist" className="flex items-center gap-3 text-[var(--text-main)] font-semibold py-2">
                     <Heart className="w-5 h-5 text-red-500" />
                     {t("common.wishlist")}
                   </Link>
+                  {/* Mobile Theme Toggle */}
+                  <button onClick={toggleTheme} className="flex items-center gap-3 text-[var(--text-main)] font-semibold py-2 w-full">
+                    {resolvedTheme === 'dark' ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5 text-brand-primary" />}
+                    {resolvedTheme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+                  </button>
                 </>
               ) : null}
               {mounted && isAuthenticated ? (

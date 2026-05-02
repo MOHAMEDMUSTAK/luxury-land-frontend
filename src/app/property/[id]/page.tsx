@@ -99,14 +99,14 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
       <div className="container mx-auto px-4 py-10 max-w-6xl">
         <div className="flex flex-col lg:flex-row gap-8 animate-pulse">
           <div className="lg:w-2/3 space-y-8">
-            <div className="aspect-[4/3] md:aspect-[16/10] w-full bg-gray-200 rounded-[28px]" />
+            <div className="aspect-[4/3] md:aspect-[16/10] w-full bg-[var(--skeleton-base)] rounded-[28px]" />
             <div className="space-y-4">
-              <div className="h-10 bg-gray-200 rounded-xl w-3/4" />
-              <div className="h-6 bg-gray-200 rounded-lg w-1/2" />
+              <div className="h-10 bg-[var(--skeleton-base)] rounded-xl w-3/4" />
+              <div className="h-6 bg-[var(--skeleton-base)] rounded-lg w-1/2" />
             </div>
           </div>
           <div className="lg:w-1/3">
-            <div className="bg-gray-100 rounded-[24px] p-8 space-y-6 h-[400px] w-full" />
+            <div className="bg-[var(--skeleton-base)] rounded-[24px] p-8 space-y-6 h-[400px] w-full" />
           </div>
         </div>
       </div>
@@ -137,7 +137,7 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
         <div className="lg:w-2/3 space-y-8">
           
           {/* Gallery */}
-          <div className="rounded-[24px] overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.06)] border border-ui-border bg-gray-50 group/gallery">
+          <div className="rounded-[24px] overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.06)] border border-[var(--ui-border)] bg-[var(--surface-elevated)] group/gallery">
             {hasImages ? (
               <ImageGallery images={property.images} />
             ) : (
@@ -293,12 +293,12 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
                { icon: Sparkles, label: t("property.landType"), value: property.landType || "Standard", hide: !property.landType },
                { icon: MapPin, label: t("property.status"), value: property.status === "Sold" ? t("property.sold") : t("property.available"), color: property.status === "Sold" ? "text-red-600" : "text-green-600" },
              ].filter(spec => !spec.hide).slice(0, 4).map((spec, i) => (
-                <div key={i} className="p-5 bg-white rounded-[20px] border border-ui-border flex flex-col items-center text-center hover:shadow-[0_10px_30px_rgba(0,0,0,0.06)] hover:-translate-y-1.5 transition-all duration-500 group/spec">
+                <div key={i} className="p-5 bg-[var(--surface)] rounded-[20px] border border-[var(--ui-border)] flex flex-col items-center text-center hover:shadow-[0_10px_30px_rgba(0,0,0,0.06)] hover:-translate-y-1.5 transition-all duration-500 group/spec">
                   <div className="w-10 h-10 rounded-full bg-brand-primary/[0.04] flex items-center justify-center mb-3 group-hover/spec:bg-brand-primary/10 transition-colors">
                     <spec.icon className="w-5 h-5 text-brand-primary transition-transform duration-500 group-hover/spec:scale-110" />
                   </div>
-                  <span className="text-[9px] font-bold text-text-secondary uppercase tracking-[0.15em] mb-1">{spec.label}</span>
-                  <span className={`font-bold text-sm text-text-main ${spec.color || ""}`}>{spec.value}</span>
+                  <span className="text-[9px] font-bold text-[var(--text-secondary)] uppercase tracking-[0.15em] mb-1">{spec.label}</span>
+                  <span className={`font-bold text-sm text-[var(--text-main)] ${spec.color || ""}`}>{spec.value}</span>
                 </div>
              ))}
           </motion.div>
@@ -309,11 +309,11 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 0.5, delay: 0.2, ease: "easeOut" }}
-            className="bg-white rounded-2xl border border-ui-border shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden"
+            className="bg-[var(--surface)] rounded-2xl border border-[var(--ui-border)] shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden"
           >
             {/* Section Header */}
             <div className="px-8 pt-8 pb-6">
-              <h2 className="text-xl font-bold text-text-main border-l-4 border-brand-primary pl-4 tracking-tight">{t("property.details")}</h2>
+              <h2 className="text-xl font-bold text-[var(--text-main)] border-l-4 border-brand-primary pl-4 tracking-tight">{t("property.details")}</h2>
             </div>
 
             {/* Description Body */}
@@ -326,11 +326,11 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
               >
                 Premium Opportunity — Perfect for your future investment
               </motion.p>
-              <p className="text-text-secondary leading-[1.8] text-[15px]">{property.description}</p>
+              <p className="text-[var(--text-secondary)] leading-[1.8] text-[15px]">{property.description}</p>
             </div>
 
             {/* Property Highlights Grid */}
-            <div className="mx-8 mb-6 p-6 bg-gray-50/80 rounded-2xl border border-ui-border">
+            <div className="mx-8 mb-6 p-6 bg-[var(--surface-elevated)] rounded-2xl border border-[var(--ui-border)]">
               <h3 className="text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em] mb-5 flex items-center gap-2">
                 <Sparkles className="w-3.5 h-3.5 text-brand-primary" />
                 {t("property.highlights")}
@@ -345,7 +345,7 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
                   { icon: Navigation, label: "District", value: property.district || "—" },
                 ].map((item, i) => (
                   <div key={i} className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-white border border-ui-border flex items-center justify-center flex-shrink-0 shadow-sm group-hover:border-brand-primary/30 transition-colors">
+                    <div className="w-10 h-10 rounded-xl bg-[var(--surface)] border border-[var(--ui-border)] flex items-center justify-center flex-shrink-0 shadow-sm">
                       <item.icon className="w-4 h-4 text-brand-primary" />
                     </div>
                     <div className="min-w-0 flex-1">
@@ -365,7 +365,7 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
                 { icon: Heart, label: "Interested", value: `${property.wishlistCount || 0} saved` },
                 { icon: Clock, label: t("property.status"), value: property.status === "Sold" ? t("property.sold") : t("property.available"), color: property.status === "Sold" ? "text-red-600" : "text-green-600" },
               ].map((item, i) => (
-                <div key={i} className="flex items-center gap-2.5 p-3 bg-white border border-ui-border rounded-xl">
+                <div key={i} className="flex items-center gap-2.5 p-3 bg-[var(--surface)] border border-[var(--ui-border)] rounded-xl">
                   <item.icon className="w-4 h-4 text-brand-primary flex-shrink-0" />
                   <div className="min-w-0">
                     <p className="text-[9px] font-bold text-text-secondary uppercase tracking-widest">{item.label}</p>
@@ -421,7 +421,7 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
             transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
             className="static lg:sticky lg:top-[100px] space-y-6"
           >
-            <div className="bg-white border border-ui-border rounded-[24px] p-8 shadow-[0_10px_40px_rgba(0,0,0,0.06)] overflow-hidden relative group/owner flex flex-col items-center text-center">
+            <div className="bg-[var(--surface)] border border-[var(--ui-border)] rounded-[24px] p-8 shadow-[0_10px_40px_rgba(0,0,0,0.06)] overflow-hidden relative group/owner flex flex-col items-center text-center">
               <div className="absolute top-0 left-0 w-1.5 h-full bg-brand-primary" />
               
               <div className="w-full mb-6 pb-6 border-b border-gray-100 flex flex-col items-center">
@@ -595,7 +595,7 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
       <div className="mt-12 pt-12 border-t border-ui-border max-w-4xl mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
           <div>
-            <h2 className="text-2xl font-bold text-text-main mb-2">User Reviews</h2>
+            <h2 className="text-2xl font-bold text-[var(--text-main)] mb-2">User Reviews</h2>
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-0.5">
                 {[1, 2, 3, 4, 5].map((s) => (
@@ -625,7 +625,7 @@ export default function PropertyDetails({ params }: { params: Promise<{ id: stri
             id="review-form"
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
-            className="bg-gray-50/50 rounded-[24px] p-8 border border-ui-border mb-12"
+            className="bg-[var(--surface-elevated)] rounded-[24px] p-8 border border-[var(--ui-border)] mb-12"
           >
             <h3 className="text-lg font-bold text-text-main mb-6">How was your experience?</h3>
             <div className="space-y-6">

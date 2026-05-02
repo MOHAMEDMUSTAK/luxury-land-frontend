@@ -113,6 +113,10 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
+        {/* ★ Flash-prevention: apply theme BEFORE first paint */}
+        <script
+          dangerouslySetInnerHTML={{ __html: `(function(){try{var d=document.documentElement;var s=localStorage.getItem('luxuryland-ui');if(s){var p=JSON.parse(s);var t=(p.state&&p.state.theme)||'system';if(t==='system'){t=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';}d.setAttribute('data-theme',t);}else{var m=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';d.setAttribute('data-theme',m);}}catch(e){d.setAttribute('data-theme','light');}})();` }}
+        />
         <link rel="apple-touch-icon" href="/icon-512.png" />
         {/* CDN pre-connections for faster image load */}
         <link rel="dns-prefetch" href="https://res.cloudinary.com" />
@@ -136,12 +140,12 @@ export default function RootLayout({
             toastOptions={{
               style: {
                 borderRadius: '16px',
-                background: '#fff',
-                color: '#1C1C1E',
+                background: 'var(--toast-bg)',
+                color: 'var(--toast-color)',
                 fontSize: '14px',
                 fontWeight: '600',
-                boxShadow: '0 8px 32px rgba(0,0,0,0.08)',
-                border: '1px solid rgba(0,0,0,0.04)',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+                border: '1px solid var(--toast-border)',
               },
             }}
           />

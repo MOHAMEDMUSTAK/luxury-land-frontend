@@ -51,8 +51,8 @@ export default function WishlistPage() {
     <ProtectedRoute>
     <div className="container mx-auto px-4 py-16 max-w-7xl page-fade-in">
       <div className="mb-12">
-        <h1 className="text-3xl font-bold text-text-main mb-2">Saved Properties</h1>
-        <p className="text-text-secondary font-medium max-w-xl">
+        <h1 className="text-3xl font-bold text-[var(--text-main)] mb-2">Saved Properties</h1>
+        <p className="text-[var(--text-secondary)] font-medium max-w-xl">
           A curated collection of your most desired properties. Review and compare your exceptional finds.
         </p>
       </div>
@@ -63,12 +63,12 @@ export default function WishlistPage() {
           <p className="text-[10px] font-bold tracking-widest text-text-secondary uppercase">Consulting Your Collection</p>
         </div>
       ) : wishlistProperties.length === 0 ? (
-        <div className="py-32 bg-white border border-ui-border rounded-3xl flex flex-col items-center justify-center text-center px-6 shadow-sm">
-          <div className="w-20 h-20 rounded-2xl bg-gray-50 flex items-center justify-center mb-6 border border-gray-100">
-             <Heart className="w-8 h-8 text-gray-300" />
+        <div className="py-32 bg-[var(--surface)] border border-[var(--ui-border)] rounded-3xl flex flex-col items-center justify-center text-center px-6 shadow-sm">
+          <div className="w-20 h-20 rounded-2xl bg-[var(--surface-elevated)] flex items-center justify-center mb-6 border border-[var(--ui-border)]">
+             <Heart className="w-8 h-8 text-[var(--text-secondary)]" />
           </div>
-          <h2 className="text-xl font-bold text-text-main mb-2">No saved properties yet</h2>
-          <p className="text-text-secondary max-w-xs font-medium mb-8 leading-relaxed">
+          <h2 className="text-xl font-bold text-[var(--text-main)] mb-2">No saved properties yet</h2>
+          <p className="text-[var(--text-secondary)] max-w-xs font-medium mb-8 leading-relaxed">
             Your private collection is currently empty. Explore our portfolio to discover assets that resonate with your vision.
           </p>
           <Link 

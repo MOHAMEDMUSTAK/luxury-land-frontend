@@ -36,8 +36,7 @@ export default function EmiCalculatorModal({ isOpen, onClose }: { isOpen: boolea
           <motion.div
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="fixed top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%] w-[92%] max-w-[420px] bg-white rounded-[24px] shadow-2xl z-[201] overflow-hidden"
+            className="fixed top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%] w-[92%] max-w-[420px] bg-[var(--surface)] rounded-[24px] shadow-2xl z-[201] overflow-hidden"
           >
             <div className="bg-gradient-to-r from-brand-primary to-brand-secondary p-6 text-white relative">
               <button onClick={onClose} className="absolute top-4 right-4 text-white/70 hover:text-white bg-white/10 p-2 rounded-full backdrop-blur-md transition-all active:scale-95">
@@ -54,27 +53,27 @@ export default function EmiCalculatorModal({ isOpen, onClose }: { isOpen: boolea
               <div className="space-y-5">
                 {/* Principal */}
                 <div>
-                  <label className="flex justify-between text-[10px] font-black text-text-secondary uppercase tracking-widest mb-3">
+                  <label className="flex justify-between text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest mb-3">
                     <span>Loan Amount</span>
                     <span className="text-brand-primary">₹{(principal / 100000).toFixed(1)} Lakhs</span>
                   </label>
-                  <input type="range" min="100000" max="50000000" step="100000" value={principal} onChange={(e) => setPrincipal(Number(e.target.value))} className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-brand-primary" />
+                  <input type="range" min="100000" max="50000000" step="100000" value={principal} onChange={(e) => setPrincipal(Number(e.target.value))} className="w-full h-1.5 bg-[var(--ui-border)] rounded-lg appearance-none cursor-pointer accent-brand-primary" />
                 </div>
                 {/* Interest Rate */}
                 <div>
-                  <label className="flex justify-between text-[10px] font-black text-text-secondary uppercase tracking-widest mb-3">
+                  <label className="flex justify-between text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest mb-3">
                     <span>Interest Rate</span>
                     <span className="text-brand-primary">{rate}%</span>
                   </label>
-                  <input type="range" min="5" max="15" step="0.1" value={rate} onChange={(e) => setRate(Number(e.target.value))} className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-brand-primary" />
+                  <input type="range" min="5" max="15" step="0.1" value={rate} onChange={(e) => setRate(Number(e.target.value))} className="w-full h-1.5 bg-[var(--ui-border)] rounded-lg appearance-none cursor-pointer accent-brand-primary" />
                 </div>
                 {/* Years */}
                 <div>
-                  <label className="flex justify-between text-[10px] font-black text-text-secondary uppercase tracking-widest mb-3">
+                  <label className="flex justify-between text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest mb-3">
                     <span>Tenure (Years)</span>
                     <span className="text-brand-primary">{years} Years</span>
                   </label>
-                  <input type="range" min="1" max="30" step="1" value={years} onChange={(e) => setYears(Number(e.target.value))} className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-brand-primary" />
+                  <input type="range" min="1" max="30" step="1" value={years} onChange={(e) => setYears(Number(e.target.value))} className="w-full h-1.5 bg-[var(--ui-border)] rounded-lg appearance-none cursor-pointer accent-brand-primary" />
                 </div>
               </div>
 
@@ -83,16 +82,16 @@ export default function EmiCalculatorModal({ isOpen, onClose }: { isOpen: boolea
                 
                 <div className="text-center mb-5 relative z-10">
                    <p className="text-[9px] font-black text-brand-primary uppercase tracking-[0.2em] mb-1 opacity-80">Monthly EMI</p>
-                   <p className="text-3xl font-black text-text-main tracking-tight">₹{emi.toLocaleString('en-IN')}</p>
+                   <p className="text-3xl font-black text-[var(--text-main)] tracking-tight">₹{emi.toLocaleString('en-IN')}</p>
                 </div>
                 
-                <div className="flex justify-between items-center text-xs border-t border-gray-200 pt-4 relative z-10">
-                   <div className="text-center w-1/2 border-r border-gray-200 pr-2">
-                     <p className="text-[10px] font-black uppercase tracking-widest text-text-secondary opacity-60 mb-1">Principal</p>
-                     <p className="font-black text-text-main">₹{(principal / 100000).toFixed(1)}L</p>
+                <div className="flex justify-between items-center text-xs border-t border-[var(--ui-border)] pt-4 relative z-10">
+                   <div className="text-center w-1/2 border-r border-[var(--ui-border)] pr-2">
+                     <p className="text-[10px] font-black uppercase tracking-widest text-[var(--text-secondary)] opacity-60 mb-1">Principal</p>
+                     <p className="font-black text-[var(--text-main)]">₹{(principal / 100000).toFixed(1)}L</p>
                    </div>
                    <div className="text-center w-1/2 pl-2">
-                     <p className="text-[10px] font-black uppercase tracking-widest text-text-secondary opacity-60 mb-1">Total Interest</p>
+                     <p className="text-[10px] font-black uppercase tracking-widest text-[var(--text-secondary)] opacity-60 mb-1">Total Interest</p>
                      <p className="font-black text-red-500">₹{(totalInterest / 100000).toFixed(1)}L</p>
                    </div>
                 </div>

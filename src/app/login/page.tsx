@@ -61,7 +61,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex-1 flex items-center justify-center px-4 py-20 relative overflow-hidden bg-[#F8FAFC] min-h-screen">
+    <div className="flex-1 flex items-center justify-center px-4 py-20 relative overflow-hidden bg-[var(--background)] min-h-screen">
       {/* ★ Animated floating orbs — pure CSS, no JS overhead */}
       <div className="login-orb login-orb-1" />
       <div className="login-orb login-orb-2" />
@@ -77,7 +77,7 @@ export default function LoginPage() {
 
       <div className="w-full max-w-[420px] relative z-10">
         {/* Card */}
-        <div className="bg-white/70 backdrop-blur-2xl rounded-[32px] border border-white/60 shadow-[0_20px_60px_rgba(0,0,0,0.08),0_0_0_1px_rgba(255,255,255,0.5)_inset] p-8 sm:p-10 transition-all duration-500 hover:shadow-[0_25px_70px_rgba(99,102,241,0.12),0_0_0_1px_rgba(255,255,255,0.5)_inset]">
+        <div className="bg-[var(--glass-bg)] backdrop-blur-2xl rounded-[32px] border border-[var(--glass-border)] shadow-[0_20px_60px_rgba(0,0,0,0.08)] p-8 sm:p-10 transition-all duration-500 hover:shadow-[0_25px_70px_rgba(99,102,241,0.12)]">
           {/* Logo */}
           <div className="flex justify-center mb-7">
             <div className="w-[68px] h-[68px] rounded-[20px] bg-gradient-to-br from-brand-primary via-indigo-500 to-brand-secondary flex items-center justify-center text-white font-black text-3xl shadow-[0_12px_30px_rgba(99,102,241,0.35)] ring-4 ring-white/30">
@@ -87,10 +87,10 @@ export default function LoginPage() {
 
           {/* Title */}
           <div className="text-center mb-8">
-            <h1 className="text-[28px] font-black text-text-main tracking-tight mb-2 gradient-heading">
+            <h1 className="text-[28px] font-black text-[var(--text-main)] tracking-tight mb-2 gradient-heading">
               Welcome Back
             </h1>
-            <p className="text-[15px] text-text-secondary font-medium">
+            <p className="text-[15px] text-[var(--text-secondary)] font-medium">
               Unlock your premium dashboard
             </p>
           </div>
@@ -99,15 +99,15 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Email */}
             <div className="space-y-1.5">
-              <label className="text-[13px] font-bold text-text-main ml-0.5 tracking-wide">Email Address</label>
+              <label className="text-[13px] font-bold text-[var(--text-main)] ml-0.5 tracking-wide">Email Address</label>
               <div className="relative group">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-gray-400 group-focus-within:text-brand-primary transition-colors duration-300 pointer-events-none" />
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-[var(--text-secondary)] group-focus-within:text-brand-primary transition-colors duration-300 pointer-events-none" />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => { setEmail(e.target.value); setErrors(p => ({...p, email: undefined})); }}
                   placeholder="you@example.com"
-                  className={`w-full pl-11 pr-4 py-3.5 rounded-2xl border bg-white/60 text-[15px] font-semibold outline-none transition-all duration-300 placeholder:text-gray-400 focus:bg-white focus:ring-[4px] focus:ring-brand-primary/15 ${errors.email ? "border-red-400 focus:border-red-400" : "border-gray-200 focus:border-brand-primary hover:border-gray-300"}`}
+                  className={`w-full pl-11 pr-4 py-3.5 rounded-2xl border bg-[var(--input-bg)] text-[15px] font-semibold text-[var(--text-main)] outline-none transition-all duration-300 placeholder:text-[var(--text-secondary)] placeholder:opacity-60 focus:bg-[var(--surface)] focus:ring-[4px] focus:ring-brand-primary/15 ${errors.email ? "border-red-400 focus:border-red-400" : "border-[var(--input-border)] focus:border-brand-primary hover:border-[var(--ui-border-hover)]"}`}
                 />
               </div>
               {errors.email && <p className="text-[12px] font-bold text-red-500 ml-1 mt-1">{errors.email}</p>}
@@ -116,22 +116,22 @@ export default function LoginPage() {
             {/* Password */}
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <label className="text-[13px] font-bold text-text-main ml-0.5 tracking-wide">Password</label>
+                <label className="text-[13px] font-bold text-[var(--text-main)] ml-0.5 tracking-wide">Password</label>
                 <Link href="/forgot-password" className="text-[12px] font-bold text-brand-primary hover:text-brand-secondary transition-colors">Forgot?</Link>
               </div>
               <div className="relative group">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-gray-400 group-focus-within:text-brand-primary transition-colors duration-300 pointer-events-none" />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-[var(--text-secondary)] group-focus-within:text-brand-primary transition-colors duration-300 pointer-events-none" />
                 <input
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => { setPassword(e.target.value); setErrors(p => ({...p, password: undefined})); }}
                   placeholder="••••••••"
-                  className={`w-full pl-11 pr-12 py-3.5 rounded-2xl border bg-white/60 text-[15px] font-semibold outline-none transition-all duration-300 placeholder:text-gray-400 focus:bg-white focus:ring-[4px] focus:ring-brand-primary/15 ${errors.password ? "border-red-400 focus:border-red-400" : "border-gray-200 focus:border-brand-primary hover:border-gray-300"}`}
+                  className={`w-full pl-11 pr-12 py-3.5 rounded-2xl border bg-[var(--input-bg)] text-[15px] font-semibold text-[var(--text-main)] outline-none transition-all duration-300 placeholder:text-[var(--text-secondary)] placeholder:opacity-60 focus:bg-[var(--surface)] focus:ring-[4px] focus:ring-brand-primary/15 ${errors.password ? "border-red-400 focus:border-red-400" : "border-[var(--input-border)] focus:border-brand-primary hover:border-[var(--ui-border-hover)]"}`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-brand-primary transition-colors p-0.5"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] hover:text-brand-primary transition-colors p-0.5"
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
@@ -160,13 +160,13 @@ export default function LoginPage() {
 
           {/* Divider */}
           <div className="flex items-center gap-4 my-7">
-            <div className="flex-1 h-[1px] bg-gradient-to-r from-transparent via-gray-200 to-gray-200" />
-            <span className="text-[12px] font-black text-gray-400 uppercase tracking-widest">or</span>
-            <div className="flex-1 h-[1px] bg-gradient-to-l from-transparent via-gray-200 to-gray-200" />
+            <div className="flex-1 h-[1px] bg-gradient-to-r from-transparent via-[var(--ui-border)] to-[var(--ui-border)]" />
+            <span className="text-[12px] font-black text-[var(--text-secondary)] uppercase tracking-widest">or</span>
+            <div className="flex-1 h-[1px] bg-gradient-to-l from-transparent via-[var(--ui-border)] to-[var(--ui-border)]" />
           </div>
 
           {/* Signup Link */}
-          <p className="text-center text-[14px] text-text-secondary font-medium">
+          <p className="text-center text-[14px] text-[var(--text-secondary)] font-medium">
             Don&apos;t have an account?{" "}
             <Link href="/signup" className="text-brand-primary font-black hover:text-brand-secondary transition-colors underline decoration-2 underline-offset-4 decoration-brand-primary/30 hover:decoration-brand-primary">
               Sign Up Fast

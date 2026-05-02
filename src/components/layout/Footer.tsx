@@ -30,16 +30,16 @@ const stats = [
 export default function Footer() {
   const { t } = useTranslation();
   return (
-    <footer className="bg-white border-t border-ui-border pt-0 pb-12 mt-auto relative overflow-hidden">
+    <footer className="bg-[var(--surface)] border-t border-[var(--ui-border)] pt-0 pb-12 mt-auto relative overflow-hidden">
       {/* Premium Accent Line */}
       <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-brand-primary/40 to-transparent" />
 
       {/* ★ Scrolling Trust Bar */}
-      <div className="bg-gray-50/80 border-b border-ui-border py-3 overflow-hidden">
+      <div className="bg-[var(--surface-elevated)] border-b border-[var(--ui-border)] py-3 overflow-hidden">
         <div className="flex overflow-hidden">
           <div className="trust-bar-track flex items-center gap-10 px-6">
             {trustItems.map((item, i) => (
-              <div key={i} className="flex items-center gap-2 text-xs font-bold text-text-secondary whitespace-nowrap flex-shrink-0">
+              <div key={i} className="flex items-center gap-2 text-xs font-bold text-[var(--text-secondary)] whitespace-nowrap flex-shrink-0">
                 <span>{item.icon}</span>
                 <span>{item.label}</span>
                 <span className="w-1 h-1 rounded-full bg-gray-300 ml-4" />
@@ -53,9 +53,9 @@ export default function Footer() {
       <div className="container mx-auto px-4 lg:px-8 pt-10 pb-6">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
           {stats.map((stat) => (
-            <div key={stat.label} className="text-center p-4 rounded-2xl bg-gray-50 border border-ui-border hover:border-brand-primary/20 hover:bg-brand-primary/[0.02] transition-all group">
+            <div key={stat.label} className="text-center p-4 rounded-2xl bg-[var(--surface-elevated)] border border-[var(--ui-border)] hover:border-brand-primary/20 hover:bg-brand-primary/[0.02] transition-all group">
               <p className="text-2xl font-black gradient-accent">{stat.value}</p>
-              <p className="text-[10px] font-bold text-text-secondary uppercase tracking-widest mt-1 group-hover:text-brand-primary transition-colors">{stat.label}</p>
+              <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mt-1 group-hover:text-brand-primary transition-colors">{stat.label}</p>
             </div>
           ))}
         </div>
@@ -68,7 +68,7 @@ export default function Footer() {
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-primary to-brand-secondary flex items-center justify-center text-white font-black text-xl shadow-lg shadow-brand-primary/25 group-hover:scale-105 transition-transform duration-500">
                 L
               </div>
-              <span className="text-2xl font-bold tracking-tight text-text-main">
+              <span className="text-2xl font-bold tracking-tight text-[var(--text-main)]">
                 <span className="gradient-accent">Land</span><span className="text-brand-secondary">Market</span>
               </span>
             </Link>
@@ -137,13 +137,13 @@ export default function Footer() {
 
           {/* Column 3: Premium Contact Card */}
           <div className="md:col-span-2 lg:col-span-5">
-            <div className="premium-card luxe-lift p-8 relative bg-white border border-ui-border group/card">
+            <div className="premium-card luxe-lift p-8 relative border border-[var(--ui-border)] group/card">
               {/* Glow Line Top */}
               <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-brand-primary to-brand-secondary opacity-80" />
 
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div className="space-y-1">
-                  <h5 className="text-lg font-black text-text-main tracking-tight">MOHAMED MUSTAK M</h5>
+                  <h5 className="text-lg font-black text-[var(--text-main)] tracking-tight">MOHAMED MUSTAK M</h5>
                   <p className="text-[10px] font-black text-brand-primary uppercase tracking-[0.15em]">{t("footer.trusted")}</p>
                 </div>
 
@@ -175,7 +175,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-16 pt-8 border-t border-ui-border/40 flex flex-col md:flex-row justify-between items-center gap-4 text-[11px] font-bold text-text-secondary uppercase tracking-[0.1em] opacity-60">
+        <div className="mt-16 pt-8 border-t border-[var(--ui-border)] flex flex-col md:flex-row justify-between items-center gap-4 text-[11px] font-bold text-[var(--text-secondary)] uppercase tracking-[0.1em] opacity-60">
           <p>© {new Date().getFullYear()} LuxuryLand. All rights reserved.</p>
           <p className="flex items-center gap-2">
             Made with ❤️ in <span className="gradient-accent">Tamil Nadu </span>

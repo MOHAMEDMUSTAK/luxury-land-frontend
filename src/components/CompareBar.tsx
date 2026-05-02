@@ -79,29 +79,29 @@ export default function CompareBar() {
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="relative w-full md:max-w-[540px] h-[85vh] md:h-auto md:max-h-[85vh] bg-white rounded-t-[32px] md:rounded-[32px] shadow-2xl overflow-hidden flex flex-col z-[121]"
+              className="relative w-full md:max-w-[540px] h-[85vh] md:h-auto md:max-h-[85vh] bg-[var(--surface)] rounded-t-[32px] md:rounded-[32px] shadow-2xl overflow-hidden flex flex-col z-[121]"
             >
               {/* Native Mobile Drag Handle */}
               <div className="md:hidden flex justify-center p-3">
-                <div className="w-12 h-1.5 bg-gray-200 rounded-full" />
+                <div className="w-12 h-1.5 bg-[var(--ui-border)] rounded-full" />
               </div>
 
               {/* Header */}
-              <div className="px-6 pb-6 border-b border-gray-50 flex items-center justify-between bg-white sticky top-0 z-10 pt-2">
+              <div className="px-6 pb-6 border-b border-[var(--ui-border)] flex items-center justify-between bg-[var(--surface)] sticky top-0 z-10 pt-2">
                 <div>
-                  <h3 className="text-2xl font-black text-text-main tracking-tight uppercase">AI Insights</h3>
-                  <p className="text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em] opacity-50">Advanced side-by-side metric comparison</p>
+                  <h3 className="text-2xl font-black text-[var(--text-main)] tracking-tight uppercase">AI Insights</h3>
+                  <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-[0.2em] opacity-50">Advanced side-by-side metric comparison</p>
                 </div>
                 <button 
                   onClick={() => setIsAnalysisOpen(false)}
-                  className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-text-main hover:bg-red-50 hover:text-red-500 transition-all active:scale-90"
+                  className="w-10 h-10 rounded-full bg-[var(--surface-elevated)] flex items-center justify-center text-[var(--text-main)] hover:bg-red-50 hover:text-red-500 transition-all active:scale-90"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
               {/* Matrix Scrollable Content */}
-              <div className="flex-1 overflow-y-auto no-scrollbar p-6 space-y-10 bg-gray-50/20">
+              <div className="flex-1 overflow-y-auto no-scrollbar p-6 space-y-10 bg-[var(--background)]">
                 <div className="grid grid-cols-2 gap-4">
                   {properties.map((p) => (
                     <div key={p.id || p._id} className="group relative">
@@ -109,7 +109,7 @@ export default function CompareBar() {
                         {p.images && p.images.length > 0 ? (
                           <Image src={p.images[0]} alt={p.title} fill className="object-cover" sizes="240px" />
                         ) : (
-                          <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-300">No Image</div>
+                          <div className="w-full h-full bg-[var(--skeleton-base)] flex items-center justify-center text-[var(--text-secondary)]">No Image</div>
                         )}
                         {p.price === lowestPrice && (
                           <div className="absolute top-2 left-2 px-2.5 py-1 bg-brand-primary text-white text-[8px] font-black tracking-widest uppercase rounded-full shadow-lg">
@@ -117,7 +117,7 @@ export default function CompareBar() {
                           </div>
                         )}
                       </div>
-                      <h4 className="text-xs font-black text-text-main line-clamp-1 mb-1">{p.title}</h4>
+                      <h4 className="text-xs font-black text-[var(--text-main)] line-clamp-1 mb-1">{p.title}</h4>
                       <p className="text-sm font-black text-brand-primary">{formatCurrency(p.price)}</p>
                     </div>
                   ))}
@@ -130,14 +130,14 @@ export default function CompareBar() {
                     { label: "Location", icon: Target, data: properties.map(p => p.town || p.area || "N/A") },
                     { label: "Features", icon: CheckCircle2, data: properties.map(p => (p.features?.length || 0) + " Premium Items") }
                   ].map((row, i) => (
-                    <div key={i} className="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm space-y-4">
+                    <div key={i} className="bg-[var(--surface)] p-5 rounded-3xl border border-[var(--ui-border)] shadow-sm space-y-4">
                       <div className="flex items-center gap-2 opacity-30">
                         <row.icon className="w-3.5 h-3.5" />
                         <span className="text-[10px] font-black uppercase tracking-widest">{row.label}</span>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         {row.data.map((val, idx) => (
-                          <div key={idx} className={`p-3 rounded-2xl text-center font-bold text-xs ${row.highlight && properties[idx].size === largestSize ? 'bg-brand-primary text-white shadow-lg' : 'bg-gray-50 text-text-main'}`}>
+                          <div key={idx} className={`p-3 rounded-2xl text-center font-bold text-xs ${row.highlight && properties[idx].size === largestSize ? 'bg-brand-primary text-white shadow-lg' : 'bg-[var(--surface-elevated)] text-[var(--text-main)]'}`}>
                             {val}
                           </div>
                         ))}
@@ -148,7 +148,7 @@ export default function CompareBar() {
               </div>
 
               {/* Action Footer */}
-              <div className="p-6 bg-white border-t border-gray-100 flex flex-col gap-3">
+              <div className="p-6 bg-[var(--surface)] border-t border-[var(--ui-border)] flex flex-col gap-3">
                 <button 
                   onClick={() => router.push(`/property/${properties[0].id || properties[0]._id}`)}
                   className="w-full py-4 bg-brand-primary text-white font-black text-[11px] uppercase tracking-[0.2em] rounded-2xl shadow-xl shadow-brand-primary/20 hover:scale-[1.01] transition-all active:scale-[0.98]"
@@ -180,13 +180,13 @@ export default function CompareBar() {
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={{ type: "spring", damping: 30, stiffness: 300 }}
-              className="relative w-full md:max-w-4xl md:px-0 bg-white md:bg-white/90 md:backdrop-blur-3xl md:border md:border-white/60 rounded-t-[32px] md:rounded-[32px] md:mb-10 px-6 py-6 pb-12 md:p-4 shadow-[0_-20px_50px_rgba(0,0,0,0.1),0_30px_70px_rgba(0,0,0,0.1)] pointer-events-auto flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden"
+              className="relative w-full md:max-w-4xl md:px-0 bg-[var(--surface)] md:bg-[var(--glass-bg)] md:backdrop-blur-3xl md:border md:border-[var(--glass-border)] rounded-t-[32px] md:rounded-[32px] md:mb-10 px-6 py-6 pb-12 md:p-4 shadow-[0_-20px_50px_rgba(0,0,0,0.1),0_30px_70px_rgba(0,0,0,0.1)] pointer-events-auto flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden"
               style={{ bottom: `env(safe-area-inset-bottom)` }}
             >
               {/* Desktop Close Arrow (Hidden on Mobile) */}
               <button 
                 onClick={() => setIsExpanded(false)}
-                className="hidden md:flex absolute top-4 right-5 p-2 text-text-secondary hover:text-brand-primary transition-colors active:scale-90"
+                className="hidden md:flex absolute top-4 right-5 p-2 text-[var(--text-secondary)] hover:text-brand-primary transition-colors active:scale-90"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -194,7 +194,7 @@ export default function CompareBar() {
               <div className="flex flex-col md:flex-row items-center gap-6 w-full">
                 {/* Mobile Drag Handle */}
                 <div className="md:hidden flex justify-center w-full pb-2">
-                  <div className="w-10 h-1 bg-gray-200 rounded-full" />
+                  <div className="w-10 h-1 bg-[var(--ui-border)] rounded-full" />
                 </div>
 
                 <div className="flex flex-col gap-0.5 text-center md:text-left pt-2 md:pt-0">
@@ -202,7 +202,7 @@ export default function CompareBar() {
                     <BarChart2 className="w-4 h-4" />
                     <span>Comparison Console</span>
                   </div>
-                  <p className="text-[10px] font-black text-text-secondary uppercase tracking-[0.1em] opacity-40">
+                  <p className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-[0.1em] opacity-40">
                     {properties.length} Selection Ready
                   </p>
                 </div>
@@ -211,11 +211,11 @@ export default function CompareBar() {
                 <div className="flex justify-center md:justify-start gap-4 overflow-x-auto no-scrollbar pb-1 w-full md:w-auto">
                     {properties.map((p) => (
                       <div key={p.id || p._id} className="group relative flex-shrink-0">
-                        <div className="w-16 h-16 md:w-12 md:h-12 relative rounded-2xl md:rounded-xl overflow-hidden border-2 border-gray-100 shadow-sm transition-all group-hover:border-brand-primary/40">
+                        <div className="w-16 h-16 md:w-12 md:h-12 relative rounded-2xl md:rounded-xl overflow-hidden border-2 border-[var(--ui-border)] shadow-sm transition-all group-hover:border-brand-primary/40">
                           {p.images && p.images.length > 0 ? (
                             <Image src={p.images[0]} alt="Prop" fill className="object-cover" sizes="64px" />
                           ) : (
-                            <div className="w-full h-full bg-gray-50 flex items-center justify-center text-[8px] text-gray-300">No Img</div>
+                            <div className="w-full h-full bg-[var(--skeleton-base)] flex items-center justify-center text-[8px] text-[var(--text-secondary)]">No Img</div>
                           )}
                           <button
                             onClick={() => removeProperty(p.id || p._id || '')}
@@ -227,8 +227,8 @@ export default function CompareBar() {
                       </div>
                     ))}
                     {properties.length < 3 && (
-                      <div className="w-16 h-16 md:w-12 md:h-12 border-2 border-dashed border-gray-100 rounded-2xl md:rounded-xl flex items-center justify-center bg-gray-50/20">
-                        <Target className="w-5 h-5 md:w-4 md:h-4 text-gray-200" />
+                      <div className="w-16 h-16 md:w-12 md:h-12 border-2 border-dashed border-[var(--ui-border)] rounded-2xl md:rounded-xl flex items-center justify-center bg-[var(--surface-elevated)]">
+                        <Target className="w-5 h-5 md:w-4 md:h-4 text-[var(--text-secondary)] opacity-30" />
                       </div>
                     )}
                 </div>

@@ -394,7 +394,7 @@ function HomeContent() {
             <h1 className="text-2xl font-bold text-text-main">{t("home.title")}</h1>
             <button
               onClick={() => setIsMobileFilterOpen(true)}
-              className="flex items-center gap-2 px-4 py-2.5 bg-white/80 backdrop-blur-xl border border-ui-border rounded-xl shadow-sm text-sm font-bold text-brand-primary active:scale-95 transition-all"
+              className="flex items-center gap-2 px-4 py-2.5 bg-[var(--surface)]/80 backdrop-blur-xl border border-[var(--ui-border)] rounded-xl shadow-sm text-sm font-bold text-brand-primary active:scale-95 transition-all"
             >
               <Filter className="w-4 h-4" />
               {t("home.filters")}
@@ -415,7 +415,7 @@ function HomeContent() {
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder="Search lands, cities..."
-                      className="w-full pl-11 pr-11 py-3.5 bg-white/60 border border-ui-border rounded-2xl text-sm focus:bg-white focus:border-brand-primary/30 focus:ring-4 focus:ring-brand-primary/10 transition-all duration-300 font-bold text-text-main placeholder-text-secondary/60"
+                      className="w-full pl-11 pr-11 py-3.5 bg-[var(--input-bg)] border border-[var(--ui-border)] rounded-2xl text-sm focus:bg-[var(--surface)] focus:border-brand-primary/30 focus:ring-4 focus:ring-brand-primary/10 transition-all duration-300 font-bold text-[var(--text-main)] placeholder-[var(--text-secondary)] opacity-90"
                     />
                     {searchQuery && (
                       <button onClick={clearSearch} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 transition-colors">
@@ -434,12 +434,12 @@ function HomeContent() {
                       { id: "price-low-high", label: "Price: Low → High" },
                       { id: "price-high-low", label: "Price: High → Low" }
                     ].map((sort) => (
-                      <label key={sort.id} className={`flex items-center gap-3 cursor-pointer group/label p-3.5 rounded-2xl transition-all duration-300 border ${activeSort === sort.id ? 'bg-brand-primary/[0.04] border-brand-primary/10 shadow-sm' : 'border-transparent hover:bg-gray-50'}`}>
+                      <label key={sort.id} className={`flex items-center gap-3 cursor-pointer group/label p-3.5 rounded-2xl transition-all duration-300 border ${activeSort === sort.id ? 'bg-brand-primary/[0.04] border-brand-primary/10 shadow-sm' : 'border-transparent hover:bg-[var(--surface-elevated)]'}`}>
                         <div className="relative w-5 h-5 flex items-center justify-center">
                           <input type="radio" name="sort" value={sort.id} checked={activeSort === sort.id} onChange={() => setActiveSort(sort.id)} className="peer sr-only" />
-                          <div className={`w-5 h-5 rounded-full border-2 transition-all duration-300 ${activeSort === sort.id ? 'border-brand-primary border-[6px]' : 'border-gray-200 group-hover/label:border-brand-primary/30'}`} />
+                          <div className={`w-5 h-5 rounded-full border-2 transition-all duration-300 ${activeSort === sort.id ? 'border-brand-primary border-[6px]' : 'border-[var(--ui-border)] group-hover/label:border-brand-primary/30'}`} />
                         </div>
-                        <span className={`text-sm font-bold transition-colors duration-300 ${activeSort === sort.id ? "text-brand-primary" : "text-text-secondary group-hover/label:text-text-main"}`}>
+                        <span className={`text-sm font-bold transition-colors duration-300 ${activeSort === sort.id ? "text-brand-primary" : "text-[var(--text-secondary)] group-hover/label:text-[var(--text-main)]"}`}>
                           {sort.label}
                         </span>
                       </label>
@@ -453,11 +453,11 @@ function HomeContent() {
                   <div className="space-y-3">
                     <div className="relative">
                       <span className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-primary text-xs font-black">₹</span>
-                      <input type="number" placeholder="Min Price" value={minPrice} onChange={(e) => setMinPrice(e.target.value)} className="w-full pl-8 pr-4 py-3 bg-gray-50 border border-transparent rounded-xl text-xs focus:bg-white focus:border-brand-primary/20 focus:ring-4 focus:ring-brand-primary/5 transition-all font-bold" />
+                      <input type="number" placeholder="Min Price" value={minPrice} onChange={(e) => setMinPrice(e.target.value)} className="w-full pl-8 pr-4 py-3 bg-[var(--input-bg)] border border-[var(--input-border)] rounded-xl text-xs focus:bg-[var(--surface)] focus:border-brand-primary/20 focus:ring-4 focus:ring-brand-primary/5 transition-all font-bold text-[var(--text-main)]" />
                     </div>
                     <div className="relative">
                       <span className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-primary text-xs font-black">₹</span>
-                      <input type="number" placeholder="Max Price" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} className="w-full pl-8 pr-4 py-3 bg-gray-50 border border-transparent rounded-xl text-xs focus:bg-white focus:border-brand-primary/20 focus:ring-4 focus:ring-brand-primary/5 transition-all font-bold" />
+                      <input type="number" placeholder="Max Price" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} className="w-full pl-8 pr-4 py-3 bg-[var(--input-bg)] border border-[var(--input-border)] rounded-xl text-xs focus:bg-[var(--surface)] focus:border-brand-primary/20 focus:ring-4 focus:ring-brand-primary/5 transition-all font-bold text-[var(--text-main)]" />
                     </div>
                   </div>
                 </div>
@@ -467,7 +467,7 @@ function HomeContent() {
                   <h3 className="text-[11px] font-black text-text-secondary uppercase tracking-[0.2em] mb-4 opacity-60 px-1">{t("home.propertyType")}</h3>
                   <div className="grid grid-cols-2 gap-2">
                     {[{ id: "", label: "All" }, { id: "Land", label: "Land" }, { id: "House", label: "House" }, { id: "Shop", label: "Shop" }].map((type) => (
-                      <button key={type.id} onClick={() => setPropertyType(type.id)} className={`py-2 px-3 rounded-xl text-xs font-bold transition-all border ${propertyType === type.id ? 'bg-brand-primary text-white border-brand-primary shadow-sm shadow-brand-primary/20' : 'bg-gray-50 text-text-secondary border-transparent hover:bg-gray-100'}`}>
+                      <button key={type.id} onClick={() => setPropertyType(type.id)} className={`py-2 px-3 rounded-xl text-xs font-bold transition-all border ${propertyType === type.id ? 'bg-brand-primary text-white border-brand-primary shadow-sm shadow-brand-primary/20' : 'bg-[var(--surface-elevated)] text-[var(--text-secondary)] border-[var(--ui-border)] hover:bg-[var(--surface)]'}`}>
                         {type.label}
                       </button>
                     ))}
@@ -479,10 +479,10 @@ function HomeContent() {
                   <h3 className="text-[11px] font-black text-text-secondary uppercase tracking-[0.2em] mb-4 opacity-60 px-1">{t("home.sizeRange")}</h3>
                   <div className="space-y-4">
                     <div className="flex gap-2">
-                      <input type="number" placeholder="Min" value={minSize} onChange={(e) => setMinSize(e.target.value)} className="w-full px-4 py-3 bg-gray-50 border border-transparent rounded-xl text-xs focus:bg-white focus:border-brand-primary/20 focus:ring-4 focus:ring-brand-primary/5 transition-all font-bold" />
-                      <input type="number" placeholder="Max" value={maxSize} onChange={(e) => setMaxSize(e.target.value)} className="w-full px-4 py-3 bg-gray-50 border border-transparent rounded-xl text-xs focus:bg-white focus:border-brand-primary/20 focus:ring-4 focus:ring-brand-primary/5 transition-all font-bold" />
+                      <input type="number" placeholder="Min" value={minSize} onChange={(e) => setMinSize(e.target.value)} className="w-full px-4 py-3 bg-[var(--input-bg)] border border-[var(--input-border)] rounded-xl text-xs focus:bg-[var(--surface)] focus:border-brand-primary/20 focus:ring-4 focus:ring-brand-primary/5 transition-all font-bold text-[var(--text-main)]" />
+                      <input type="number" placeholder="Max" value={maxSize} onChange={(e) => setMaxSize(e.target.value)} className="w-full px-4 py-3 bg-[var(--input-bg)] border border-[var(--input-border)] rounded-xl text-xs focus:bg-[var(--surface)] focus:border-brand-primary/20 focus:ring-4 focus:ring-brand-primary/5 transition-all font-bold text-[var(--text-main)]" />
                     </div>
-                    <select value={sizeUnitFilter} onChange={(e) => setSizeUnitFilter(e.target.value)} className="w-full px-4 py-3 bg-gray-50 border border-transparent rounded-xl text-xs font-black text-brand-primary appearance-none cursor-pointer">
+                    <select value={sizeUnitFilter} onChange={(e) => setSizeUnitFilter(e.target.value)} className="w-full px-4 py-3 bg-[var(--input-bg)] border border-[var(--input-border)] rounded-xl text-xs font-black text-brand-primary appearance-none cursor-pointer">
                       <option value="sq ft">sq ft</option>
                       <option value="acres">acres</option>
                       <option value="cents">cents</option>
@@ -497,14 +497,14 @@ function HomeContent() {
 
             {/* RIGHT: Main Content Area */}
             <div className="flex-1 min-w-0">
-              <div className="hidden lg:flex items-end justify-between mb-8 pb-6 border-b border-ui-border">
+              <div className="hidden lg:flex items-end justify-between mb-8 pb-6 border-b border-[var(--ui-border)]">
                 <div>
-                  <h1 className="text-3xl font-bold text-text-main mb-1">{searchQuery ? `${t("common.search")}: "${searchQuery}"` : t("home.title")}</h1>
-                  <p className="text-text-secondary font-medium text-sm">{t("home.subtitle", { count: properties.length })}</p>
+                  <h1 className="text-3xl font-bold text-[var(--text-main)] mb-1">{searchQuery ? `${t("common.search")}: "${searchQuery}"` : t("home.title")}</h1>
+                  <p className="text-[var(--text-secondary)] font-medium text-sm">{t("home.subtitle", { count: properties.length })}</p>
                 </div>
-                <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-xl border border-ui-border shadow-sm">
-                  <SlidersHorizontal className="w-3.5 h-3.5 text-text-secondary" />
-                  <span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">{t("home.sortBy")}:</span>
+                <div className="flex items-center gap-3 bg-[var(--surface)] px-4 py-2 rounded-xl border border-[var(--ui-border)] shadow-sm">
+                  <SlidersHorizontal className="w-3.5 h-3.5 text-[var(--text-secondary)]" />
+                  <span className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider">{t("home.sortBy")}:</span>
                   <span className="text-sm font-bold text-brand-primary">{sortLabel}</span>
                 </div>
               </div>
@@ -515,7 +515,7 @@ function HomeContent() {
                   <button
                     key={chip.id}
                     onClick={() => { if (activeChip === chip.id) clearAllFilters(); else { clearAllFilters(); setActiveChip(chip.id); chip.logic(); } }}
-                    className={`whitespace-nowrap px-6 py-3 rounded-2xl text-[10px] sm:text-xs font-black uppercase tracking-widest transition-all border shadow-sm ${activeChip === chip.id ? "bg-gradient-to-r from-brand-primary to-brand-secondary text-white border-brand-primary shadow-lg shadow-brand-primary/20" : "bg-white/80 backdrop-blur-md text-text-secondary border-ui-border hover:border-brand-primary/20"}`}
+                    className={`whitespace-nowrap px-6 py-3 rounded-2xl text-[10px] sm:text-xs font-black uppercase tracking-widest transition-all border shadow-sm ${activeChip === chip.id ? "bg-gradient-to-r from-brand-primary to-brand-secondary text-white border-brand-primary shadow-lg shadow-brand-primary/20" : "bg-[var(--surface-elevated)] backdrop-blur-md text-[var(--text-secondary)] border-[var(--ui-border)] hover:border-brand-primary/50"}`}
                   >
                     {chip.label}
                   </button>
@@ -528,9 +528,9 @@ function HomeContent() {
                   {[...Array(6)].map((_, i) => <PropertySkeleton key={i} />)}
                 </div>
               ) : properties.length === 0 ? (
-                <div className="text-center py-32 bg-white rounded-3xl border border-ui-border shadow-sm">
-                  <Search className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                  <p className="text-text-secondary font-bold tracking-widest uppercase">{t("home.noResults")}</p>
+                <div className="text-center py-32 bg-[var(--surface)] rounded-3xl border border-[var(--ui-border)] shadow-sm">
+                  <Search className="w-12 h-12 text-[var(--text-secondary)] mx-auto mb-4 opacity-50" />
+                  <p className="text-[var(--text-secondary)] font-bold tracking-widest uppercase">{t("home.noResults")}</p>
                   <button onClick={clearAllFilters} className="mt-4 text-brand-primary font-bold text-sm hover:underline">{t("home.showAll")}</button>
                 </div>
               ) : (
@@ -551,9 +551,9 @@ function HomeContent() {
                   {page < totalPages && (
                     <div ref={loadMoreRef} className="flex justify-center pt-4 pb-8">
                       {isFetchingMore && (
-                        <div className="flex items-center gap-3 px-8 py-4 bg-white border border-ui-border rounded-2xl shadow-sm">
-                          <div className="w-5 h-5 border-2 border-gray-200 border-t-brand-primary rounded-full animate-spin" />
-                          <span className="text-xs font-bold text-text-secondary uppercase tracking-widest">Loading more...</span>
+                        <div className="flex items-center gap-3 px-8 py-4 bg-[var(--surface)] border border-[var(--ui-border)] rounded-2xl shadow-sm">
+                          <div className="w-5 h-5 border-2 border-[var(--ui-border)] border-t-brand-primary rounded-full animate-spin" />
+                          <span className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-widest">Loading more...</span>
                         </div>
                       )}
                     </div>
@@ -581,60 +581,60 @@ function HomeContent() {
             <motion.div
               initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
               transition={{ duration: 0.3, ease: "easeOut" }}
-              className="relative w-full h-[85vh] bg-white rounded-t-3xl shadow-[0_-20px_60px_rgba(0,0,0,0.2)] flex flex-col overflow-hidden"
+              className="relative w-full h-[85vh] bg-[var(--surface)] rounded-t-3xl shadow-[0_-20px_60px_rgba(0,0,0,0.2)] flex flex-col overflow-hidden"
             >
-              <div className="flex justify-center p-3"><div className="w-10 h-1 bg-gray-200 rounded-full" /></div>
-              <div className="px-6 pb-4 flex items-center justify-between border-b border-gray-50">
+              <div className="flex justify-center p-3"><div className="w-10 h-1 bg-[var(--ui-border)] rounded-full" /></div>
+              <div className="px-6 pb-4 flex items-center justify-between border-b border-[var(--ui-border)]">
                 <div>
-                  <h2 className="text-2xl font-black text-text-main tracking-tight">{t("home.filters")}</h2>
-                  <p className="text-[10px] font-bold text-text-secondary uppercase tracking-widest opacity-60">Fine-tune your landscape</p>
+                  <h2 className="text-2xl font-black text-[var(--text-main)] tracking-tight">{t("home.filters")}</h2>
+                  <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest opacity-60">Fine-tune your landscape</p>
                 </div>
-                <button onClick={() => setIsMobileFilterOpen(false)} className="w-9 h-9 rounded-full bg-gray-50 flex items-center justify-center text-text-main">✕</button>
+                <button onClick={() => setIsMobileFilterOpen(false)} className="w-9 h-9 rounded-full bg-[var(--surface-elevated)] flex items-center justify-center text-[var(--text-main)]">✕</button>
               </div>
 
-              <div className="flex-1 overflow-y-auto no-scrollbar p-6 space-y-6 bg-gray-50/50">
+              <div className="flex-1 overflow-y-auto no-scrollbar p-6 space-y-6 bg-[var(--background)]">
                 {/* 1. Market Selection */}
-                <div className="bg-white p-5 rounded-[20px] border border-gray-100 shadow-sm space-y-4">
-                  <h3 className="text-[11px] font-black text-text-secondary uppercase tracking-[0.2em]">{t("home.listingCategory")}</h3>
-                  <div className="grid grid-cols-2 gap-3 p-1 bg-gray-50 rounded-xl relative">
-                    <button onClick={() => setListingCategory("Buy")} className={`flex-1 py-3 text-xs font-black uppercase tracking-widest relative z-10 ${listingCategory === "Buy" ? "text-brand-primary" : "text-text-secondary"}`}>Buy</button>
-                    <button onClick={() => setListingCategory("Rent")} className={`flex-1 py-3 text-xs font-black uppercase tracking-widest relative z-10 ${listingCategory === "Rent" ? "text-brand-primary" : "text-text-secondary"}`}>Rent</button>
-                    <motion.div layoutId="mobileMarketToggle" className="absolute inset-y-1 w-[calc(50%-4px)] bg-white rounded-lg shadow-sm" style={{ left: listingCategory === 'Buy' ? '4px' : 'calc(50%)' }} />
+                <div className="bg-[var(--surface)] p-5 rounded-[20px] border border-[var(--ui-border)] shadow-sm space-y-4">
+                  <h3 className="text-[11px] font-black text-[var(--text-secondary)] uppercase tracking-[0.2em]">{t("home.listingCategory")}</h3>
+                  <div className="grid grid-cols-2 gap-3 p-1 bg-[var(--surface-elevated)] rounded-xl relative">
+                    <button onClick={() => setListingCategory("Buy")} className={`flex-1 py-3 text-xs font-black uppercase tracking-widest relative z-10 ${listingCategory === "Buy" ? "text-brand-primary" : "text-[var(--text-secondary)]"}`}>Buy</button>
+                    <button onClick={() => setListingCategory("Rent")} className={`flex-1 py-3 text-xs font-black uppercase tracking-widest relative z-10 ${listingCategory === "Rent" ? "text-brand-primary" : "text-[var(--text-secondary)]"}`}>Rent</button>
+                    <motion.div layoutId="mobileMarketToggle" className="absolute inset-y-1 w-[calc(50%-4px)] bg-[var(--surface)] rounded-lg shadow-sm" style={{ left: listingCategory === 'Buy' ? '4px' : 'calc(50%)' }} />
                   </div>
                 </div>
 
                 {/* 2. Location Search */}
-                <div className="bg-white p-5 rounded-[20px] border border-gray-100 shadow-sm space-y-4">
-                  <h3 className="text-[11px] font-black text-text-secondary uppercase tracking-[0.2em]">{t("common.search")}</h3>
+                <div className="bg-[var(--surface)] p-5 rounded-[20px] border border-[var(--ui-border)] shadow-sm space-y-4">
+                  <h3 className="text-[11px] font-black text-[var(--text-secondary)] uppercase tracking-[0.2em]">{t("common.search")}</h3>
                   <div className="relative">
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-primary w-4 h-4" />
-                    <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search..." className="w-full pl-11 pr-11 py-3.5 bg-gray-50 border-none rounded-xl text-sm font-bold text-text-main" />
-                    {searchQuery && <button onClick={clearSearch} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"><X className="w-4 h-4" /></button>}
+                    <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search..." className="w-full pl-11 pr-11 py-3.5 bg-[var(--input-bg)] border border-[var(--input-border)] rounded-xl text-sm font-bold text-[var(--text-main)] placeholder-[var(--text-secondary)] opacity-90" />
+                    {searchQuery && <button onClick={clearSearch} className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] hover:text-red-500"><X className="w-4 h-4" /></button>}
                   </div>
                 </div>
 
                 {/* 3. Property Type */}
-                <div className="bg-white p-5 rounded-[20px] border border-gray-100 shadow-sm space-y-4">
-                  <h3 className="text-[11px] font-black text-text-secondary uppercase tracking-[0.2em]">{t("home.propertyType")}</h3>
+                <div className="bg-[var(--surface)] p-5 rounded-[20px] border border-[var(--ui-border)] shadow-sm space-y-4">
+                  <h3 className="text-[11px] font-black text-[var(--text-secondary)] uppercase tracking-[0.2em]">{t("home.propertyType")}</h3>
                   <div className="grid grid-cols-2 gap-2">
                     {[{ id: "", label: "All" }, { id: "Land", label: "Land" }, { id: "House", label: "House" }, { id: "Shop", label: "Shop" }].map((type) => (
-                      <button key={type.id} onClick={() => setPropertyType(type.id)} className={`py-3 rounded-xl text-xs font-bold transition-all border ${propertyType === type.id ? 'bg-brand-primary text-white border-brand-primary' : 'bg-gray-50 text-text-secondary border-transparent'}`}>{type.label}</button>
+                      <button key={type.id} onClick={() => setPropertyType(type.id)} className={`py-3 rounded-xl text-xs font-bold transition-all border ${propertyType === type.id ? 'bg-brand-primary text-white border-brand-primary shadow-sm shadow-brand-primary/20' : 'bg-[var(--surface-elevated)] text-[var(--text-secondary)] border-[var(--ui-border)] hover:bg-[var(--input-bg)]'}`}>{type.label}</button>
                     ))}
                   </div>
                 </div>
 
                 {/* 4. Budget */}
-                <div className="bg-white p-5 rounded-[20px] border border-gray-100 shadow-sm space-y-4">
-                  <h3 className="text-[11px] font-black text-text-secondary uppercase tracking-[0.2em]">{t("home.priceRange")}</h3>
+                <div className="bg-[var(--surface)] p-5 rounded-[20px] border border-[var(--ui-border)] shadow-sm space-y-4">
+                  <h3 className="text-[11px] font-black text-[var(--text-secondary)] uppercase tracking-[0.2em]">{t("home.priceRange")}</h3>
                   <div className="grid grid-cols-2 gap-3">
-                    <input type="number" placeholder="Min" value={minPrice} onChange={(e) => setMinPrice(e.target.value)} className="w-full px-4 py-3 bg-gray-50 border-none rounded-xl text-xs font-bold" />
-                    <input type="number" placeholder="Max" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} className="w-full px-4 py-3 bg-gray-50 border-none rounded-xl text-xs font-bold" />
+                    <input type="number" placeholder="Min" value={minPrice} onChange={(e) => setMinPrice(e.target.value)} className="w-full px-4 py-3 bg-[var(--input-bg)] border border-[var(--input-border)] rounded-xl text-xs font-bold text-[var(--text-main)]" />
+                    <input type="number" placeholder="Max" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} className="w-full px-4 py-3 bg-[var(--input-bg)] border border-[var(--input-border)] rounded-xl text-xs font-bold text-[var(--text-main)]" />
                   </div>
                 </div>
 
                 {/* 5. Classification */}
-                <div className="bg-white p-5 rounded-[20px] border border-gray-100 shadow-sm space-y-4">
-                  <h3 className="text-[11px] font-black text-text-secondary uppercase tracking-[0.2em]">{t("home.classification")}</h3>
+                <div className="bg-[var(--surface)] p-5 rounded-[20px] border border-[var(--ui-border)] shadow-sm space-y-4">
+                  <h3 className="text-[11px] font-black text-[var(--text-secondary)] uppercase tracking-[0.2em]">{t("home.classification")}</h3>
                   <div className="space-y-2">
                     {[
                       { id: "", label: "All Classifications" },
@@ -643,13 +643,13 @@ function HomeContent() {
                       { id: "Residential", label: "🏡 Residential" },
                       { id: "Agricultural", label: "🌱 Agricultural" }
                     ].map((l) => (
-                      <label key={l.id} className={`flex items-center justify-between p-3.5 rounded-xl border transition-all ${landTypeFilter === l.id ? 'bg-brand-primary/[0.03] border-brand-primary/20' : 'bg-gray-50 border-transparent'}`}>
+                      <label key={l.id} className={`flex items-center justify-between p-3.5 rounded-xl border transition-all ${landTypeFilter === l.id ? 'bg-brand-primary/[0.03] border-brand-primary/20' : 'bg-[var(--surface-elevated)] border-[var(--ui-border)]'}`}>
                         <div className="flex items-center gap-3">
                           <input type="radio" name="mobileLandType" checked={landTypeFilter === l.id} onChange={() => setLandTypeFilter(l.id)} className="sr-only" />
-                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${landTypeFilter === l.id ? 'border-brand-primary bg-brand-primary' : 'border-gray-300'}`}>
-                            {landTypeFilter === l.id && <div className="w-2 h-2 bg-white rounded-full" />}
+                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${landTypeFilter === l.id ? 'border-brand-primary bg-brand-primary' : 'border-[var(--ui-border)]'}`}>
+                            {landTypeFilter === l.id && <div className="w-2 h-2 bg-[var(--surface)] rounded-full" />}
                           </div>
-                          <span className={`text-sm font-bold ${landTypeFilter === l.id ? 'text-text-main' : 'text-text-secondary'}`}>{l.label}</span>
+                          <span className={`text-sm font-bold ${landTypeFilter === l.id ? 'text-[var(--text-main)]' : 'text-[var(--text-secondary)]'}`}>{l.label}</span>
                         </div>
                         {landTypeFilter === l.id && <CheckIcon className="w-4 h-4 text-brand-primary" />}
                       </label>
@@ -658,15 +658,15 @@ function HomeContent() {
                 </div>
 
                 {/* 6. Sort By */}
-                <div className="bg-white p-5 rounded-[20px] border border-gray-100 shadow-sm space-y-4">
-                  <h3 className="text-[11px] font-black text-text-secondary uppercase tracking-[0.2em]">{t("home.sortBy")}</h3>
+                <div className="bg-[var(--surface)] p-5 rounded-[20px] border border-[var(--ui-border)] shadow-sm space-y-4">
+                  <h3 className="text-[11px] font-black text-[var(--text-secondary)] uppercase tracking-[0.2em]">{t("home.sortBy")}</h3>
                   <div className="flex flex-col gap-2">
                     {[
                       { id: "latest", label: "Newly Listed" },
                       { id: "price-low-high", label: "Price: Low → High" },
                       { id: "price-high-low", label: "Price: High → Low" }
                     ].map((sort) => (
-                      <button key={sort.id} onClick={() => setActiveSort(sort.id)} className={`flex items-center justify-between p-4 rounded-xl border transition-all ${activeSort === sort.id ? 'bg-brand-primary/[0.03] border-brand-primary/20 text-brand-primary' : 'bg-gray-50 border-transparent text-text-secondary'}`}>
+                      <button key={sort.id} onClick={() => setActiveSort(sort.id)} className={`flex items-center justify-between p-4 rounded-xl border transition-all ${activeSort === sort.id ? 'bg-brand-primary/[0.03] border-brand-primary/20 text-brand-primary' : 'bg-[var(--surface-elevated)] border-[var(--ui-border)] text-[var(--text-secondary)] hover:text-[var(--text-main)]'}`}>
                         <span className="text-sm font-bold">{sort.label}</span>
                         {activeSort === sort.id && <CheckIcon className="w-4 h-4" />}
                       </button>
@@ -675,7 +675,7 @@ function HomeContent() {
                 </div>
               </div>
 
-              <div className="p-6 bg-white border-t border-gray-100 sticky bottom-0">
+              <div className="p-6 bg-[var(--surface)] border-t border-[var(--ui-border)] sticky bottom-0">
                 <button onClick={() => setIsMobileFilterOpen(false)} className="w-full btn-primary py-4 text-sm font-black uppercase tracking-[0.2em]">
                   View {properties.length} Results
                 </button>
@@ -690,7 +690,7 @@ function HomeContent() {
 
 export default function Home() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-gray-50"><div className="w-10 h-10 border-4 border-gray-100 border-t-brand-primary rounded-full animate-spin" /></div>}>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-[var(--background)]"><div className="w-10 h-10 border-4 border-[var(--ui-border)] border-t-brand-primary rounded-full animate-spin" /></div>}>
       <HomeContent />
     </Suspense>
   );

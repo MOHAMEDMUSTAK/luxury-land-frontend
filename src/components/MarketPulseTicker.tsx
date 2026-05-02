@@ -22,8 +22,8 @@ const TrendIcon = ({ trend }: { trend: string }) => {
 
 export default function MarketPulseTicker() {
   return (
-    <div className="w-full bg-[#0a0a0a] text-white border-b border-white/5 flex items-center h-[38px] px-2 sm:px-4 z-[60] relative">
-      <div className="items-center gap-2 shrink-0 bg-[#0a0a0a] z-10 pr-4 mr-2 border-r border-white/10 hidden sm:flex h-full">
+    <div className="w-full bg-[var(--ticker-bg)] text-white border-b border-white/5 flex items-center h-[38px] px-2 sm:px-4 z-[60] relative">
+      <div className="items-center gap-2 shrink-0 bg-[var(--ticker-bg)] z-10 pr-4 mr-2 border-r border-white/10 hidden sm:flex h-full">
          <Activity className="text-brand-primary w-3.5 h-3.5 animate-pulse" />
          <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/70">Market Pulse</span>
       </div>

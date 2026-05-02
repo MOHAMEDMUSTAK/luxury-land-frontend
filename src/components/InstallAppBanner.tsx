@@ -112,14 +112,14 @@ export default function InstallAppBanner() {
     <div
       role="dialog"
       aria-label="Install LuxuryLand App"
-      className="fixed bottom-24 left-4 right-4 z-[90] sm:bottom-6 sm:left-auto sm:right-6 sm:w-[400px] bg-white/95 backdrop-blur-2xl border border-white/80 rounded-[32px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)] p-6 animate-fade-in-up"
+      className="fixed bottom-24 left-4 right-4 z-[90] sm:bottom-6 sm:left-auto sm:right-6 sm:w-[400px] bg-[var(--surface)]/95 backdrop-blur-2xl border border-[var(--ui-border)] rounded-[32px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)] p-6 animate-fade-in-up"
     >
       {/* Close button */}
       <button
         id="pwa-banner-close"
         onClick={handleDismiss}
         aria-label="Dismiss install banner"
-        className="absolute top-3 right-3 p-1.5 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors"
+        className="absolute top-3 right-3 p-1.5 text-[var(--text-secondary)] hover:text-[var(--text-main)] rounded-full hover:bg-[var(--surface-elevated)] transition-colors"
       >
         <X className="w-4 h-4" />
       </button>
@@ -130,7 +130,7 @@ export default function InstallAppBanner() {
           <span className="font-black text-3xl tracking-tighter">L</span>
         </div>
         <div className="flex-1 pr-6">
-          <h4 className="font-black text-text-main text-[17px] tracking-tight">LuxuryLand App</h4>
+          <h4 className="font-black text-[var(--text-main)] text-[17px] tracking-tight">LuxuryLand App</h4>
           <p className="text-xs text-text-secondary mt-0.5 leading-tight font-medium">
             {installState === "ios"
               ? "Follow the 3 steps below to install"
@@ -176,7 +176,7 @@ export default function InstallAppBanner() {
           id="pwa-install-button"
           onClick={handleInstallClick}
           disabled={installing}
-          className="mt-2 w-full bg-black text-white hover:bg-gray-900 active:scale-95 transition-all duration-300 py-3.5 px-4 rounded-[18px] flex items-center justify-center gap-2.5 text-[15px] font-bold shadow-[0_4px_14px_0_rgba(0,0,0,0.2)]"
+          className="mt-2 w-full bg-[var(--text-main)] text-[var(--background)] hover:opacity-90 active:scale-95 transition-all duration-300 py-3.5 px-4 rounded-[18px] flex items-center justify-center gap-2.5 text-[15px] font-bold shadow-[0_4px_14px_0_rgba(0,0,0,0.2)]"
         >
           {installing ? (
             <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />

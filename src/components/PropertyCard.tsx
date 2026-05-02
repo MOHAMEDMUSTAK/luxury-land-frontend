@@ -202,7 +202,7 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
           <button
             onClick={handleToggleWishlist}
             disabled={isWishlisting}
-            className={`w-10 h-10 rounded-xl bg-white/95 flex items-center justify-center hover:bg-white transition-all shadow-md border border-white group/heart active:scale-90 ${isWishlisting ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className={`w-10 h-10 rounded-xl bg-[var(--surface)]/95 flex items-center justify-center hover:bg-[var(--surface)] transition-all shadow-md border border-[var(--ui-border)] group/heart active:scale-90 ${isWishlisting ? 'opacity-50 cursor-not-allowed' : ''}`}
             aria-label="Add to Wishlist"
           >
             <Heart
@@ -214,10 +214,10 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
           
           <button
             onClick={handleShare}
-            className="w-10 h-10 rounded-xl bg-white/95 flex items-center justify-center hover:bg-white transition-all shadow-md border border-white group/share active:scale-90"
+            className="w-10 h-10 rounded-xl bg-[var(--surface)]/95 flex items-center justify-center hover:bg-[var(--surface)] transition-all shadow-md border border-[var(--ui-border)] group/share active:scale-90"
             aria-label="Share Property"
           >
-            <Share2 className="w-4.5 h-4.5 text-text-secondary group-hover/share:text-brand-primary transition-colors duration-300" />
+            <Share2 className="w-4.5 h-4.5 text-[var(--text-secondary)] group-hover/share:text-brand-primary transition-colors duration-300" />
           </button>
         </div>
 
@@ -249,9 +249,9 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
               sizes="(max-width: 640px) 300px, (max-width: 1024px) 400px, 400px"
             />
           ) : (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-gray-50">
-              <ImageOff className="w-8 h-8 text-gray-300" />
-              <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">{t("home.noResults")}</span>
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-[var(--surface-elevated)]">
+              <ImageOff className="w-8 h-8 text-[var(--text-secondary)]" />
+              <span className="text-[9px] font-bold text-[var(--text-secondary)] uppercase tracking-widest">{t("home.noResults")}</span>
             </div>
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-20 group-hover/card:opacity-40 transition-opacity duration-300 pointer-events-none" />
@@ -264,7 +264,7 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
         </div>
 
         <div className="p-5 flex flex-col flex-grow">
-          <h3 className="font-bold text-gray-900 text-lg leading-snug line-clamp-2 mb-2 group-hover/card:text-brand-primary transition-colors duration-200 tracking-tight">
+          <h3 className="font-bold text-[var(--text-main)] text-lg leading-snug line-clamp-2 mb-2 group-hover/card:text-brand-primary transition-colors duration-200 tracking-tight">
             {property.title}
           </h3>
 
@@ -321,7 +321,7 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
           <div className="mt-auto space-y-4">
             <div className="flex items-center gap-2 flex-wrap">
               {sizeDisplay && (
-                <span className="px-2.5 py-1 bg-gray-50 text-[10px] font-bold tracking-wider uppercase rounded-lg text-text-secondary border border-gray-100">
+                <span className="px-2.5 py-1 bg-[var(--surface-elevated)] text-[10px] font-bold tracking-wider uppercase rounded-lg text-[var(--text-secondary)] border border-[var(--ui-border)]">
                   {sizeDisplay}
                 </span>
               )}
@@ -344,7 +344,7 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
             <div className="premium-divider" />
             <div className="flex items-center gap-2 pt-1 border-t border-gray-100/50 mt-4 h-12">
               <div className="flex-1 min-w-0 pr-1">
-                <p className="font-black text-xl sm:text-[22px] text-gray-900 flex items-baseline leading-tight truncate tracking-tight">
+                <p className="font-black text-xl sm:text-[22px] text-[var(--text-main)] flex items-baseline leading-tight truncate tracking-tight">
                   <span className="truncate">
                     {formatCurrency(property.listingType === "rent" ? (property.rentPerMonth || 0) : (property.price || 0))}
                   </span>
@@ -359,7 +359,7 @@ const PropertyCard = memo(({ property, priority = false }: PropertyCardProps) =>
                   className={`min-h-[44px] px-3 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all duration-300 border shadow-sm active:scale-95 ${
                     isCompared 
                       ? "bg-brand-primary text-white border-brand-primary shadow-brand-primary/20" 
-                      : "bg-white text-text-secondary border-gray-200 hover:border-brand-primary hover:text-brand-primary hover:bg-white"
+                      : "bg-[var(--surface)] text-[var(--text-secondary)] border-[var(--ui-border)] hover:border-brand-primary hover:text-brand-primary"
                   }`}
                 >
                   <BarChart2 className={`w-3.5 h-3.5 ${isCompared ? "text-white" : "text-brand-primary"}`} />
