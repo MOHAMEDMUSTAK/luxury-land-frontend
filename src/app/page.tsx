@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useState, useEffect, useCallback, Suspense, useMemo, useRef } from "react";
-import { Filter, Search, X, SlidersHorizontal, Check as CheckIcon, Flame, TrendingUp } from "lucide-react";
+import { Filter, Search, X, SlidersHorizontal, Check as CheckIcon, Flame, TrendingUp, ShieldCheck, Zap, Star, Clock } from "lucide-react";
 import PropertyCard from "@/components/PropertyCard";
 import { api } from "@/services/api";
 import { useSearchParams } from "next/navigation";
@@ -17,61 +17,30 @@ const RecentlyViewed = dynamic(() => import("@/components/RecentlyViewed"), {
   loading: () => <div className="h-40 animate-pulse bg-gray-50 rounded-3xl mt-12" />
 });
 
-// ★ Animated counter hook — counts up from 0 to target over 400ms
-function useCountUp(target: number, duration = 400, startOnMount = true) {
-  const [count, setCount] = useState(0);
-  const started = useRef(false);
-  useEffect(() => {
-    if (!startOnMount || started.current) return;
-    started.current = true;
-    const startTime = performance.now();
-    const step = (now: number) => {
-      const elapsed = now - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      // Ease-out cubic
-      const eased = 1 - Math.pow(1 - progress, 3);
-      setCount(Math.floor(eased * target));
-      if (progress < 1) requestAnimationFrame(step);
-    };
-    requestAnimationFrame(step);
-  }, [target, duration, startOnMount]);
-  return count;
-}
-
-// ★ Hero stat counters — dynamic based on real data
-function HeroStats({ total }: { total: number }) {
-  const [visible, setVisible] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setVisible(true); }, { threshold: 0.3 });
-    if (ref.current) obs.observe(ref.current);
-    return () => obs.disconnect();
-  }, []);
-
-  const listings = useCountUp(total, 1200, visible);
-  const sellers  = useCountUp(Math.floor(total * 0.8),  1000, visible);
-  const crores   = useCountUp(Math.floor(total * 1.5),   1400, visible);
-  const districts = Math.min(5, Math.max(1, Math.ceil(total / 2)));
-
-  const stats = [
-    { value: `${listings}${total > 0 ? '+' : ''}`, label: "Active Listings",   suffix: "" },
-    { value: `${sellers}${sellers > 0 ? '+' : ''}`,  label: "Happy Sellers",     suffix: "" },
-    { value: `₹${crores}Cr${crores > 0 ? '+' : ''}`,label: "Transacted",        suffix: "" },
-    { value: `${total > 0 ? districts : 0}`,            label: "Districts",         suffix: "" },
+// ★ Premium Animated Features Badges
+function AnimatedTrustBadges() {
+  const badges = [
+    { icon: ShieldCheck, text: "100% Verified Lands", delay: 0 },
+    { icon: Zap, text: "Instant Connect", delay: 0.1 },
+    { icon: Star, text: "Premium Properties", delay: 0.2 },
+    { icon: Clock, text: "24/7 Support", delay: 0.3 }
   ];
 
   return (
-    <div ref={ref} className="w-full max-w-3xl grid grid-cols-2 sm:grid-cols-4 gap-3 mt-10 px-4 sm:px-0">
-      {stats.map((s, i) => (
-        <div
-          key={s.label}
-          className="stat-counter-card stat-counter-animate"
-          style={{ animationDelay: `${i * 0.1}s` }}
+    <div className="w-full max-w-3xl flex flex-wrap justify-center gap-3 mt-10 px-4 sm:px-0 z-10 relative">
+      {badges.map((b, i) => (
+        <motion.div
+          key={i}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: b.delay, type: "spring", stiffness: 100 }}
+          className="flex items-center gap-2 bg-white/[0.04] border border-white/10 backdrop-blur-md px-4 py-2.5 rounded-full shadow-[0_4px_30px_rgba(0,0,0,0.1)] hover:bg-white/[0.08] transition-colors cursor-default"
         >
-          <span className="stat-counter-value">{s.value}</span>
-          <span className="stat-counter-label">{s.label}</span>
-        </div>
+          <div className="w-6 h-6 rounded-full bg-brand-primary/20 flex items-center justify-center">
+            <b.icon className="w-3.5 h-3.5 text-brand-primary" />
+          </div>
+          <span className="text-white/80 text-[10px] sm:text-xs font-black tracking-widest uppercase">{b.text}</span>
+        </motion.div>
       ))}
     </div>
   );
@@ -316,8 +285,8 @@ function HomeContent() {
                 Discover premium lands, houses &amp; commercial plots across Tamil Nadu — with an unparalleled experience.
               </p>
             </div>
-            {/* ★ Animated stat counters */}
-            <HeroStats total={totalProperties} />
+            {/* ★ Animated Trust Badges */}
+            <AnimatedTrustBadges />
 
             {/* Search Section */}
             <div className="w-full max-w-3xl flex flex-col items-center px-0">
