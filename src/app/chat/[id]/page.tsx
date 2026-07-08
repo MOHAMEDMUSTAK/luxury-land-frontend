@@ -336,7 +336,7 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
 
   return (
     <ProtectedRoute>
-      <div className="fixed inset-0 bg-[#f8fafc] z-[99999] flex flex-col overflow-hidden page-fade-in md:relative md:h-[calc(100vh-64px)] md:z-10 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
+      <div className="fixed top-0 left-0 w-full h-[100dvh] bg-[#f8fafc] z-[99999] flex flex-col overflow-hidden page-fade-in md:relative md:h-[calc(100vh-64px)] md:z-10 pt-[env(safe-area-inset-top)]">
         
         {/* Upper Premium Header */}
         <div className="bg-white/85 backdrop-blur-2xl px-4 py-3 flex items-center justify-between border-b border-gray-100 z-30 shadow-[0_4px_30px_rgba(0,0,0,0.03)] supports-[backdrop-filter]:bg-white/60">

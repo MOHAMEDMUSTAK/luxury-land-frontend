@@ -15,7 +15,7 @@ if (process.env.NODE_ENV === 'production' && !process.env.NEXT_PUBLIC_API_URL) {
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 15000, // Reduced from 60s to 15s for normal API calls (faster failure detection)
+  timeout: 8000, // Fast failure detection (reduced from 15s)
   withCredentials: true,
 });
 
@@ -53,6 +53,9 @@ api.interceptors.request.use(
     } else {
       config.headers['Content-Type'] = 'application/json';
     }
+
+    // ★ Reuse TCP connections across requests
+    config.headers['Connection'] = 'keep-alive';
 
     return config;
   },

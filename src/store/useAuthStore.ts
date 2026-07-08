@@ -157,8 +157,11 @@ export const useAuthStore = create<AuthStore>()(
           if (!state.isAuthenticated || state.isCheckingAuth) {
              set({ isAuthenticated: true, isCheckingAuth: false });
           }
-          // Silent background refresh — no blocking, no loading screen
-          get().fetchProfile().catch(() => {});
+          // ★ Debounced background refresh — don't compete with the login redirect
+          // The login response already has all user data, so wait 5s before refreshing
+          setTimeout(() => {
+            get().fetchProfile().catch(() => {});
+          }, 5000);
           return;
         }
 

@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect, useTransition } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
@@ -15,6 +15,12 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuthStore();
   const router = useRouter();
+  const [, startTransition] = useTransition();
+
+  // ★ Prefetch home page so it loads instantly after login
+  useEffect(() => {
+    router.prefetch("/");
+  }, [router]);
 
   const validate = () => {
     const newErrors: { email?: string; password?: string } = {};
@@ -46,13 +52,16 @@ export default function LoginPage() {
         res.data.token
       );
       toast.success("Welcome back!");
-      const redirect = localStorage.getItem("redirectAfterLogin");
-      if (redirect) {
-        localStorage.removeItem("redirectAfterLogin");
-        router.replace(redirect);
-      } else {
-        router.replace("/");
-      }
+      // ★ Non-blocking redirect — toast shows instantly, navigation happens in background
+      startTransition(() => {
+        const redirect = localStorage.getItem("redirectAfterLogin");
+        if (redirect) {
+          localStorage.removeItem("redirectAfterLogin");
+          router.push(redirect);
+        } else {
+          router.push("/");
+        }
+      });
     } catch (err: any) {
       toast.error(err.response?.data?.message || "Invalid credentials.");
     } finally {
