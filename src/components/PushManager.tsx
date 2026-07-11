@@ -60,7 +60,17 @@ export default function PushNotificationManager() {
 
     const setupPush = async () => {
       try {
-        // ── Step 1: Register the service worker ──
+        // ── Step 0: Unregister old broken service workers ──
+        // This is necessary because an older version of the SW might be 
+        // throwing fetch errors and blocking the push registration pipeline.
+        const existingRegistrations = await navigator.serviceWorker.getRegistrations();
+        for (const reg of existingRegistrations) {
+          // Unregister if it's the old one, or just unregister all and start fresh
+          await reg.unregister();
+          console.log('[Push] Unregistered old service worker');
+        }
+
+        // ── Step 1: Register the new service worker ──
         const registration = await navigator.serviceWorker.register('/sw.js', {
           scope: '/',
           updateViaCache: 'none'  // Always check for SW updates

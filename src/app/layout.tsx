@@ -8,7 +8,6 @@ import { Toaster } from "react-hot-toast";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import CompareBar from "@/components/CompareBar";
-import PWARegistration from "@/components/PWARegistration";
 import MobileBottomNav from "@/components/MobileBottomNav";
 import PageTransitionProvider from "@/components/PageTransitionProvider";
 import InstallAppBanner from "@/components/InstallAppBanner";
@@ -149,7 +148,6 @@ export default function RootLayout({
               },
             }}
           />
-          <PWARegistration />
           <Navbar />
           <MarketPulseTicker />
 
