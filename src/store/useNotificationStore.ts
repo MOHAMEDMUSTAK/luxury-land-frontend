@@ -3,20 +3,33 @@ import { api } from '@/services/api';
 
 export interface Notification {
   _id: string;
+  title: string;
   message: string;
-  type: 'chat' | 'wishlist' | 'system';
+  type: 'chat' | 'inquiry' | 'property_approved' | 'property_status' | 'view_milestone' | 'price_change' | 'new_match' | 'promotion' | 'offer' | 'account' | 'system';
   link: string;
+  icon: string;
+  priority: 'low' | 'normal' | 'high' | 'urgent';
   isRead: boolean;
+  metadata?: any;
   createdAt: string;
 }
 
 interface NotificationStore {
   notifications: Notification[];
   unreadCount: number;
+  total: number;
+  page: number;
+  pages: number;
+  hasMore: boolean;
   isLoading: boolean;
-  fetchNotifications: () => Promise<void>;
+  filter: 'all' | 'unread';
+  setFilter: (filter: 'all' | 'unread') => void;
+  fetchNotifications: (page?: number, reset?: boolean) => Promise<void>;
+  fetchUnreadCount: () => Promise<void>;
+  addNotification: (notification: Notification) => void;
   markAsRead: (id: string) => Promise<void>;
   markAllAsRead: () => Promise<void>;
+  deleteNotification: (id: string) => Promise<void>;
   clearHistory: () => Promise<void>;
   startPolling: () => void;
   stopPolling: () => void;
@@ -25,7 +38,6 @@ interface NotificationStore {
 let pollingInterval: ReturnType<typeof setInterval> | null = null;
 let isPageVisible = true;
 
-// Track page visibility to pause polling when app is in background
 if (typeof window !== 'undefined') {
   document.addEventListener('visibilitychange', () => {
     isPageVisible = !document.hidden;
@@ -35,21 +47,39 @@ if (typeof window !== 'undefined') {
 export const useNotificationStore = create<NotificationStore>((set, get) => ({
   notifications: [],
   unreadCount: 0,
+  total: 0,
+  page: 1,
+  pages: 1,
+  hasMore: false,
   isLoading: false,
+  filter: 'all',
 
-  fetchNotifications: async () => {
-    // Skip fetch if page is not visible (app in background / recent apps)
+  setFilter: (filter) => {
+    set({ filter });
+    get().fetchNotifications(1, true);
+  },
+
+  fetchNotifications: async (page = 1, reset = false) => {
     if (!isPageVisible) return;
 
     try {
-      // Small optimization: only show loading on very first fetch
-      if (get().notifications.length === 0) set({ isLoading: true });
+      if (reset) set({ isLoading: true });
       
-      const res = await api.get('/notifications');
-      const unreadCount = res.data.filter((n: Notification) => !n.isRead).length;
-      set({ notifications: res.data, unreadCount, isLoading: false });
+      const { filter } = get();
+      const res = await api.get(`/notifications?page=${page}&limit=20${filter === 'unread' ? '&filter=unread' : ''}`);
+      
+      const newNotifications = res.data.notifications;
+      
+      set((state) => ({
+        notifications: reset ? newNotifications : [...state.notifications, ...newNotifications],
+        unreadCount: res.data.unreadCount,
+        total: res.data.total,
+        page: res.data.page,
+        pages: res.data.pages,
+        hasMore: res.data.hasMore,
+        isLoading: false
+      }));
     } catch (error: any) {
-      // Silently handle 401s (unauthorized) or Network Errors during background polling
       if (error.response?.status !== 401) {
         console.error('Failed to fetch notifications', error.message);
       }
@@ -57,47 +87,101 @@ export const useNotificationStore = create<NotificationStore>((set, get) => ({
     }
   },
 
+  fetchUnreadCount: async () => {
+    if (!isPageVisible) return;
+    try {
+      const res = await api.get('/notifications/unread-count');
+      set({ unreadCount: res.data.count });
+    } catch (error) {
+      console.error('Failed to fetch unread count', error);
+    }
+  },
+
+  addNotification: (notification: Notification) => {
+    set((state) => {
+      // If we are filtering by unread, or all, adding it to the top is correct
+      const newNotifications = [notification, ...state.notifications];
+      return {
+        notifications: newNotifications,
+        unreadCount: state.unreadCount + 1,
+        total: state.total + 1
+      };
+    });
+  },
+
   markAsRead: async (id: string) => {
     try {
+      // Optimistic update
+      set((state) => {
+        const updated = state.notifications.map(n => n._id === id ? { ...n, isRead: true } : n);
+        // If filter is unread, remove it from list
+        if (state.filter === 'unread') {
+          return {
+             notifications: updated.filter(n => !n.isRead),
+             unreadCount: Math.max(0, state.unreadCount - 1)
+          }
+        }
+        return { 
+          notifications: updated, 
+          unreadCount: Math.max(0, state.unreadCount - 1) 
+        };
+      });
       await api.patch(`/notifications/${id}/read`);
-      const { notifications } = get();
-      const updated = notifications.map(n => n._id === id ? { ...n, isRead: true } : n);
-      const unreadCount = updated.filter(n => !n.isRead).length;
-      set({ notifications: updated, unreadCount });
     } catch (error) {
       console.error('Failed to mark notification as read', error);
+      get().fetchNotifications(1, true); // Revert on fail
     }
   },
 
   markAllAsRead: async () => {
     try {
+      set((state) => ({
+        notifications: state.filter === 'unread' ? [] : state.notifications.map(n => ({ ...n, isRead: true })),
+        unreadCount: 0
+      }));
       await api.patch('/notifications/read-all');
-      const { notifications } = get();
-      const updated = notifications.map(n => ({ ...n, isRead: true }));
-      set({ notifications: updated, unreadCount: 0 });
     } catch (error) {
       console.error('Failed to mark all as read', error);
+      get().fetchNotifications(1, true);
+    }
+  },
+
+  deleteNotification: async (id: string) => {
+    try {
+      set((state) => {
+        const notification = state.notifications.find(n => n._id === id);
+        return {
+          notifications: state.notifications.filter(n => n._id !== id),
+          unreadCount: (notification && !notification.isRead) ? Math.max(0, state.unreadCount - 1) : state.unreadCount,
+          total: Math.max(0, state.total - 1)
+        };
+      });
+      await api.delete(`/notifications/${id}`);
+    } catch (error) {
+      console.error('Failed to delete notification', error);
+      get().fetchNotifications(1, true);
     }
   },
 
   clearHistory: async () => {
     try {
+      set({ notifications: [], unreadCount: 0, total: 0 });
       await api.delete('/notifications/clear-all');
-      set({ notifications: [], unreadCount: 0 });
     } catch (error) {
       console.error('Failed to clear notification history', error);
+      get().fetchNotifications(1, true);
     }
   },
 
+  // Keep polling as a resilient fallback for when sockets disconnect or background fetch is needed
   startPolling: () => {
     if (pollingInterval) return;
-    get().fetchNotifications(); // Initial fetch
+    get().fetchNotifications(1, true); 
     pollingInterval = setInterval(() => {
-      // Only fetch when page is visible
       if (isPageVisible) {
-        get().fetchNotifications();
+        get().fetchUnreadCount(); // Light check, don't re-fetch list unless needed
       }
-    }, 30000); // Reduced from 10s → 30s to reduce server hammering
+    }, 60000); 
   },
 
   stopPolling: () => {

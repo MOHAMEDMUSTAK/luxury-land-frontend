@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Search, Heart, User, PlusCircle, Menu, X, LogOut, LayoutDashboard, Bell, CheckCircle2, Settings, Sun, Moon } from "lucide-react";
+import { Search, Heart, User, PlusCircle, Menu, X, LogOut, LayoutDashboard, Bell, CheckCircle2, Settings, Sun, Moon, MessageCircle, Eye, Tag, Home, Star, Megaphone, Shield } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useUIStore } from "@/store/useUIStore";
 import { useLanguageStore } from "@/store/useLanguageStore";
@@ -26,6 +26,20 @@ export default function Navbar() {
   const router = useRouter();
   const currentLang = i18n.language || 'en';
   const { resolvedTheme, toggleTheme } = useUIStore();
+
+  const iconMap = {
+    chat: MessageCircle,
+    inquiry: HelpCircle,
+    property_approved: CheckCircle2,
+    property_status: Home,
+    view_milestone: Eye,
+    price_change: Tag,
+    new_match: Star,
+    promotion: Megaphone,
+    offer: Tag,
+    account: Shield,
+    system: Bell,
+  };
 
   useEffect(() => {
     setMounted(true);
@@ -152,7 +166,7 @@ export default function Navbar() {
                             onClick={() => {
                               if (window.confirm("Clear all notification history?")) clearHistory();
                             }}
-                            className="text-[10px] font-bold text-red-500 hover:text-red-700 transition-colors tracking-wide uppercase"
+                            className="text-[10px] font-bold text-red-500 hover:text-red-700 transition-colors tracking-wide uppercase hidden sm:block"
                           >
                             Clear All
                           </button>
@@ -168,7 +182,9 @@ export default function Navbar() {
                           <p className="text-xs text-text-secondary mt-1">Check back later for new notifications.</p>
                         </div>
                       ) : (
-                        notifications.map((notif) => (
+                        notifications.slice(0, 5).map((notif) => {
+                          const IconComponent = (iconMap as any)[notif.type] || Bell;
+                          return (
                           <button
                             key={notif._id}
                             onClick={() => {
@@ -177,35 +193,41 @@ export default function Navbar() {
                               router.push(notif.link);
                             }}
                             className={`w-full text-left p-3 rounded-xl transition-all flex gap-3 group ${
-                              notif.isRead ? 'bg-white hover:bg-gray-50 opacity-70' : 'bg-brand-primary/[0.03] hover:bg-brand-primary/5 border border-brand-primary/10'
+                              notif.isRead ? 'bg-[var(--surface)] hover:bg-[var(--ui-border)] opacity-70' : 'bg-brand-primary/[0.03] hover:bg-brand-primary/5 border border-brand-primary/10'
                             }`}
                           >
                             <div className={`mt-0.5 flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
-                              notif.type === 'wishlist' ? 'bg-red-50 text-red-500' :
+                              notif.priority === 'urgent' ? 'bg-red-50 text-red-500' :
+                              notif.priority === 'high' ? 'bg-orange-50 text-orange-500' :
                               notif.type === 'chat' ? 'bg-blue-50 text-blue-500' :
-                              'bg-green-50 text-green-500'
+                              notif.type === 'property_approved' ? 'bg-green-50 text-green-500' :
+                              'bg-[var(--ui-surface)] text-brand-primary'
                             }`}>
-                              {notif.type === 'wishlist' ? <Heart className="w-4 h-4 fill-current" /> :
-                               notif.type === 'chat' ? <div className="font-bold text-sm">💬</div> :
-                               <CheckCircle2 className="w-4 h-4" />}
+                               <IconComponent className="w-4 h-4" />
                             </div>
                             <div className="min-w-0 flex-1">
-                              <p className={`text-sm leading-tight ${notif.isRead ? 'text-text-secondary font-medium' : 'text-text-main font-bold'}`}>
+                              <p className={`text-sm leading-tight ${notif.isRead ? 'text-[var(--text-secondary)] font-medium' : 'text-[var(--text-main)] font-bold'}`}>
                                 {notif.message}
                               </p>
-                              <p className="text-[10px] uppercase tracking-wider text-text-secondary mt-1 font-bold">
+                              <p className="text-[10px] uppercase tracking-wider text-[var(--text-secondary)] mt-1 font-bold">
                                 {formatDistanceToNow(new Date(notif.createdAt), { addSuffix: true })}
                               </p>
                             </div>
                             {!notif.isRead && (
-                              <div className="w-2 h-2 rounded-full bg-brand-primary flex-shrink-0 mt-1" />
+                              <div className="w-2 h-2 rounded-full bg-brand-primary flex-shrink-0 mt-1 shadow-[0_0_8px_rgba(99,102,241,0.6)]" />
                             )}
                           </button>
-                        ))
+                        )})
                       )}
                     </div>
-                    <div className="p-2 border-t border-ui-border text-center bg-gray-50/50">
-                      <p className="text-[9px] uppercase tracking-widest text-text-secondary font-bold">Recent activity</p>
+                    <div className="p-0 border-t border-[var(--ui-border)] bg-[var(--surface-elevated)]">
+                      <Link 
+                        href="/notifications" 
+                        onClick={() => setIsNotifOpen(false)}
+                        className="block w-full text-center py-3 text-[11px] uppercase tracking-widest text-brand-primary font-bold hover:bg-brand-primary/5 transition-colors"
+                      >
+                        View all notifications
+                      </Link>
                     </div>
                   </motion.div>
                 )}
@@ -366,7 +388,9 @@ export default function Navbar() {
                           <p className="text-sm font-bold text-gray-400">All caught up!</p>
                         </div>
                       ) : (
-                        notifications.map((notif) => (
+                        notifications.slice(0, 5).map((notif) => {
+                          const IconComponent = (iconMap as any)[notif.type] || Bell;
+                          return (
                           <button
                             key={notif._id}
                             onClick={() => {
@@ -375,29 +399,38 @@ export default function Navbar() {
                               router.push(notif.link);
                             }}
                             className={`w-full text-left p-3 rounded-xl transition-all flex gap-3 group ${
-                              notif.isRead ? 'bg-white hover:bg-gray-50 opacity-70' : 'bg-brand-primary/[0.03] hover:bg-brand-primary/5 border border-brand-primary/10'
+                              notif.isRead ? 'bg-[var(--surface)] hover:bg-[var(--ui-border)] opacity-70' : 'bg-brand-primary/[0.03] hover:bg-brand-primary/5 border border-brand-primary/10'
                             }`}
                           >
                             <div className={`mt-0.5 flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
-                              notif.type === 'wishlist' ? 'bg-red-50 text-red-500' :
+                              notif.priority === 'urgent' ? 'bg-red-50 text-red-500' :
+                              notif.priority === 'high' ? 'bg-orange-50 text-orange-500' :
                               notif.type === 'chat' ? 'bg-blue-50 text-blue-500' :
-                              'bg-green-50 text-green-500'
+                              notif.type === 'property_approved' ? 'bg-green-50 text-green-500' :
+                              'bg-[var(--ui-surface)] text-brand-primary'
                             }`}>
-                              {notif.type === 'wishlist' ? <Heart className="w-4 h-4 fill-current" /> :
-                               notif.type === 'chat' ? <div className="font-bold text-sm">💬</div> :
-                               <CheckCircle2 className="w-4 h-4" />}
+                               <IconComponent className="w-4 h-4" />
                             </div>
                             <div className="min-w-0 flex-1">
-                              <p className={`text-sm leading-tight ${notif.isRead ? 'text-text-secondary font-medium' : 'text-text-main font-bold'}`}>
+                              <p className={`text-sm leading-tight ${notif.isRead ? 'text-[var(--text-secondary)] font-medium' : 'text-[var(--text-main)] font-bold'}`}>
                                 {notif.message}
                               </p>
-                              <p className="text-[10px] uppercase tracking-wider text-text-secondary mt-1 font-bold">
+                              <p className="text-[10px] uppercase tracking-wider text-[var(--text-secondary)] mt-1 font-bold">
                                 {formatDistanceToNow(new Date(notif.createdAt), { addSuffix: true })}
                               </p>
                             </div>
                           </button>
-                        ))
+                        )})
                       )}
+                    </div>
+                    <div className="p-0 border-t border-ui-border bg-[var(--surface-elevated)]">
+                      <Link 
+                        href="/notifications" 
+                        onClick={() => { setIsNotifOpen(false); setIsMobileMenuOpen(false); }}
+                        className="block w-full text-center py-3 text-[11px] uppercase tracking-widest text-brand-primary font-bold hover:bg-brand-primary/5 transition-colors"
+                      >
+                        View all notifications
+                      </Link>
                     </div>
                   </motion.div>
                 )}

@@ -8,6 +8,9 @@ import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persist
 import { persistQueryClient } from "@tanstack/react-query-persist-client";
 import { useUIStore } from "@/store/useUIStore";
 
+import NotificationSocket from "./NotificationSocket";
+import PushManager from "./PushManager";
+
 // ★ ThemeInitializer — syncs Zustand theme with DOM on mount and listens for OS changes
 function ThemeInitializer() {
   useEffect(() => {
@@ -72,6 +75,8 @@ export default function Providers({ children }: { children: ReactNode }) {
     <QueryClientProvider client={queryClient}>
       <I18nextProvider i18n={i18n}>
         <ThemeInitializer />
+        <NotificationSocket />
+        <PushManager />
         {children}
       </I18nextProvider>
     </QueryClientProvider>

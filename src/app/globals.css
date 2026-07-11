@@ -139,6 +139,27 @@ body {
   contain: layout style paint;
 }
 
+/* ═══════════════════════════════════════════
+   NOTIFICATIONS SYSTEM STYLES
+   ═══════════════════════════════════════════ */
+
+.notification-card {
+  will-change: transform, opacity;
+}
+
+.notification-unread {
+  background: linear-gradient(145deg, var(--surface-elevated) 0%, var(--surface) 100%);
+}
+
+.notification-slide-in {
+  animation: notifSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes notifSlideIn {
+  0% { opacity: 0; transform: translateY(10px) scale(0.98); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
 body.is-chat-active .page-fade-in,
 body.is-chat-active .premium-card,
 body.is-chat-active main,
