@@ -22,7 +22,13 @@ export default function NotificationSocket() {
     }
 
     if (!socket) {
-      const backendUrl = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:5000';
+      let backendUrl = 'http://localhost:5000';
+      if (typeof window !== 'undefined') {
+        backendUrl = `http://${window.location.hostname}:5000`;
+      }
+      if (process.env.NEXT_PUBLIC_API_URL) {
+        backendUrl = process.env.NEXT_PUBLIC_API_URL.replace('/api', '');
+      }
       socket = io(backendUrl, {
         withCredentials: true,
         transports: ['websocket', 'polling']

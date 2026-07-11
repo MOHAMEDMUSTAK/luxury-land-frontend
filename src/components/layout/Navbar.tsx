@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Search, Heart, User, PlusCircle, Menu, X, LogOut, LayoutDashboard, Bell, CheckCircle2, Settings, Sun, Moon, MessageCircle, Eye, Tag, Home, Star, Megaphone, Shield } from "lucide-react";
+import { Search, Heart, User, PlusCircle, Menu, X, LogOut, LayoutDashboard, Bell, CheckCircle2, Settings, Sun, Moon, MessageCircle, Eye, Tag, Home, Star, Megaphone, Shield, HelpCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useUIStore } from "@/store/useUIStore";
 import { useLanguageStore } from "@/store/useLanguageStore";
