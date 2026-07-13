@@ -106,7 +106,7 @@ export default function PushNotificationManager() {
         if (!subscription) {
           subscription = await registration.pushManager.subscribe({
             userVisibleOnly: true,
-            applicationServerKey: urlBase64ToUint8Array(publicVapidKey)
+            applicationServerKey: urlBase64ToUint8Array(publicVapidKey) as any
           });
           console.log('[Push] New push subscription created');
         } else {

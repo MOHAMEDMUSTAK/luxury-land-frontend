@@ -42,8 +42,7 @@ export default function NotificationsPage() {
   const router = useRouter();
 
   // Infinite scroll loader
-  const loadMoreRef = useRef<HTMLDivElement>(null);
-  const entry = useIntersectionObserver(loadMoreRef, { threshold: 0.1 });
+  const [loadMoreRef, isIntersecting] = useIntersectionObserver({ threshold: 0.1 });
 
   useEffect(() => {
     // Initial fetch on mount
@@ -57,10 +56,10 @@ export default function NotificationsPage() {
   }, [isLoading, hasMore, page, fetchNotifications]);
 
   useEffect(() => {
-    if (entry?.isIntersecting) {
+    if (isIntersecting) {
       fetchMore();
     }
-  }, [entry?.isIntersecting, fetchMore]);
+  }, [isIntersecting, fetchMore]);
 
   const handleNotificationClick = (id: string, link: string, isRead: boolean) => {
     if (!isRead) markAsRead(id);
