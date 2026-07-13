@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { api } from '@/services/api';
+import toast from 'react-hot-toast';
 
 /**
  * Convert VAPID public key from base64url to Uint8Array
@@ -60,36 +61,28 @@ export default function PushNotificationManager() {
 
     const setupPush = async () => {
       try {
-        // ── Step 0: Unregister old broken service workers ──
-        // This is necessary because an older version of the SW might be 
-        // throwing fetch errors and blocking the push registration pipeline.
-        const existingRegistrations = await navigator.serviceWorker.getRegistrations();
-        for (const reg of existingRegistrations) {
-          // Unregister if it's the old one, or just unregister all and start fresh
-          await reg.unregister();
-          console.log('[Push] Unregistered old service worker');
-        }
-
-        // ── Step 1: Register the new service worker ──
+        // ── Step 1: Register or update the service worker ──
         const registration = await navigator.serviceWorker.register('/sw.js', {
           scope: '/',
           updateViaCache: 'none'  // Always check for SW updates
         });
-        console.log('[Push] Service Worker registered');
+        
+        // Ensure the SW is updated
+        registration.update();
+        
+        console.log('[Push] Service Worker registered and updated');
 
         // ── Step 2: Wait for the SW to be fully active ──
-        // On first install, the SW goes: installing → waiting → active
-        // Push subscriptions only work on an active SW
-        const sw = registration.installing || registration.waiting || registration.active;
+        let sw = registration.installing || registration.waiting || registration.active;
         if (sw && sw.state !== 'activated') {
           await new Promise<void>((resolve) => {
-            sw.addEventListener('statechange', function handler() {
-              if (sw.state === 'activated') {
-                sw.removeEventListener('statechange', handler);
+            sw!.addEventListener('statechange', function handler() {
+              if (sw!.state === 'activated') {
+                sw!.removeEventListener('statechange', handler);
                 resolve();
               }
             });
-            // Safety timeout — don't block forever
+            // Safety timeout
             setTimeout(resolve, 5000);
           });
         }
@@ -97,7 +90,9 @@ export default function PushNotificationManager() {
         // ── Step 3: Request notification permission ──
         let permission = Notification.permission;
         if (permission === 'default') {
-          permission = await Notification.requestPermission();
+          // We must ask the user with a direct user interaction
+          // Return early, and we'll handle this with a UI prompt below
+          return;
         }
 
         if (permission !== 'granted') {
@@ -130,7 +125,46 @@ export default function PushNotificationManager() {
     };
 
     // Small delay to not compete with initial page load
-    const timer = setTimeout(setupPush, 2000);
+    const timer = setTimeout(() => {
+      setupPush();
+      
+      // If permission is default, ask the user gracefully
+      if ('Notification' in window && Notification.permission === 'default') {
+        const toastId = toast.custom(
+          (t) => (
+            <div className={`${t.visible ? 'animate-enter' : 'animate-leave'} max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex ring-1 ring-black ring-opacity-5`}>
+              <div className="flex-1 w-0 p-4">
+                <div className="flex items-start">
+                  <div className="ml-3 flex-1">
+                    <p className="text-sm font-medium text-gray-900">
+                      Enable Notifications
+                    </p>
+                    <p className="mt-1 text-sm text-gray-500">
+                      Get real-time updates for messages, offers, and property status changes.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="flex border-l border-gray-200">
+                <button
+                  onClick={async () => {
+                    toast.dismiss(t.id);
+                    const permission = await Notification.requestPermission();
+                    if (permission === 'granted') {
+                      setupPush(); // Re-run setup now that we have permission
+                    }
+                  }}
+                  className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center text-sm font-medium text-brand-primary hover:text-brand-secondary focus:outline-none"
+                >
+                  Allow
+                </button>
+              </div>
+            </div>
+          ),
+          { duration: 10000, position: 'top-center' }
+        );
+      }
+    }, 3000);
     return () => clearTimeout(timer);
 
   }, [isAuthenticated, user, token]);
