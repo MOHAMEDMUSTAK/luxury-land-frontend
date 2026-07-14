@@ -117,10 +117,20 @@ export default function PushNotificationManager() {
         await api.post('/notifications/push/subscribe', subscription.toJSON());
         hasSubscribed.current = true;
         console.log('[Push] Subscription synced with backend successfully');
+        toast.success("Push notifications enabled!");
 
       } catch (error: any) {
         // Don't crash the app if push setup fails
         console.error('[Push] Setup failed:', error.message || error);
+        
+        // Extract error message specifically for Network Error / CORS / Mixed Content
+        let errorMsg = error?.response?.data?.message || error.message;
+        if (errorMsg === 'Network Error') {
+          errorMsg = "Cannot reach backend. Check NEXT_PUBLIC_API_URL in Vercel or mixed content.";
+        }
+        
+        // Only show toast if it's likely a critical configuration error
+        toast.error(`Push setup failed: ${errorMsg}`, { duration: 6000 });
       }
     };
 
